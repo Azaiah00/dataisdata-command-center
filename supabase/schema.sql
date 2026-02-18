@@ -149,3 +149,5 @@ INSERT INTO contacts (full_name, title_role, email, relationship_health) VALUES
 INSERT INTO partners (name, partner_type, capabilities) VALUES
 ('AWS', 'Vendor', 'Cloud Infrastructure'),
 ('Microsoft', 'Vendor', 'Productivity, Cloud');
+
+-- Optional: run seed-mock-data.sql next (after rls-policies.sql) to add 2–3 mock engagements, opportunities, and activities with revenue.
