@@ -138,9 +138,9 @@ CREATE TABLE activity_contacts (
 -- Seed Data
 
 INSERT INTO accounts (name, account_type, region_state, region_locality, status, owner) VALUES
-('Richmond City IT', 'City', 'VA', 'Richmond', 'Active', 'Azaiah'),
-('Henrico County Public Schools', 'County', 'VA', 'Henrico', 'Prospect', 'Azaiah'),
-('Virginia Department of Health', 'State Agency', 'VA', 'Statewide', 'Active', 'Azaiah');
+('Richmond City IT', 'City', 'VA', 'Richmond', 'Active', 'Tony Wood'),
+('Henrico County Public Schools', 'County', 'VA', 'Henrico', 'Prospect', 'Tony Wood'),
+('Virginia Department of Health', 'State Agency', 'VA', 'Statewide', 'Active', 'Tony Wood');
 
 INSERT INTO contacts (full_name, title_role, email, relationship_health) VALUES
 ('John Doe', 'CIO', 'john.doe@richmond.gov', 'Strong'),

@@ -17,7 +17,7 @@ export function Header() {
       </div>
       <div className="flex items-center gap-4">
         <div className="flex flex-col items-end">
-          <span className="text-sm font-semibold text-slate-900">Azaiah</span>
+          <span className="text-sm font-semibold text-slate-900">Tony Wood</span>
           <span className="text-xs text-slate-500">Admin</span>
         </div>
         <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold border border-blue-200">

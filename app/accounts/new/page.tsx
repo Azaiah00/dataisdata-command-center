@@ -50,7 +50,7 @@ export default function NewAccountPage() {
       region_locality: "",
       primary_focus: "",
       status: "Prospect",
-      owner: "Azaiah",
+      owner: "Tony Wood",
       notes: "",
     },
   });
