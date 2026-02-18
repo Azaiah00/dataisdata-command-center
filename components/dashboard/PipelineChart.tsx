@@ -49,7 +49,7 @@ export function PipelineChart({ data }: PipelineChartProps) {
           <Tooltip 
             cursor={{ fill: "#f8fafc" }}
             contentStyle={{ borderRadius: "8px", border: "none", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }}
-            formatter={(value: number) => [new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value), 'Value']}
+            formatter={(value: number | undefined) => [value != null ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value) : '', 'Value']}
           />
           <Bar dataKey="value" radius={[4, 4, 0, 0]}>
             {data.map((entry, index) => (

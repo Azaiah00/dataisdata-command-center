@@ -35,7 +35,7 @@ const formSchema = z.object({
   account_id: z.string().uuid("Please select an account."),
   email: z.string().email("Invalid email address.").or(z.literal("")),
   phone: z.string().optional(),
-  influence_level: z.string().transform((v) => parseInt(v, 10)),
+  influence_level: z.string().min(1, "Select influence level"),
   relationship_health: z.enum(RELATIONSHIP_HEALTHS),
   next_step: z.string().optional(),
 });
@@ -45,7 +45,7 @@ function ContactForm() {
   const searchParams = useSearchParams();
   const preselectedAccountId = searchParams.get("account_id");
   
-  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [accounts, setAccounts] = useState<Pick<Account, "id" | "name">[]>([]);
   const [loadingAccounts, setLoadingAccounts] = useState(true);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -71,8 +71,12 @@ function ContactForm() {
     fetchAccounts();
   }, []);
 
-  async function onSubmit(values: any) {
-    const { error } = await supabase.from("contacts").insert([values]);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    const payload = {
+      ...values,
+      influence_level: values.influence_level ? parseInt(values.influence_level, 10) : null,
+    };
+    const { error } = await supabase.from("contacts").insert([payload]);
 
     if (error) {
       console.error("Error creating contact:", error);

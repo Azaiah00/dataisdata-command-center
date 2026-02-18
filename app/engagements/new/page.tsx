@@ -47,7 +47,7 @@ function EngagementForm() {
   const searchParams = useSearchParams();
   const preselectedAccountId = searchParams.get("account_id");
   
-  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [accounts, setAccounts] = useState<Pick<Account, "id" | "name">[]>([]);
   const [loadingAccounts, setLoadingAccounts] = useState(true);
 
   const form = useForm<any>({

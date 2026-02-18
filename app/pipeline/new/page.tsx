@@ -50,8 +50,8 @@ function OpportunityForm() {
   const searchParams = useSearchParams();
   const preselectedAccountId = searchParams.get("account_id");
   
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [accounts, setAccounts] = useState<Pick<Account, "id" | "name">[]>([]);
+  const [contacts, setContacts] = useState<Pick<Contact, "id" | "full_name">[]>([]);
   const [loading, setLoading] = useState(true);
 
   const form = useForm<any>({

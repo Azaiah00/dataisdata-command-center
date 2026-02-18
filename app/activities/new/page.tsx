@@ -48,9 +48,9 @@ function ActivityForm() {
   const preselectedEngagementId = searchParams.get("engagement_id");
   const preselectedOpportunityId = searchParams.get("opportunity_id");
   
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [engagements, setEngagements] = useState<Engagement[]>([]);
-  const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
+  const [accounts, setAccounts] = useState<Pick<Account, "id" | "name">[]>([]);
+  const [engagements, setEngagements] = useState<Pick<Engagement, "id" | "name">[]>([]);
+  const [opportunities, setOpportunities] = useState<Pick<Opportunity, "id" | "name">[]>([]);
   const [loading, setLoading] = useState(true);
 
   const form = useForm<any>({
