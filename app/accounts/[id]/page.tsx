@@ -24,6 +24,7 @@ import {
   Plus,
 } from "lucide-react";
 import Link from "next/link";
+import { ActivityFeed } from "@/components/dashboard/ActivityFeed";
 
 export default function AccountDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
