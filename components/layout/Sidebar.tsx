@@ -2,81 +2,176 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
-  Users,
   Building2,
+  Users,
   Briefcase,
-  GitBranch,
-  CalendarDays,
-  ShieldCheck,
-  Menu,
+  Calendar,
+  TrendingUp,
+  Handshake,
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  FileText,
+  BarChart3,
+  Settings,
 } from "lucide-react";
-import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
 
-const navItems = [
-  { name: "Dashboard", href: "/", icon: LayoutDashboard },
-  { name: "Accounts", href: "/accounts", icon: Building2 },
-  { name: "Contacts", href: "/contacts", icon: Users },
-  { name: "Engagements", href: "/engagements", icon: Briefcase },
-  { name: "Pipeline", href: "/pipeline", icon: GitBranch },
-  { name: "Activities", href: "/activities", icon: CalendarDays },
-  { name: "Partners", href: "/partners", icon: ShieldCheck },
+interface SidebarProps {
+  collapsed: boolean;
+  onToggle: () => void;
+}
+
+const mainNavItems = [
+  { path: "/", label: "Dashboard", icon: LayoutDashboard },
+  { path: "/accounts", label: "Accounts", icon: Building2, count: 8 },
+  { path: "/contacts", label: "Contacts", icon: Users, count: 10 },
+  { path: "/engagements", label: "Engagements", icon: Briefcase, count: 5 },
+  { path: "/activities", label: "Activities", icon: Calendar, count: 7 },
+  { path: "/pipeline", label: "Pipeline", icon: TrendingUp, count: 8 },
+  { path: "/partners", label: "Partners", icon: Handshake, count: 6 },
 ];
 
-export function Sidebar() {
+const quickActions = [
+  { label: "New Activity", icon: Plus, href: "/activities/new" },
+  { label: "Reports", icon: BarChart3, href: "#" },
+  { label: "Documents", icon: FileText, href: "#" },
+];
+
+export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const pathname = usePathname();
-  const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <div
+    <aside
       className={cn(
-        "flex flex-col h-screen bg-slate-950 text-slate-200 transition-all duration-300",
+        "fixed left-0 top-16 bottom-0 z-40 bg-slate-950 border-r border-slate-800 transition-all duration-300",
         collapsed ? "w-16" : "w-64"
       )}
     >
-      <div className="flex items-center justify-between p-4 border-b border-slate-800">
-        {!collapsed && <span className="text-xl font-bold tracking-tight">DataIsData</span>}
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="p-1 rounded hover:bg-slate-800 transition-colors"
-        >
-          <Menu className="w-5 h-5 text-slate-400" />
-        </button>
-      </div>
+      {/* Toggle button - styled for dark theme */}
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={onToggle}
+        className="absolute -right-3 top-4 h-6 w-6 rounded-full bg-slate-950 border border-slate-800 shadow-sm hover:bg-slate-900 text-slate-400 hover:text-slate-100 z-50"
+      >
+        {collapsed ? (
+          <ChevronRight className="h-3 w-3" />
+        ) : (
+          <ChevronLeft className="h-3 w-3" />
+        )}
+      </Button>
 
-      <nav className="flex-1 overflow-y-auto py-4">
-        <ul className="space-y-1 px-2">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href || (item.href !== "/" && pathname?.startsWith(item.href));
-            return (
-              <li key={item.name}>
-                <Link
-                  href={item.href}
-                  className={cn(
-                    "flex items-center p-3 rounded-lg transition-colors group",
-                    isActive
-                      ? "bg-blue-600 text-white"
-                      : "hover:bg-slate-800 text-slate-400 hover:text-slate-200"
-                  )}
-                >
-                  <item.icon className={cn("w-5 h-5 flex-shrink-0", collapsed ? "mx-auto" : "mr-3")} />
-                  {!collapsed && <span className="font-medium whitespace-nowrap">{item.name}</span>}
-                </Link>
-              </li>
+      <div className="flex flex-col h-full py-4">
+        {/* Main Navigation */}
+        <nav className="flex-1 px-2 space-y-1 overflow-y-auto">
+          {mainNavItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = pathname === item.path || (item.path !== "/" && pathname?.startsWith(item.path));
+            
+            const navItem = (
+              <Link
+                href={item.path}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors mb-1",
+                  isActive 
+                    ? "bg-blue-600 text-white" 
+                    : "text-slate-400 hover:bg-slate-900 hover:text-slate-200",
+                  collapsed && "justify-center px-2"
+                )}
+              >
+                <Icon className={cn("flex-shrink-0", collapsed ? "w-5 h-5" : "w-4 h-4")} />
+                {!collapsed && (
+                  <>
+                    <span className="flex-1">{item.label}</span>
+                    {item.count && (
+                      <Badge variant="secondary" className="h-5 px-1.5 text-[10px] bg-slate-800 text-slate-400 border-none">
+                        {item.count}
+                      </Badge>
+                    )}
+                  </>
+                )}
+              </Link>
             );
-          })}
-        </ul>
-      </nav>
 
-      <div className="p-4 border-t border-slate-800">
+            if (collapsed) {
+              return (
+                <Tooltip key={item.path} delayDuration={0}>
+                  <TooltipTrigger asChild>
+                    {navItem}
+                  </TooltipTrigger>
+                  <TooltipContent side="right" className="flex items-center gap-2 bg-slate-900 text-slate-100 border-slate-800">
+                    {item.label}
+                    {item.count && (
+                      <Badge variant="secondary" className="h-5 px-1.5 text-[10px] bg-slate-800 text-slate-400 border-none">
+                        {item.count}
+                      </Badge>
+                    )}
+                  </TooltipContent>
+                </Tooltip>
+              );
+            }
+
+            return <div key={item.path}>{navItem}</div>;
+          })}
+        </nav>
+
+        {/* Quick Actions */}
         {!collapsed && (
-          <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">
-            Command Center v1.0
+          <div className="px-4 py-4 border-t border-slate-800">
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-3 px-2">
+              Quick Actions
+            </p>
+            <div className="space-y-1">
+              {quickActions.map((action) => {
+                const Icon = action.icon;
+                return (
+                  <Link
+                    key={action.label}
+                    href={action.href}
+                    className="flex items-center gap-2 px-2 py-1.5 text-sm text-slate-400 hover:text-slate-200 hover:bg-slate-900 rounded-md transition-colors"
+                  >
+                    <Icon className="w-4 h-4" />
+                    {action.label}
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         )}
+
+        {/* Settings */}
+        <div className="px-2 py-2 border-t border-slate-800">
+          {collapsed ? (
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" className="w-full text-slate-400 hover:text-slate-100 hover:bg-slate-900">
+                  <Settings className="w-5 h-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="right" className="bg-slate-900 text-slate-100 border-slate-800">Settings</TooltipContent>
+            </Tooltip>
+          ) : (
+            <Link
+              href="/settings"
+              className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-900 rounded-lg transition-colors"
+            >
+              <Settings className="w-4 h-4" />
+              Settings
+            </Link>
+          )}
+        </div>
       </div>
-    </div>
+    </aside>
   );
 }

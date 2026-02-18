@@ -1,63 +1,84 @@
 "use client";
 
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-} from "recharts";
-import { STAGE_COLORS } from "@/lib/constants";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { formatCurrency, formatCompactCurrency } from "@/lib/utils";
 
-interface PipelineChartProps {
-  data: { stage: string; value: number }[];
+interface PipelineStage {
+  stage: string;
+  count: number;
+  value: number;
 }
 
-export function PipelineChart({ data }: PipelineChartProps) {
-  // Convert Tailwind classes to hex colors for Recharts if needed, 
-  // but for now we'll just use a set of default hexes that match the theme
-  const colors: Record<string, string> = {
-    Lead: "#64748b",
-    Discovery: "#3b82f6",
-    Proposal: "#6366f1",
-    Negotiation: "#a855f7",
-    Awarded: "#22c55e",
-    Lost: "#ef4444",
-  };
+interface PipelineChartProps {
+  stages: PipelineStage[];
+}
+
+export function PipelineChart({ stages }: PipelineChartProps) {
+  const activeStages = stages.filter(s => s.stage !== 'Awarded' && s.stage !== 'Lost');
+  const totalValue = activeStages.reduce((sum, s) => sum + s.value, 0);
 
   return (
-    <div className="h-[300px] w-full mt-4">
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-          <XAxis 
-            dataKey="stage" 
-            axisLine={false} 
-            tickLine={false} 
-            tick={{ fontSize: 10, fill: "#64748b" }} 
-            dy={10}
-          />
-          <YAxis 
-            axisLine={false} 
-            tickLine={false} 
-            tick={{ fontSize: 10, fill: "#64748b" }}
-            tickFormatter={(value) => `$${value / 1000}k`}
-          />
-          <Tooltip 
-            cursor={{ fill: "#f8fafc" }}
-            contentStyle={{ borderRadius: "8px", border: "none", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }}
-            formatter={(value: number | undefined) => [value != null ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value) : '', 'Value']}
-          />
-          <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-            {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={colors[entry.stage] || "#3b82f6"} />
-            ))}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
-    </div>
+    <Card className="h-full border-none shadow-sm">
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-lg font-semibold text-[#111827]">Pipeline by Stage</CardTitle>
+            <CardDescription>Opportunity distribution across stages</CardDescription>
+          </div>
+          <Link href="/pipeline">
+            <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
+              View All
+              <ArrowRight className="w-4 h-4 ml-1" />
+            </Button>
+          </Link>
+        </div>
+      </CardHeader>
+      <CardContent className="pt-4">
+        <div className="space-y-4">
+          {activeStages.length === 0 ? (
+            <div className="py-8 text-center text-[#6B7280]">No active opportunities</div>
+          ) : (
+            activeStages.map((stage) => {
+              const percentage = totalValue > 0 ? (stage.value / totalValue) * 100 : 0;
+              return (
+                <div key={stage.stage} className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-[#111827]">{stage.stage}</span>
+                      <Badge variant="secondary" className="text-[10px] h-5 px-1.5 bg-slate-100 text-[#6B7280] border-none">
+                        {stage.count}
+                      </Badge>
+                    </div>
+                    <span className="font-medium text-blue-600">
+                      {formatCompactCurrency(stage.value)}
+                    </span>
+                  </div>
+                  <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-blue-600 rounded-full transition-all duration-500"
+                      style={{ width: `${percentage}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+        
+        <Separator className="my-4 bg-slate-100" />
+        
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-[#6B7280]">Total Pipeline</span>
+          <span className="text-lg font-bold text-[#111827]">
+            {formatCurrency(totalValue)}
+          </span>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

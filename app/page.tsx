@@ -2,69 +2,136 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { Activity, Opportunity, Engagement, Account } from "@/lib/types";
-import { StatsCards } from "@/components/dashboard/StatsCards";
+import { Activity, Opportunity, Engagement } from "@/lib/types";
+import { KPICard } from "@/components/dashboard/KPICard";
 import { PipelineChart } from "@/components/dashboard/PipelineChart";
 import { ActivityFeed } from "@/components/dashboard/ActivityFeed";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EngagementHealth } from "@/components/dashboard/EngagementHealth";
+import { UpcomingTasks } from "@/components/dashboard/UpcomingTasks";
+import { TopOpportunities } from "@/components/dashboard/TopOpportunities";
 import { PIPELINE_STAGES } from "@/lib/constants";
-import { subDays } from "date-fns";
-import { Briefcase, TrendingUp, Clock } from "lucide-react";
+import { formatCompactCurrency } from "@/lib/utils";
+import { 
+  DollarSign, 
+  Target, 
+  Briefcase, 
+  Calendar,
+  Plus,
+  ArrowUpRight
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({
-    totalPipeline: 0,
-    weightedPipeline: 0,
-    activeEngagements: 0,
-    activitiesThisWeek: 0,
+  const [data, setData] = useState<{
+    stats: {
+      totalPipeline: number;
+      weightedPipeline: number;
+      activeEngagements: number;
+      activitiesThisWeek: number;
+      openOpportunities: number;
+      atRiskEngagements: number;
+    };
+    pipelineByStage: any[];
+    engagementHealth: any[];
+    recentActivities: any[];
+    upcomingTasks: any[];
+    topOpportunities: any[];
+  }>({
+    stats: {
+      totalPipeline: 0,
+      weightedPipeline: 0,
+      activeEngagements: 0,
+      activitiesThisWeek: 0,
+      openOpportunities: 0,
+      atRiskEngagements: 0,
+    },
+    pipelineByStage: [],
+    engagementHealth: [],
+    recentActivities: [],
+    upcomingTasks: [],
+    topOpportunities: [],
   });
-  const [pipelineData, setPipelineData] = useState<{ stage: string; value: number }[]>([]);
-  const [recentActivities, setRecentActivities] = useState<any[]>([]);
-  const [atRiskEngagements, setAtRiskEngagements] = useState<Engagement[]>([]);
 
   useEffect(() => {
     async function fetchDashboardData() {
-      const sevenDaysAgo = subDays(new Date(), 7).toISOString();
+      try {
+        const [oppsRes, engsRes, actsRes] = await Promise.all([
+          supabase.from("opportunities").select("*, accounts(name)"),
+          supabase.from("engagements").select("*"),
+          supabase.from("activities").select("*, accounts(name)").order("date_time", { ascending: false }),
+        ]);
 
-      const [oppsRes, engsRes, actsRes] = await Promise.all([
-        supabase.from("opportunities").select("*"),
-        supabase.from("engagements").select("*"),
-        supabase.from("activities").select("*, accounts(name)").order("date_time", { ascending: false }).limit(5),
-      ]);
+        const opportunities = oppsRes.data || [];
+        const engagements = engsRes.data || [];
+        const activities = actsRes.data || [];
 
-      const opportunities = oppsRes.data || [];
-      const engagements = engsRes.data || [];
-      const activities = actsRes.data || [];
+        // Stats calculations
+        const totalPipeline = opportunities.reduce((sum, op) => sum + (op.estimated_value || 0), 0);
+        const weightedPipeline = opportunities.reduce((sum, op) => sum + (op.weighted_value || 0), 0);
+        const activeEngagements = engagements.filter(e => e.status === "In Progress").length;
+        const atRiskEngagements = engagements.filter(e => e.status === "On Hold").length;
+        const openOpportunities = opportunities.filter(o => !['Awarded', 'Lost'].includes(o.stage)).length;
+        
+        // Activities this week (last 7 days)
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        const activitiesThisWeek = activities.filter(a => new Date(a.date_time) >= sevenDaysAgo).length;
 
-      // Calculate Stats
-      const totalPipeline = opportunities.reduce((sum, op) => sum + (op.estimated_value || 0), 0);
-      const weightedPipeline = opportunities.reduce((sum, op) => sum + (op.weighted_value || 0), 0);
-      const activeEngagements = engagements.filter(e => e.status === "In Progress").length;
-      
-      // Count activities in last 7 days (mocking this for now with all if needed)
-      const activitiesThisWeek = activities.length; 
+        // Pipeline by stage
+        const pipelineByStage = PIPELINE_STAGES.map(stage => {
+          const stageOpps = opportunities.filter(op => op.stage === stage);
+          return {
+            stage,
+            count: stageOpps.length,
+            value: stageOpps.reduce((sum, op) => sum + (op.estimated_value || 0), 0)
+          };
+        });
 
-      setStats({
-        totalPipeline,
-        weightedPipeline,
-        activeEngagements,
-        activitiesThisWeek,
-      });
+        // Engagement Health
+        const statuses = ["Planned", "In Progress", "On Hold", "Complete"];
+        const engagementHealth = statuses.map(status => {
+          const statusEngs = engagements.filter(e => e.status === status);
+          return {
+            status,
+            count: statusEngs.length,
+            atRisk: status === "On Hold" ? statusEngs.length : 0
+          };
+        });
 
-      // Prepare Chart Data
-      const chartData = PIPELINE_STAGES.map(stage => ({
-        stage,
-        value: opportunities
-          .filter(op => op.stage === stage)
-          .reduce((sum, op) => sum + (op.estimated_value || 0), 0)
-      }));
-      setPipelineData(chartData);
+        // Top Opportunities
+        const topOpportunities = [...opportunities]
+          .filter(o => !['Awarded', 'Lost'].includes(o.stage))
+          .sort((a, b) => (b.weighted_value || 0) - (a.weighted_value || 0))
+          .slice(0, 6);
 
-      setRecentActivities(activities);
-      setAtRiskEngagements(engagements.filter(e => e.status === "On Hold").slice(0, 3));
-      
-      setLoading(false);
+        // Upcoming Tasks
+        const upcomingTasks = activities
+          .filter(a => a.next_action_due && new Date(a.next_action_due) >= new Date())
+          .sort((a, b) => new Date(a.next_action_due!).getTime() - new Date(b.next_action_due!).getTime())
+          .slice(0, 5);
+
+        setData({
+          stats: {
+            totalPipeline,
+            weightedPipeline,
+            activeEngagements,
+            activitiesThisWeek,
+            openOpportunities,
+            atRiskEngagements,
+          },
+          pipelineByStage,
+          engagementHealth,
+          recentActivities: activities.slice(0, 5),
+          upcomingTasks,
+          topOpportunities,
+        });
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      } finally {
+        setLoading(false);
+      }
     }
 
     fetchDashboardData();
@@ -72,7 +139,7 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
+      <div className="flex items-center justify-center h-[calc(100vh-10rem)]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
@@ -80,66 +147,74 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Command Center</h1>
-        <p className="text-slate-500 mt-1">Welcome back. Here's what's happening across DataIsData.</p>
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-[#111827]">Dashboard</h1>
+          <p className="text-[#6B7280]">Welcome back, Tony. Here's what's happening today.</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" className="bg-white border-slate-200 text-slate-700">
+            <Calendar className="w-4 h-4 mr-2" />
+            This Week
+          </Button>
+          <Link href="/activities/new">
+            <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+              <Plus className="w-4 h-4 mr-2" />
+              Log Activity
+            </Button>
+          </Link>
+        </div>
       </div>
 
-      <StatsCards {...stats} />
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle className="text-lg font-bold text-slate-800">Pipeline by Stage</CardTitle>
-              <p className="text-xs text-slate-500 mt-1">Current distribution of potential revenue.</p>
-            </div>
-            <TrendingUp className="w-5 h-5 text-slate-400" />
-          </CardHeader>
-          <CardContent>
-            <PipelineChart data={pipelineData} />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle className="text-lg font-bold text-slate-800">Recent Activity</CardTitle>
-              <p className="text-xs text-slate-500 mt-1">Latest team communications.</p>
-            </div>
-            <Clock className="w-5 h-5 text-slate-400" />
-          </CardHeader>
-          <CardContent>
-            <ActivityFeed activities={recentActivities} />
-          </CardContent>
-        </Card>
-
-        <Card className="lg:col-span-1">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle className="text-lg font-bold text-slate-800">At Risk</CardTitle>
-              <p className="text-xs text-slate-500 mt-1">Projects currently on hold.</p>
-            </div>
-            <Briefcase className="w-5 h-5 text-red-400" />
-          </CardHeader>
-          <CardContent>
-             <div className="space-y-4">
-               {atRiskEngagements.length > 0 ? (
-                 atRiskEngagements.map(eng => (
-                   <div key={eng.id} className="flex flex-col p-3 rounded-lg border border-red-100 bg-red-50/50">
-                      <span className="text-sm font-bold text-slate-900">{eng.name}</span>
-                      <span className="text-xs text-slate-500 mt-1">Last update: {new Date(eng.updated_at).toLocaleDateString()}</span>
-                   </div>
-                 ))
-               ) : (
-                 <div className="text-center py-8 text-slate-400 text-sm italic">
-                   All projects are on track.
-                 </div>
-               )}
-             </div>
-          </CardContent>
-        </Card>
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <KPICard
+          title="Total Pipeline"
+          value={formatCompactCurrency(data.stats.totalPipeline)}
+          change="+12% from last month"
+          changeType="positive"
+          icon={DollarSign}
+          description={`${data.stats.openOpportunities} open opportunities`}
+        />
+        <KPICard
+          title="Weighted Pipeline"
+          value={formatCompactCurrency(data.stats.weightedPipeline)}
+          change="+8% from last month"
+          changeType="positive"
+          icon={Target}
+          description="Probability-adjusted value"
+        />
+        <KPICard
+          title="Active Engagements"
+          value={data.stats.activeEngagements.toString()}
+          change="On track"
+          changeType="neutral"
+          icon={Briefcase}
+          description={`${data.stats.atRiskEngagements} at risk`}
+        />
+        <KPICard
+          title="Activities This Week"
+          value={data.stats.activitiesThisWeek.toString()}
+          change="+5 from last week"
+          changeType="positive"
+          icon={Calendar}
+          description="Meetings, calls, emails"
+        />
       </div>
+
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <PipelineChart stages={data.pipelineByStage} />
+        <EngagementHealth healthData={data.engagementHealth} />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ActivityFeed activities={data.recentActivities} />
+        <UpcomingTasks tasks={data.upcomingTasks} />
+      </div>
+
+      <TopOpportunities opportunities={data.topOpportunities} />
     </div>
   );
 }

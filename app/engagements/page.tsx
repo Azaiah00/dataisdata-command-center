@@ -5,11 +5,10 @@ import { supabase } from "@/lib/supabase";
 import { Engagement } from "@/lib/types";
 import { DataTable } from "@/components/data-table/DataTable";
 import { Button } from "@/components/ui/button";
-import { Plus, Briefcase, Building2, Calendar } from "lucide-react";
+import { Plus, Briefcase, Building2, Calendar, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { ENGAGEMENT_STATUSES } from "@/lib/constants";
-import { cn, formatCurrency, formatDate } from "@/lib/utils";
+import { cn, formatCurrency, formatDate, getStatusColor } from "@/lib/utils";
 
 export default function EngagementsPage() {
   const [engagements, setEngagements] = useState<any[]>([]);
@@ -28,7 +27,7 @@ export default function EngagementsPage() {
         .order("start_date", { ascending: false });
 
       if (error) {
-        console.error("Error fetching engagements:", error?.message || error, error?.code, error?.details);
+        console.error("Error fetching engagements:", error?.message || error);
       } else {
         setEngagements(data || []);
       }
@@ -40,12 +39,17 @@ export default function EngagementsPage() {
 
   const columns = [
     {
-      header: "Engagement Name",
+      header: "Engagement",
       accessorKey: "name",
       cell: (engagement: any) => (
-        <div className="flex flex-col">
-          <span className="font-semibold text-slate-900">{engagement.name}</span>
-          <span className="text-xs text-slate-500">{engagement.engagement_type}</span>
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-[#E8F1FB] flex items-center justify-center flex-shrink-0">
+            <Briefcase className="w-4 h-4 text-blue-600" />
+          </div>
+          <div className="flex flex-col min-w-0">
+            <span className="font-bold text-[#111827] text-sm truncate">{engagement.name}</span>
+            <span className="text-xs text-[#6B7280]">{engagement.engagement_type}</span>
+          </div>
         </div>
       ),
     },
@@ -53,8 +57,8 @@ export default function EngagementsPage() {
       header: "Account",
       accessorKey: "account_id",
       cell: (engagement: any) => (
-        <div className="flex items-center gap-1 text-slate-600 text-sm">
-          <Building2 className="w-3 h-3" />
+        <div className="flex items-center gap-1.5 text-[#6B7280] text-xs">
+          <Building2 className="w-3.5 h-3.5" />
           {engagement.accounts?.name || "No Account"}
         </div>
       ),
@@ -63,8 +67,8 @@ export default function EngagementsPage() {
       header: "Dates",
       accessorKey: "start_date",
       cell: (engagement: Engagement) => (
-        <div className="flex items-center gap-1 text-slate-600 text-sm">
-          <Calendar className="w-3 h-3" />
+        <div className="flex items-center gap-1.5 text-[#6B7280] text-xs">
+          <Calendar className="w-3.5 h-3.5" />
           {formatDate(engagement.start_date)} - {formatDate(engagement.end_date)}
         </div>
       ),
@@ -73,7 +77,7 @@ export default function EngagementsPage() {
       header: "Value",
       accessorKey: "contract_value",
       cell: (engagement: Engagement) => (
-        <span className="text-sm font-medium text-slate-900">
+        <span className="text-sm font-bold text-[#111827]">
           {formatCurrency(engagement.contract_value)}
         </span>
       ),
@@ -81,36 +85,41 @@ export default function EngagementsPage() {
     {
       header: "Status",
       accessorKey: "status",
-      cell: (engagement: Engagement) => {
-        const colors: Record<string, string> = {
-          Planned: "text-blue-600 bg-blue-50",
-          "In Progress": "text-amber-600 bg-amber-50",
-          "On Hold": "text-slate-600 bg-slate-50",
-          Complete: "text-green-600 bg-green-50",
-        };
-        return (
-          <Badge
-            className={cn(
-              "font-medium border-none",
-              colors[engagement.status] || "bg-slate-50"
-            )}
-          >
-            {engagement.status}
-          </Badge>
-        );
-      },
+      cell: (engagement: Engagement) => (
+        <Badge
+          className={cn(
+            "font-medium border-none text-[10px] h-5 px-2",
+            getStatusColor(engagement.status)
+          )}
+        >
+          {engagement.status}
+        </Badge>
+      ),
+    },
+    {
+      header: "",
+      accessorKey: "actions",
+      cell: (engagement: Engagement) => (
+        <div className="flex justify-end">
+          <Link href={`/engagements/${engagement.id}`}>
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-blue-600 hover:bg-blue-50">
+              <ArrowUpRight className="w-4 h-4" />
+            </Button>
+          </Link>
+        </div>
+      ),
     },
   ];
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Engagements</h1>
-          <p className="text-slate-500 mt-1">Track active projects and service delivery.</p>
+          <h1 className="text-2xl font-bold text-[#111827]">Engagements</h1>
+          <p className="text-[#6B7280]">Track active projects and service delivery.</p>
         </div>
         <Link href="/engagements/new">
-          <Button className="bg-blue-600 hover:bg-blue-700">
+          <Button className="bg-blue-600 hover:bg-blue-700 text-white">
             <Plus className="w-4 h-4 mr-2" />
             New Engagement
           </Button>
