@@ -120,3 +120,15 @@ export interface Partner {
     created_at: string;
     updated_at: string;
 }
+
+export interface Contractor {
+    id: string;
+    full_name: string;
+    title_role: string | null;
+    email: string | null;
+    phone: string | null;
+    status: string;
+    notes: string | null;
+    created_at: string;
+    updated_at: string;
+}

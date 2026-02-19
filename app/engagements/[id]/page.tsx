@@ -4,7 +4,7 @@ import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
-import { Engagement } from "@/lib/types";
+import { Engagement, Contractor } from "@/lib/types";
 import { ENGAGEMENT_STATUSES } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -48,6 +48,7 @@ import {
   DollarSign,
   Pencil,
   Trash2,
+  HardHat,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -79,6 +80,7 @@ export default function EngagementDetailPage({
   const [deleting, setDeleting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [linkedContractors, setLinkedContractors] = useState<Contractor[]>([]);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -110,6 +112,15 @@ export default function EngagementDetailPage({
       return;
     }
     setEngagement(data);
+
+    // Fetch linked contractors
+    const { data: cLinks } = await supabase
+      .from("engagement_contractors")
+      .select("contractors(*)")
+      .eq("engagement_id", id);
+    const contractors = (cLinks || []).map((l: any) => l.contractors).filter(Boolean);
+    setLinkedContractors(contractors);
+
     form.reset({
       name: data.name,
       account_id: data.account_id,
@@ -552,6 +563,35 @@ export default function EngagementDetailPage({
                 </li>
               ))}
             </ul>
+          </CardContent>
+        </Card>
+      )}
+
+      {!isEditing && linkedContractors.length > 0 && (
+        <Card className="border-none shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-lg font-bold text-[#111827]">
+              Assigned Contractors ({linkedContractors.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {linkedContractors.map((c) => (
+                <Link key={c.id} href={`/contractors/${c.id}`}>
+                  <div className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 border border-slate-100 cursor-pointer">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
+                        <HardHat className="w-4 h-4 text-amber-700" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-[#111827]">{c.full_name}</p>
+                        <p className="text-xs text-[#6B7280]">{c.title_role || "Contractor"}</p>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </CardContent>
         </Card>
       )}

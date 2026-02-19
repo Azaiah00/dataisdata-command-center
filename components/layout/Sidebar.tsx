@@ -13,6 +13,7 @@ import {
   Calendar,
   TrendingUp,
   Handshake,
+  HardHat,
   ChevronLeft,
   ChevronRight,
   Plus,
@@ -41,6 +42,7 @@ const mainNavItems: { path: string; label: string; icon: typeof Building2; count
   { path: "/activities", label: "Activities", icon: Calendar, countKey: "activities" },
   { path: "/pipeline", label: "Pipeline", icon: TrendingUp, countKey: "opportunities" },
   { path: "/partners", label: "Partners", icon: Handshake, countKey: "partners" },
+  { path: "/contractors", label: "Contractors", icon: HardHat, countKey: "contractors" },
 ];
 
 const quickActions = [
@@ -55,8 +57,8 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
   useEffect(() => {
     async function fetchCounts() {
-      const keys = ["accounts", "contacts", "engagements", "activities", "opportunities", "partners"];
-      const tableNames = ["accounts", "contacts", "engagements", "activities", "opportunities", "partners"];
+      const keys = ["accounts", "contacts", "engagements", "activities", "opportunities", "partners", "contractors"];
+      const tableNames = ["accounts", "contacts", "engagements", "activities", "opportunities", "partners", "contractors"];
       const result: Record<string, number> = {};
       await Promise.all(
         tableNames.map(async (table, i) => {

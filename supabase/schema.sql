@@ -113,6 +113,19 @@ CREATE TABLE partners (
     updated_at TIMESTAMPTZ DEFAULT now()
 );
 
+-- Contractors
+CREATE TABLE contractors (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    full_name TEXT NOT NULL,
+    title_role TEXT,
+    email TEXT,
+    phone TEXT,
+    status TEXT DEFAULT 'Active',
+    notes TEXT,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    updated_at TIMESTAMPTZ DEFAULT now()
+);
+
 -- Junction Tables
 
 CREATE TABLE engagement_contacts (
@@ -143,6 +156,12 @@ CREATE TABLE account_contacts (
     account_id UUID REFERENCES accounts(id) ON DELETE CASCADE,
     contact_id UUID REFERENCES contacts(id) ON DELETE CASCADE,
     PRIMARY KEY (account_id, contact_id)
+);
+
+CREATE TABLE engagement_contractors (
+    engagement_id UUID REFERENCES engagements(id) ON DELETE CASCADE,
+    contractor_id UUID REFERENCES contractors(id) ON DELETE CASCADE,
+    PRIMARY KEY (engagement_id, contractor_id)
 );
 
 -- Seed Data
