@@ -6,6 +6,8 @@ export type OutcomeType = 'Good' | 'Neutral' | 'Bad';
 export type PipelineStage = 'Lead' | 'Discovery' | 'Proposal' | 'Negotiation' | 'Awarded' | 'Lost';
 export type ActivityType = 'Meeting' | 'Call' | 'Email' | 'Site Visit';
 export type PartnerType = 'Prime' | 'Sub' | 'Vendor' | 'University' | 'Community Org';
+export type InnovationTier = 'Dashboard Only' | 'Advisory' | 'Full IaaS';
+export type VendorStatus = 'Approved Innovation Partner' | 'Approved Event Participant' | 'Conditional' | 'Not Approved';
 
 export interface Account {
     id: string;
@@ -18,6 +20,12 @@ export interface Account {
     owner: string | null;
     notes: string | null;
     parent_account_id: string | null;
+    innovation_tier: InnovationTier | null;
+    population_size: number | null;
+    annual_it_budget: number | null;
+    top_challenges: string[] | null;
+    grant_funding_interest: boolean | null;
+    readiness_score: number | null;
     created_at: string;
     updated_at: string;
     // Joined data
@@ -58,6 +66,24 @@ export interface Engagement {
     budget: number | null;
     contract_value: number | null;
     margin_pct: number | null;
+    innovation_theme: string | null;
+    lifecycle_stage: string | null;
+    strategic_plan_goal: string | null;
+    council_priority: string | null;
+    compliance_framework: string | null;
+    existing_tool_owned: boolean | null;
+    redundant_purchase_risk: boolean | null;
+    annual_license_cost: number | null;
+    estimated_savings: number | null;
+    funding_source: string | null;
+    grant_deadline: string | null;
+    match_pct: number | null;
+    grant_probability_pct: number | null;
+    funding_stage: string | null;
+    manual_process: boolean | null;
+    automation_candidate: boolean | null;
+    estimated_hours_saved: number | null;
+    ai_impact_score: number | null;
     created_at: string;
     updated_at: string;
     // Joined data
@@ -115,6 +141,13 @@ export interface Partner {
     partner_type: PartnerType;
     capabilities: string | null;
     contract_vehicles: string | null;
+    performance_rating: number | null;
+    socioeconomic_status: string | null;
+    past_performance_notes: string | null;
+    risk_score: number | null;
+    revenue_share_pct: number | null;
+    vendor_score: number | null;
+    vendor_status: VendorStatus | null;
     notes: string | null;
     attachments: string[] | null;
     created_at: string;
@@ -131,4 +164,125 @@ export interface Contractor {
     notes: string | null;
     created_at: string;
     updated_at: string;
+}
+
+export interface InnovationMaturitySnapshot {
+    id: string;
+    account_id: string;
+    as_of_date: string;
+    overall_score: number | null;
+    governance: number | null;
+    cyber_resilience: number | null;
+    broadband_readiness: number | null;
+    data_maturity: number | null;
+    ai_readiness: number | null;
+    workforce_capacity: number | null;
+    vendor_alignment: number | null;
+    grant_capture: number | null;
+    created_at: string;
+}
+
+export interface VendorInquiry {
+    id: string;
+    company_name: string;
+    primary_contact: string | null;
+    title: string | null;
+    email: string | null;
+    website: string | null;
+    core_service_category: string | null;
+    worked_public_sector: boolean | null;
+    states: string | null;
+    brief_description: string | null;
+    interested_in: string[] | null;
+    status: string | null;
+    created_at: string;
+}
+
+export interface VendorApplication {
+    id: string;
+    inquiry_id: string | null;
+    years_in_business: number | null;
+    legal_structure: string | null;
+    certifications: string[] | null;
+    insurance_coverage: string | null;
+    contract_vehicles: string | null;
+    public_sector_references: string | null;
+    core_offerings: string | null;
+    problem_solved: string | null;
+    existing_gov_clients: string | null;
+    differentiator: string | null;
+    technology_stack: string | null;
+    integration_capabilities: string | null;
+    annual_revenue_range: string | null;
+    bonding_capacity: string | null;
+    growth_pct: number | null;
+    cost_reduction_explanation: string | null;
+    strategic_alignment: string | null;
+    open_to_revenue_share: boolean | null;
+    security_certifications: string | null;
+    data_handling_practices: string | null;
+    compliance_standards: string | null;
+    score: number | null;
+    status: string | null;
+    reviewed_by: string | null;
+    partner_id: string | null;
+    created_at: string;
+}
+
+export interface ClientIntake {
+    id: string;
+    organization_name: string;
+    population_size: number | null;
+    annual_it_budget: number | null;
+    top_challenges: string[] | null;
+    current_initiatives: string | null;
+    grant_funding_interest: boolean | null;
+    strategic_plan_link: string | null;
+    interested_in: string[] | null;
+    contact_name: string | null;
+    contact_email: string | null;
+    contact_title: string | null;
+    status: string | null;
+    assigned_tier: string | null;
+    advisory_estimate: number | null;
+    readiness_score: number | null;
+    account_id: string | null;
+    created_at: string;
+}
+
+export interface Event {
+    id: string;
+    name: string;
+    location: string | null;
+    event_date: string | null;
+    theme: string | null;
+    target_audience: string | null;
+    registration_link: string | null;
+    cost_to_vendor: number | null;
+    cost_to_attendees: number | null;
+    notes: string | null;
+    post_event_leads: number | null;
+    revenue_generated: number | null;
+    status: string | null;
+    created_at: string;
+}
+
+export interface EventVendor {
+    event_id: string;
+    partner_id: string;
+    sponsorship_tier: string | null;
+    fee: number | null;
+}
+
+export interface P3Deal {
+    id: string;
+    public_entity_id: string | null;
+    private_partner_id: string | null;
+    revenue_share_model: string | null;
+    infrastructure_asset_type: string | null;
+    risk_allocation: string | null;
+    term_length: string | null;
+    monetization_strategy: string | null;
+    status: string | null;
+    created_at: string;
 }

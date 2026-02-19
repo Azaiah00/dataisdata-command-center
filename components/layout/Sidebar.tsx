@@ -20,6 +20,11 @@ import {
   FileText,
   BarChart3,
   Settings,
+  Rocket,
+  Gauge,
+  ClipboardList,
+  FileCheck,
+  CalendarDays,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -49,6 +54,15 @@ const quickActions = [
   { label: "New Activity", icon: Plus, href: "/activities/new" },
   { label: "Reports", icon: BarChart3, href: "/reports" },
   { label: "Documents", icon: FileText, href: "/documents" },
+];
+
+const innovationNavItems: { path: string; label: string; icon: typeof Building2 }[] = [
+  { path: "/innovation", label: "Executive Portfolio", icon: Rocket },
+  { path: "/innovation/maturity", label: "Maturity Index", icon: Gauge },
+  { path: "/innovation/vendor-inquiry", label: "Vendor Inquiries", icon: ClipboardList },
+  { path: "/innovation/vendor-application", label: "Vendor Applications", icon: FileCheck },
+  { path: "/innovation/events", label: "Events", icon: CalendarDays },
+  { path: "/innovation/client-intake", label: "Client Intake", icon: Building2 },
 ];
 
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
@@ -137,6 +151,46 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                         {counts[item.countKey] ?? "—"}
                       </Badge>
                     )}
+                  </TooltipContent>
+                </Tooltip>
+              );
+            }
+
+            return <div key={item.path}>{navItem}</div>;
+          })}
+
+          {!collapsed && (
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-4 mb-2 px-3">
+              Innovation Hub
+            </p>
+          )}
+
+          {innovationNavItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = pathname === item.path || pathname?.startsWith(`${item.path}/`);
+
+            const navItem = (
+              <Link
+                href={item.path}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors mb-1",
+                  isActive
+                    ? "bg-blue-600 text-white"
+                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
+                  collapsed && "justify-center px-2"
+                )}
+              >
+                <Icon className={cn("flex-shrink-0", collapsed ? "w-5 h-5" : "w-4 h-4")} />
+                {!collapsed && <span className="flex-1">{item.label}</span>}
+              </Link>
+            );
+
+            if (collapsed) {
+              return (
+                <Tooltip key={item.path} delayDuration={0}>
+                  <TooltipTrigger asChild>{navItem}</TooltipTrigger>
+                  <TooltipContent side="right" className="bg-gray-900 text-white border-gray-800">
+                    {item.label}
                   </TooltipContent>
                 </Tooltip>
               );

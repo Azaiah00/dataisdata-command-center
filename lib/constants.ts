@@ -6,6 +6,18 @@ export const OUTCOME_TYPES = ['Good', 'Neutral', 'Bad'] as const;
 export const PIPELINE_STAGES = ['Lead', 'Discovery', 'Proposal', 'Negotiation', 'Awarded', 'Lost'] as const;
 export const ACTIVITY_TYPES = ['Meeting', 'Call', 'Email', 'Site Visit'] as const;
 export const PARTNER_TYPES = ['Prime', 'Sub', 'Vendor', 'University', 'Community Org'] as const;
+export const INNOVATION_THEMES = ['Cyber', 'Broadband', 'AI', 'Resiliency', 'Workforce'] as const;
+export const LIFECYCLE_STAGES = ['Idea', 'Assessment', 'Funding', 'Procurement', 'Implementation', 'Optimization', 'Measurement', 'Replication'] as const;
+export const COMPLIANCE_FRAMEWORKS = ['NIST', 'CISA', 'SOC2', 'CJIS'] as const;
+export const FUNDING_SOURCES = ['ARPA', 'BEAD', 'State Grant', 'Federal', 'Foundation'] as const;
+export const FUNDING_STAGES = ['Identified', 'Applied', 'Awarded', 'Reporting'] as const;
+export const INNOVATION_TIERS = ['Dashboard Only', 'Advisory', 'Full IaaS'] as const;
+export const VENDOR_STATUSES = ['Approved Innovation Partner', 'Approved Event Participant', 'Conditional', 'Not Approved'] as const;
+export const INQUIRY_INTERESTS = ['Vendor Showcase Events', 'Strategic Partnership', 'Prime/Sub Opportunities', 'Innovation Pilot', 'Other'] as const;
+export const CLIENT_INTERESTS = ['Innovation Dashboard', 'Advisory Services', 'Managed IaaS', 'Broadband Strategy', 'Cyber Assessment'] as const;
+export const SPONSORSHIP_TIERS = ['Showcase', 'Premium Sponsor', 'Strategic Partner'] as const;
+export const EVENT_THEMES = ['AI', 'Cyber', 'Broadband', 'Resiliency'] as const;
+export const MATURITY_CATEGORIES = ['governance', 'cyber_resilience', 'broadband_readiness', 'data_maturity', 'ai_readiness', 'workforce_capacity', 'vendor_alignment', 'grant_capture'] as const;
 
 export const STAGE_COLORS: Record<string, string> = {
   Lead: 'bg-slate-500',
