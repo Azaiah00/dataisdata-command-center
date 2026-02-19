@@ -54,7 +54,7 @@ export default function VendorApplicationReviewPage() {
       console.error("Error loading application:", error);
       return;
     }
-    const row = data as VendorApplication;
+    const row = data as unknown as VendorApplication;
     setApplication(row);
     setStatus(row.status || "Pending Review");
   }

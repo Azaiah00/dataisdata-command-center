@@ -46,7 +46,7 @@ export default function EventDetailPage() {
     setLeads(String(eventData?.post_event_leads || ""));
     setRevenue(String(eventData?.revenue_generated || ""));
     setPartners((partnerRows as PartnerRow[]) || []);
-    setEventVendors((vendorRows as EventVendorRow[]) || []);
+    setEventVendors((vendorRows as unknown as EventVendorRow[]) || []);
   }
 
   useEffect(() => {

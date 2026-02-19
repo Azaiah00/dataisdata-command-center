@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
@@ -13,6 +13,14 @@ import { Button } from "@/components/ui/button";
 type Inquiry = { id: string; company_name: string };
 
 export default function VendorApplicationNewPage() {
+  return (
+    <Suspense fallback={<p className="text-sm text-[#6B7280]">Loading form...</p>}>
+      <VendorApplicationForm />
+    </Suspense>
+  );
+}
+
+function VendorApplicationForm() {
   const searchParams = useSearchParams();
   const preselectedInquiryId = searchParams.get("inquiry_id") || "";
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);

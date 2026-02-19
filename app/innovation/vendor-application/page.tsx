@@ -28,7 +28,7 @@ export default function VendorApplicationListPage() {
         .select("id, inquiry_id, score, status, created_at, vendor_inquiries(company_name)")
         .order("created_at", { ascending: false });
       if (error) console.error("Error loading applications:", error);
-      setData((data as VendorApplicationRow[]) || []);
+      setData((data as unknown as VendorApplicationRow[]) || []);
       setLoading(false);
     }
     fetchData();
