@@ -1,4 +1,4 @@
-export const ACCOUNT_TYPES = ['City', 'County', 'State Agency', 'University', 'Nonprofit', 'Private'] as const;
+export const ACCOUNT_TYPES = ['City', 'County', 'State', 'State Agency', 'University', 'Nonprofit', 'Private'] as const;
 export const ACCOUNT_STATUSES = ['Active', 'Prospect', 'Dormant'] as const;
 export const RELATIONSHIP_HEALTHS = ['Cold', 'Warm', 'Strong'] as const;
 export const ENGAGEMENT_STATUSES = ['Planned', 'In Progress', 'On Hold', 'Complete'] as const;

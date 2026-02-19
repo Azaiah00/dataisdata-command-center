@@ -1,6 +1,6 @@
 -- Core Tables
 
-CREATE TYPE account_type AS ENUM ('City', 'County', 'State Agency', 'University', 'Nonprofit', 'Private');
+CREATE TYPE account_type AS ENUM ('City', 'County', 'State', 'State Agency', 'University', 'Nonprofit', 'Private');
 CREATE TYPE account_status AS ENUM ('Active', 'Prospect', 'Dormant');
 CREATE TYPE relationship_health AS ENUM ('Cold', 'Warm', 'Strong');
 CREATE TYPE engagement_status AS ENUM ('Planned', 'In Progress', 'On Hold', 'Complete');

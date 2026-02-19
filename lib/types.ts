@@ -1,4 +1,4 @@
-export type AccountType = 'City' | 'County' | 'State Agency' | 'University' | 'Nonprofit' | 'Private';
+export type AccountType = 'City' | 'County' | 'State' | 'State Agency' | 'University' | 'Nonprofit' | 'Private';
 export type AccountStatus = 'Active' | 'Prospect' | 'Dormant';
 export type RelationshipHealth = 'Cold' | 'Warm' | 'Strong';
 export type EngagementStatus = 'Planned' | 'In Progress' | 'On Hold' | 'Complete';
