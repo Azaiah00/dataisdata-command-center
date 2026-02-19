@@ -143,6 +143,11 @@ export default function PartnerDetailPage({ params }: { params: Promise<{ id: st
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <Link href={`/partners/${id}/edit`}>
+              <Button variant="outline" size="sm" className="border-slate-200 text-slate-700 bg-white">
+                <Pencil className="w-4 h-4 mr-2" /> Edit
+              </Button>
+            </Link>
             <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline" size="sm" className="border-red-200 text-red-600 hover:bg-red-50">

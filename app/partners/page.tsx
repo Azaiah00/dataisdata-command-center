@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { Partner } from "@/lib/types";
 import { DataTable } from "@/components/data-table/DataTable";
 import { Button } from "@/components/ui/button";
-import { Plus, ShieldCheck, Tag, FileText, ArrowUpRight } from "lucide-react";
+import { Plus, ShieldCheck, Tag, FileText, ArrowUpRight, Pencil } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { cn, getStatusColor } from "@/lib/utils";
@@ -83,7 +83,12 @@ export default function PartnersPage() {
       header: "",
       accessorKey: "actions",
       cell: (partner: Partner) => (
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-2">
+          <Link href={`/partners/${partner.id}/edit`}>
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-blue-600 hover:bg-blue-50">
+              <Pencil className="w-3.5 h-3.5" />
+            </Button>
+          </Link>
           <Link href={`/partners/${partner.id}`}>
             <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-blue-600 hover:bg-blue-50">
               <ArrowUpRight className="w-4 h-4" />
