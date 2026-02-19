@@ -40,6 +40,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { formatCurrency, formatDate, getStatusColor } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 import {
   ChevronLeft,
   Briefcase,
@@ -49,6 +50,7 @@ import {
   Pencil,
   Trash2,
   HardHat,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -81,6 +83,8 @@ export default function EngagementDetailPage({
   const [isEditing, setIsEditing] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [linkedContractors, setLinkedContractors] = useState<Contractor[]>([]);
+  const [allContractors, setAllContractors] = useState<Pick<Contractor, "id" | "full_name" | "title_role">[]>([]);
+  const [selectedContractorIds, setSelectedContractorIds] = useState<string[]>([]);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -120,6 +124,7 @@ export default function EngagementDetailPage({
       .eq("engagement_id", id);
     const contractors = (cLinks || []).map((l: any) => l.contractors).filter(Boolean);
     setLinkedContractors(contractors);
+    setSelectedContractorIds(contractors.map((c: Contractor) => c.id));
 
     form.reset({
       name: data.name,
@@ -142,11 +147,15 @@ export default function EngagementDetailPage({
   }, [id]);
 
   useEffect(() => {
-    async function fetchAccounts() {
-      const { data } = await supabase.from("accounts").select("id, name").order("name");
-      setAccounts(data || []);
+    async function fetchLookups() {
+      const [accRes, cRes] = await Promise.all([
+        supabase.from("accounts").select("id, name").order("name"),
+        supabase.from("contractors").select("id, full_name, title_role").order("full_name"),
+      ]);
+      setAccounts(accRes.data || []);
+      setAllContractors(cRes.data || []);
     }
-    fetchAccounts();
+    fetchLookups();
   }, []);
 
   async function onSave(values: z.infer<typeof formSchema>) {
@@ -166,11 +175,23 @@ export default function EngagementDetailPage({
       updated_at: new Date().toISOString(),
     };
     const { error } = await supabase.from("engagements").update(payload).eq("id", id);
-    setSaving(false);
     if (error) {
       console.error("Error updating engagement:", error);
+      setSaving(false);
       return;
     }
+
+    // Update contractor assignments: delete existing, insert new
+    await supabase.from("engagement_contractors").delete().eq("engagement_id", id);
+    if (selectedContractorIds.length > 0) {
+      const rows = selectedContractorIds.map((cid) => ({
+        engagement_id: id,
+        contractor_id: cid,
+      }));
+      await supabase.from("engagement_contractors").insert(rows);
+    }
+
+    setSaving(false);
     setIsEditing(false);
     await fetchEngagement();
     router.refresh();
@@ -460,6 +481,53 @@ export default function EngagementDetailPage({
                     </FormItem>
                   )}
                 />
+                {/* Editable contractor assignments */}
+                <div className="space-y-3">
+                  <label className="text-sm font-medium">Assigned Contractors</label>
+                  {selectedContractorIds.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {selectedContractorIds.map((cId) => {
+                        const c = allContractors.find((ac) => ac.id === cId);
+                        return (
+                          <Badge key={cId} variant="secondary" className="gap-1 px-2 py-1 bg-amber-50 text-amber-800 border-none">
+                            <HardHat className="w-3 h-3" />
+                            {c?.full_name || "Unknown"}
+                            <button
+                              type="button"
+                              className="ml-1 hover:text-red-600"
+                              onClick={() => setSelectedContractorIds((prev) => prev.filter((x) => x !== cId))}
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </Badge>
+                        );
+                      })}
+                    </div>
+                  )}
+                  <Select
+                    onValueChange={(val) => {
+                      if (!selectedContractorIds.includes(val)) {
+                        setSelectedContractorIds((prev) => [...prev, val]);
+                      }
+                    }}
+                    value=""
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Add a contractor..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {allContractors
+                        .filter((c) => !selectedContractorIds.includes(c.id))
+                        .map((c) => (
+                          <SelectItem key={c.id} value={c.id}>
+                            {c.full_name}{c.title_role ? ` — ${c.title_role}` : ""}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-[#6B7280]">Select multiple contractors to assign to this engagement.</p>
+                </div>
+
                 <div className="flex gap-2">
                   <Button type="submit" disabled={saving} className="bg-blue-600 hover:bg-blue-700">
                     {saving ? "Saving..." : "Save changes"}

@@ -9,6 +9,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn, formatDate, getStatusColor } from "@/lib/utils";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   HardHat,
   Mail,
   Phone,
@@ -16,6 +23,8 @@ import {
   Pencil,
   Trash2,
   ChevronLeft,
+  X,
+  Settings2,
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -32,29 +41,42 @@ export default function ContractorDetailPage({ params }: { params: Promise<{ id:
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [managingEngagements, setManagingEngagements] = useState(false);
+  const [savingEngagements, setSavingEngagements] = useState(false);
+  const [allEngagements, setAllEngagements] = useState<Pick<Engagement, "id" | "name" | "status">[]>([]);
+  const [selectedEngIds, setSelectedEngIds] = useState<string[]>([]);
+
+  async function fetchData() {
+    const { data: cData } = await supabase
+      .from("contractors")
+      .select("*")
+      .eq("id", id)
+      .single();
+    if (cData) setContractor(cData);
+
+    // Fetch linked engagements via junction table
+    const { data: links } = await supabase
+      .from("engagement_contractors")
+      .select("engagements(*, accounts(name))")
+      .eq("contractor_id", id);
+
+    const mapped = (links || [])
+      .map((l: any) => l.engagements)
+      .filter(Boolean);
+    setEngagements(mapped);
+    setSelectedEngIds(mapped.map((e: any) => e.id));
+
+    // Fetch all engagements for the dropdown
+    const { data: allEngs } = await supabase
+      .from("engagements")
+      .select("id, name, status")
+      .order("name");
+    setAllEngagements(allEngs || []);
+
+    setLoading(false);
+  }
 
   useEffect(() => {
-    async function fetchData() {
-      const { data: cData } = await supabase
-        .from("contractors")
-        .select("*")
-        .eq("id", id)
-        .single();
-      if (cData) setContractor(cData);
-
-      // Fetch linked engagements via junction table
-      const { data: links } = await supabase
-        .from("engagement_contractors")
-        .select("engagements(*, accounts(name))")
-        .eq("contractor_id", id);
-
-      const mapped = (links || [])
-        .map((l: any) => l.engagements)
-        .filter(Boolean);
-      setEngagements(mapped);
-
-      setLoading(false);
-    }
     fetchData();
   }, [id]);
 
@@ -183,13 +205,102 @@ export default function ContractorDetailPage({ params }: { params: Promise<{ id:
 
       {/* Linked Engagements */}
       <Card className="border-none shadow-sm">
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-lg font-bold text-[#111827]">
-            Linked Engagements ({engagements.length})
+            Linked Engagements ({managingEngagements ? selectedEngIds.length : engagements.length})
           </CardTitle>
+          {!managingEngagements ? (
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-slate-200"
+              onClick={() => setManagingEngagements(true)}
+            >
+              <Settings2 className="w-4 h-4 mr-2" /> Manage
+            </Button>
+          ) : (
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                className="bg-blue-600 hover:bg-blue-700"
+                disabled={savingEngagements}
+                onClick={async () => {
+                  setSavingEngagements(true);
+                  // Delete existing links, re-insert selected
+                  await supabase.from("engagement_contractors").delete().eq("contractor_id", id);
+                  if (selectedEngIds.length > 0) {
+                    const rows = selectedEngIds.map((eid) => ({ engagement_id: eid, contractor_id: id }));
+                    await supabase.from("engagement_contractors").insert(rows);
+                  }
+                  setSavingEngagements(false);
+                  setManagingEngagements(false);
+                  toast.success("Engagements updated");
+                  await fetchData();
+                }}
+              >
+                {savingEngagements ? "Saving..." : "Save"}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setSelectedEngIds(engagements.map((e) => e.id));
+                  setManagingEngagements(false);
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          )}
         </CardHeader>
         <CardContent>
-          {engagements.length > 0 ? (
+          {managingEngagements ? (
+            <div className="space-y-4">
+              {/* Currently selected as removable badges */}
+              {selectedEngIds.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {selectedEngIds.map((eid) => {
+                    const eng = allEngagements.find((e) => e.id === eid);
+                    return (
+                      <Badge key={eid} variant="secondary" className="gap-1 px-2 py-1 bg-blue-50 text-blue-800 border-none">
+                        <Briefcase className="w-3 h-3" />
+                        {eng?.name || "Unknown"}
+                        <button
+                          type="button"
+                          className="ml-1 hover:text-red-600"
+                          onClick={() => setSelectedEngIds((prev) => prev.filter((x) => x !== eid))}
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </Badge>
+                    );
+                  })}
+                </div>
+              )}
+              <Select
+                onValueChange={(val) => {
+                  if (!selectedEngIds.includes(val)) {
+                    setSelectedEngIds((prev) => [...prev, val]);
+                  }
+                }}
+                value=""
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Add an engagement..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {allEngagements
+                    .filter((e) => !selectedEngIds.includes(e.id))
+                    .map((e) => (
+                      <SelectItem key={e.id} value={e.id}>
+                        {e.name} ({e.status})
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-[#6B7280]">Add or remove engagement assignments for this contractor.</p>
+            </div>
+          ) : engagements.length > 0 ? (
             <div className="space-y-3">
               {engagements.map((eng) => (
                 <Link key={eng.id} href={`/engagements/${eng.id}`}>

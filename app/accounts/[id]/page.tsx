@@ -2,7 +2,7 @@
 
 import { useEffect, useState, use } from "react";
 import { supabase } from "@/lib/supabase";
-import { Account, Contact, Engagement, Opportunity, Activity } from "@/lib/types";
+import { Account, Contact, Engagement, Opportunity, Activity, Contractor, Partner } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -23,6 +23,9 @@ import {
   ArrowUpRight,
   Clock,
   LayoutDashboard,
+  HardHat,
+  Handshake,
+  ShieldCheck,
 } from "lucide-react";
 import Link from "next/link";
 import { ActivityFeed } from "@/components/dashboard/ActivityFeed";
@@ -36,6 +39,9 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
   const [engagements, setEngagements] = useState<Engagement[]>([]);
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
+  const [contractors, setContractors] = useState<(Contractor & { engagement_name?: string })[]>([]);
+  const [partners, setPartners] = useState<(Partner & { engagement_name?: string })[]>([]);
+  const [engContractorMap, setEngContractorMap] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -82,10 +88,54 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
         .filter(Boolean) as Contact[];
       
       setContacts(mappedContacts);
-      setEngagements(engagementsRes.data || []);
+      const engs = engagementsRes.data || [];
+      setEngagements(engs);
       setOpportunities(opportunitiesRes.data || []);
       setActivities(activitiesRes.data || []);
-      
+
+      // Fetch contractors linked to this account's engagements
+      if (engs.length > 0) {
+        const engIds = engs.map((e: any) => e.id);
+        const { data: ecLinks } = await supabase
+          .from("engagement_contractors")
+          .select("engagement_id, contractors(*)")
+          .in("engagement_id", engIds);
+
+        // Build engagement -> contractor names map and deduplicated contractor list
+        const cMap: Record<string, string[]> = {};
+        const seen = new Map<string, Contractor & { engagement_name?: string }>();
+        const engNameMap: Record<string, string> = {};
+        engs.forEach((e: any) => { engNameMap[e.id] = e.name; });
+
+        (ecLinks || []).forEach((link: any) => {
+          if (!link.contractors) return;
+          const c = link.contractors as Contractor;
+          if (!cMap[link.engagement_id]) cMap[link.engagement_id] = [];
+          cMap[link.engagement_id].push(c.full_name);
+          if (!seen.has(c.id)) {
+            seen.set(c.id, { ...c, engagement_name: engNameMap[link.engagement_id] });
+          }
+        });
+        setEngContractorMap(cMap);
+        setContractors(Array.from(seen.values()));
+
+        // Fetch partners linked to this account's engagements
+        const { data: epLinks } = await supabase
+          .from("engagement_partners")
+          .select("engagement_id, partners(*)")
+          .in("engagement_id", engIds);
+
+        const pSeen = new Map<string, Partner & { engagement_name?: string }>();
+        (epLinks || []).forEach((link: any) => {
+          if (!link.partners) return;
+          const p = link.partners as Partner;
+          if (!pSeen.has(p.id)) {
+            pSeen.set(p.id, { ...p, engagement_name: engNameMap[link.engagement_id] });
+          }
+        });
+        setPartners(Array.from(pSeen.values()));
+      }
+
       setLoading(false);
     }
 
@@ -195,6 +245,18 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
               Stakeholders ({contacts.length})
             </TabsTrigger>
             <TabsTrigger 
+              value="contractors" 
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#6B7280] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
+            >
+              Contractors ({contractors.length})
+            </TabsTrigger>
+            <TabsTrigger 
+              value="partners" 
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#6B7280] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
+            >
+              Partners ({partners.length})
+            </TabsTrigger>
+            <TabsTrigger 
               value="activities" 
               className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#6B7280] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
             >
@@ -279,10 +341,14 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
                   <span className="text-sm text-[#6B7280]">Stakeholders</span>
                   <span className="font-bold text-[#111827]">{contacts.length}</span>
                 </div>
-                  <div className="flex justify-between items-center py-2">
-                    <span className="text-sm text-[#6B7280]">Last Interaction</span>
-                    <span className="font-bold text-[#111827]">{activities.length > 0 ? formatDate(activities[0].date_time) : "N/A"}</span>
-                  </div>
+                <div className="flex justify-between items-center py-2 border-b border-slate-50">
+                  <span className="text-sm text-[#6B7280]">Contractors</span>
+                  <span className="font-bold text-amber-600">{contractors.length}</span>
+                </div>
+                <div className="flex justify-between items-center py-2">
+                  <span className="text-sm text-[#6B7280]">Last Interaction</span>
+                  <span className="font-bold text-[#111827]">{activities.length > 0 ? formatDate(activities[0].date_time) : "N/A"}</span>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -387,6 +453,17 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
                       {eng.status}
                     </Badge>
                   </div>
+                  {/* Assigned contractors */}
+                  {engContractorMap[eng.id] && engContractorMap[eng.id].length > 0 && (
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {engContractorMap[eng.id].map((name) => (
+                        <Badge key={name} variant="secondary" className="text-[9px] h-4 px-1.5 bg-amber-50 text-amber-700 border-none">
+                          <HardHat className="w-2.5 h-2.5 mr-0.5" />
+                          {name}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
                   <div className="flex items-center justify-between pt-4 border-t border-slate-50">
                     <div className="flex flex-col">
                       <span className="text-xs text-[#6B7280]">Value</span>
@@ -480,6 +557,101 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
                 <Link href={`/pipeline/new?account_id=${account.id}`} className="text-blue-600 text-xs font-bold hover:underline mt-2 inline-block">
                   Add an opportunity
                 </Link>
+              </div>
+            )}
+          </div>
+        </TabsContent>
+
+        {/* Contractors Tab */}
+        <TabsContent value="contractors" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-bold text-[#111827]">Contractors</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {contractors.map((c) => (
+              <Card
+                key={c.id}
+                className="hover:shadow-md transition-all cursor-pointer border-slate-100 group"
+                onClick={() => window.location.href = `/contractors/${c.id}`}
+              >
+                <CardContent className="p-5 flex gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center">
+                    <HardHat className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-bold text-[#111827] group-hover:text-blue-600 transition-colors truncate">
+                      {c.full_name}
+                    </h4>
+                    <p className="text-xs text-[#6B7280] truncate">{c.title_role || "Contractor"}</p>
+                    {c.engagement_name && (
+                      <p className="text-[10px] text-[#9CA3AF] mt-1 truncate">
+                        On: {c.engagement_name}
+                      </p>
+                    )}
+                    <div className="mt-2 flex items-center gap-2">
+                      {c.email && (
+                        <span className="text-[10px] text-[#6B7280] flex items-center gap-1">
+                          <Mail className="w-3 h-3" /> {c.email}
+                        </span>
+                      )}
+                    </div>
+                    <Badge className={cn("text-[9px] h-4 px-1 border-none mt-2", getStatusColor(c.status))}>
+                      {c.status}
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+            {contractors.length === 0 && (
+              <div className="col-span-full py-16 text-center bg-white rounded-2xl border-2 border-dashed border-slate-100">
+                <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <HardHat className="w-6 h-6 text-slate-300" />
+                </div>
+                <p className="text-[#6B7280] text-sm font-medium">No contractors linked to this account&apos;s engagements</p>
+              </div>
+            )}
+          </div>
+        </TabsContent>
+
+        {/* Partners Tab */}
+        <TabsContent value="partners" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-bold text-[#111827]">Partners</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {partners.map((p) => (
+              <Card
+                key={p.id}
+                className="hover:shadow-md transition-all cursor-pointer border-slate-100 group"
+                onClick={() => window.location.href = `/partners/${p.id}`}
+              >
+                <CardContent className="p-5 flex gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center">
+                    <Handshake className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-bold text-[#111827] group-hover:text-blue-600 transition-colors truncate">
+                      {p.name}
+                    </h4>
+                    <p className="text-xs text-[#6B7280] truncate">{p.partner_type || "Partner"}</p>
+                    {p.engagement_name && (
+                      <p className="text-[10px] text-[#9CA3AF] mt-1 truncate">
+                        On: {p.engagement_name}
+                      </p>
+                    )}
+                    {p.capabilities && (
+                      <p className="text-[10px] text-[#6B7280] mt-2 truncate">{p.capabilities}</p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+            {partners.length === 0 && (
+              <div className="col-span-full py-16 text-center bg-white rounded-2xl border-2 border-dashed border-slate-100">
+                <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Handshake className="w-6 h-6 text-slate-300" />
+                </div>
+                <p className="text-[#6B7280] text-sm font-medium">No partners linked to this account&apos;s engagements</p>
               </div>
             )}
           </div>
