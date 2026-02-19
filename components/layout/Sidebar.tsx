@@ -25,6 +25,10 @@ import {
   ClipboardList,
   FileCheck,
   CalendarDays,
+  DollarSign,
+  Receipt,
+  CreditCard,
+  Banknote,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -56,6 +60,14 @@ const quickActions = [
   { label: "Documents", icon: FileText, href: "/documents" },
 ];
 
+const financeNavItems: { path: string; label: string; icon: typeof Building2; countKey?: string }[] = [
+  { path: "/finance", label: "Finance Dashboard", icon: DollarSign },
+  { path: "/finance/invoices", label: "Invoices", icon: Receipt, countKey: "invoices" },
+  { path: "/finance/expenses", label: "Expenses", icon: CreditCard, countKey: "expenses" },
+  { path: "/finance/payments", label: "Payments", icon: Banknote, countKey: "payments" },
+  { path: "/finance/pnl", label: "Profit & Loss", icon: TrendingUp },
+];
+
 const innovationNavItems: { path: string; label: string; icon: typeof Building2 }[] = [
   { path: "/innovation", label: "Executive Portfolio", icon: Rocket },
   { path: "/innovation/maturity", label: "Maturity Index", icon: Gauge },
@@ -71,8 +83,8 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
   useEffect(() => {
     async function fetchCounts() {
-      const keys = ["accounts", "contacts", "engagements", "activities", "opportunities", "partners", "contractors"];
-      const tableNames = ["accounts", "contacts", "engagements", "activities", "opportunities", "partners", "contractors"];
+      const keys = ["accounts", "contacts", "engagements", "activities", "opportunities", "partners", "contractors", "invoices", "expenses", "payments"];
+      const tableNames = ["accounts", "contacts", "engagements", "activities", "opportunities", "partners", "contractors", "invoices", "expenses", "payments"];
       const result: Record<string, number> = {};
       await Promise.all(
         tableNames.map(async (table, i) => {
@@ -144,6 +156,61 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                   <TooltipTrigger asChild>
                     {navItem}
                   </TooltipTrigger>
+                  <TooltipContent side="right" className="flex items-center gap-2 bg-gray-900 text-white border-gray-800">
+                    {item.label}
+                    {item.countKey != null && (
+                      <Badge variant="secondary" className="h-5 px-1.5 text-[10px] bg-gray-100 text-gray-500 border-none">
+                        {counts[item.countKey] ?? "—"}
+                      </Badge>
+                    )}
+                  </TooltipContent>
+                </Tooltip>
+              );
+            }
+
+            return <div key={item.path}>{navItem}</div>;
+          })}
+
+          {/* Finance section */}
+          {!collapsed && (
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-4 mb-2 px-3">
+              Finance
+            </p>
+          )}
+
+          {financeNavItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = pathname === item.path || (item.path !== "/finance" && pathname?.startsWith(item.path));
+
+            const navItem = (
+              <Link
+                href={item.path}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors mb-1",
+                  isActive
+                    ? "bg-blue-600 text-white"
+                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
+                  collapsed && "justify-center px-2"
+                )}
+              >
+                <Icon className={cn("flex-shrink-0", collapsed ? "w-5 h-5" : "w-4 h-4")} />
+                {!collapsed && (
+                  <>
+                    <span className="flex-1">{item.label}</span>
+                    {item.countKey != null && (
+                      <Badge variant="secondary" className="h-5 px-1.5 text-[10px] bg-gray-100 text-gray-500 border-none">
+                        {counts[item.countKey] ?? "—"}
+                      </Badge>
+                    )}
+                  </>
+                )}
+              </Link>
+            );
+
+            if (collapsed) {
+              return (
+                <Tooltip key={item.path} delayDuration={0}>
+                  <TooltipTrigger asChild>{navItem}</TooltipTrigger>
                   <TooltipContent side="right" className="flex items-center gap-2 bg-gray-900 text-white border-gray-800">
                     {item.label}
                     {item.countKey != null && (

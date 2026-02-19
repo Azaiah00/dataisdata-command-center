@@ -33,3 +33,9 @@ export const STATUS_COLORS: Record<string, string> = {
   Prospect: 'text-blue-600 bg-blue-50',
   Dormant: 'text-slate-600 bg-slate-50',
 };
+
+// Finance Hub constants
+export const INVOICE_STATUSES = ['Draft', 'Sent', 'Paid', 'Overdue', 'Cancelled'] as const;
+export const PAYMENT_METHODS = ['Check', 'ACH', 'Wire', 'Credit Card', 'Other'] as const;
+export const EXPENSE_CATEGORIES = ['Labor', 'Materials', 'Travel', 'Software', 'Overhead', 'Other'] as const;
+export const EXPENSE_STATUSES = ['Pending', 'Approved', 'Reimbursed'] as const;

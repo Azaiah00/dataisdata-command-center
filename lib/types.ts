@@ -286,3 +286,74 @@ export interface P3Deal {
     status: string | null;
     created_at: string;
 }
+
+// Finance Hub types
+
+export type InvoiceStatus = 'Draft' | 'Sent' | 'Paid' | 'Overdue' | 'Cancelled';
+export type PaymentMethod = 'Check' | 'ACH' | 'Wire' | 'Credit Card' | 'Other';
+export type ExpenseCategory = 'Labor' | 'Materials' | 'Travel' | 'Software' | 'Overhead' | 'Other';
+export type ExpenseStatus = 'Pending' | 'Approved' | 'Reimbursed';
+
+export interface Invoice {
+    id: string;
+    invoice_number: string;
+    account_id: string;
+    engagement_id: string | null;
+    issue_date: string;
+    due_date: string | null;
+    status: InvoiceStatus;
+    subtotal: number;
+    tax_amount: number;
+    total: number;
+    notes: string | null;
+    attachments: string[] | null;
+    created_at: string;
+    updated_at: string;
+    // Joined data
+    accounts?: { id: string; name: string };
+    engagements?: { id: string; name: string };
+    invoice_line_items?: InvoiceLineItem[];
+    payments?: Payment[];
+}
+
+export interface InvoiceLineItem {
+    id: string;
+    invoice_id: string;
+    description: string;
+    quantity: number;
+    unit_price: number;
+    amount: number;
+    created_at: string;
+}
+
+export interface Payment {
+    id: string;
+    invoice_id: string;
+    amount: number;
+    payment_date: string;
+    payment_method: PaymentMethod;
+    reference_number: string | null;
+    notes: string | null;
+    created_at: string;
+    // Joined data
+    invoices?: { id: string; invoice_number: string; account_id: string; accounts?: { name: string } };
+}
+
+export interface Expense {
+    id: string;
+    engagement_id: string | null;
+    account_id: string | null;
+    contractor_id: string | null;
+    category: ExpenseCategory;
+    description: string;
+    amount: number;
+    expense_date: string;
+    receipt_url: string | null;
+    status: ExpenseStatus;
+    created_at: string;
+    updated_at: string;
+    // Joined data
+    accounts?: { name: string };
+    engagements?: { name: string };
+    contractors?: { full_name: string };
+}
