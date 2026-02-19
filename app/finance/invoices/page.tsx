@@ -13,15 +13,22 @@ import { cn, formatCurrency, formatDate, getStatusColor } from "@/lib/utils";
 export default function InvoicesPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetch() {
+      setErrorMessage(null);
       const { data, error } = await supabase
         .from("invoices")
         .select("*, accounts(id, name), engagements(id, name)")
         .order("created_at", { ascending: false });
-      if (error) console.error("Error fetching invoices:", error);
-      setInvoices(data || []);
+      if (error) {
+        // Log full details (Supabase errors often don't stringify as {})
+        console.error("Error fetching invoices:", error.message || error.code || String(error));
+        setErrorMessage(error.message || "Could not load invoices. If you just added Finance, run supabase/finance-schema.sql in your Supabase SQL Editor.");
+      } else {
+        setInvoices(data || []);
+      }
       setLoading(false);
     }
     fetch();
@@ -92,17 +99,24 @@ export default function InvoicesPage() {
           </Button>
         </Link>
       </div>
+      {errorMessage && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+          <p className="font-medium">Could not load invoices</p>
+          <p className="mt-1 text-amber-700">{errorMessage}</p>
+          <p className="mt-2 text-xs">Run the SQL in <code className="bg-amber-100 px-1 rounded">supabase/finance-schema.sql</code> in your Supabase Dashboard → SQL Editor to create the finance tables.</p>
+        </div>
+      )}
       {loading ? (
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
         </div>
-      ) : (
+      ) : !errorMessage ? (
         <DataTable
           columns={columns}
           data={invoices}
           onRowClick={(inv) => { window.location.href = `/finance/invoices/${inv.id}`; }}
         />
-      )}
+      ) : null}
     </div>
   );
 }
