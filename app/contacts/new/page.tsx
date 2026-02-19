@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { supabase } from "@/lib/supabase";
-import { RELATIONSHIP_HEALTHS } from "@/lib/constants";
+import { RELATIONSHIP_HEALTHS, ACCOUNT_TYPES } from "@/lib/constants";
 import { Account } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +16,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
@@ -26,18 +27,25 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Plus, Search } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   full_name: z.string().min(2, "Name must be at least 2 characters."),
   title_role: z.string().optional(),
-  account_id: z.string().uuid("Please select an account."),
+  account_id: z.string().optional(),
+  // New account fields
+  new_account_name: z.string().optional(),
+  new_account_type: z.enum(ACCOUNT_TYPES).optional(),
   email: z.string().email("Invalid email address.").or(z.literal("")),
   phone: z.string().optional(),
   influence_level: z.string().min(1, "Select influence level"),
   relationship_health: z.enum(RELATIONSHIP_HEALTHS),
   next_step: z.string().optional(),
+}).refine((data) => data.account_id || data.new_account_name, {
+  message: "Please select an existing account or provide a name for a new one.",
+  path: ["account_id"],
 });
 
 function ContactForm() {
@@ -47,6 +55,8 @@ function ContactForm() {
   
   const [accounts, setAccounts] = useState<Pick<Account, "id" | "name">[]>([]);
   const [loadingAccounts, setLoadingAccounts] = useState(true);
+  const [isCreatingAccount, setIsCreatingAccount] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -54,6 +64,8 @@ function ContactForm() {
       full_name: "",
       title_role: "",
       account_id: preselectedAccountId || "",
+      new_account_name: "",
+      new_account_type: "City",
       email: "",
       phone: "",
       influence_level: "3",
@@ -72,23 +84,71 @@ function ContactForm() {
   }, []);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const payload = {
-      ...values,
-      influence_level: values.influence_level ? parseInt(values.influence_level, 10) : null,
-    };
-    const { error } = await supabase.from("contacts").insert([payload]);
+    setIsSubmitting(true);
+    try {
+      let accountId = values.account_id;
 
-    if (error) {
+      // 1. Create account if needed
+      if (isCreatingAccount && values.new_account_name) {
+        const { data: newAcc, error: accError } = await supabase
+          .from("accounts")
+          .insert([{ 
+            name: values.new_account_name, 
+            account_type: values.new_account_type,
+            status: 'Active'
+          }])
+          .select()
+          .single();
+
+        if (accError) throw accError;
+        accountId = newAcc.id;
+      }
+
+      // 2. Create contact
+      const contactPayload = {
+        full_name: values.full_name,
+        title_role: values.title_role,
+        account_id: accountId, // Keep for legacy/backward compatibility
+        email: values.email,
+        phone: values.phone,
+        influence_level: values.influence_level ? parseInt(values.influence_level, 10) : null,
+        relationship_health: values.relationship_health,
+        next_step: values.next_step,
+      };
+
+      const { data: newContact, error: contactError } = await supabase
+        .from("contacts")
+        .insert([contactPayload])
+        .select()
+        .single();
+
+      if (contactError) throw contactError;
+
+      // 3. Create link in account_contacts
+      if (accountId) {
+        const { error: linkError } = await supabase
+          .from("account_contacts")
+          .insert([{ account_id: accountId, contact_id: newContact.id }]);
+        
+        if (linkError) {
+          console.warn("Failed to create account_contacts link, but contact was created:", linkError);
+        }
+      }
+
+      toast.success("Contact created successfully");
+      
+      if (preselectedAccountId || accountId) {
+        router.push(`/accounts/${preselectedAccountId || accountId}`);
+      } else {
+        router.push("/contacts");
+      }
+      router.refresh();
+    } catch (error: any) {
       console.error("Error creating contact:", error);
-      return;
+      toast.error(error.message || "Failed to create contact");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    if (preselectedAccountId) {
-      router.push(`/accounts/${preselectedAccountId}`);
-    } else {
-      router.push("/contacts");
-    }
-    router.refresh();
   }
 
   return (
@@ -136,34 +196,102 @@ function ContactForm() {
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="account_id"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Account</FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
-                        defaultValue={field.value}
-                        disabled={loadingAccounts}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder={loadingAccounts ? "Loading accounts..." : "Select account"} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {accounts.map((acc) => (
-                            <SelectItem key={acc.id} value={acc.id}>
-                              {acc.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
+                <div className="md:col-span-2 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <FormLabel>Account Association</FormLabel>
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-blue-600 hover:text-blue-700 h-8 px-2"
+                      onClick={() => {
+                        setIsCreatingAccount(!isCreatingAccount);
+                        if (!isCreatingAccount) {
+                          form.setValue("account_id", "");
+                        } else {
+                          form.setValue("new_account_name", "");
+                        }
+                      }}
+                    >
+                      {isCreatingAccount ? (
+                        <><Search className="w-3.5 h-3.5 mr-1.5" /> Select Existing</>
+                      ) : (
+                        <><Plus className="w-3.5 h-3.5 mr-1.5" /> Create New Account</>
+                      )}
+                    </Button>
+                  </div>
+
+                  {!isCreatingAccount ? (
+                    <FormField
+                      control={form.control}
+                      name="account_id"
+                      render={({ field }) => (
+                        <FormItem>
+                          <Select 
+                            onValueChange={field.onChange} 
+                            value={field.value}
+                            disabled={loadingAccounts}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder={loadingAccounts ? "Loading accounts..." : "Select account"} />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {accounts.map((acc) => (
+                                <SelectItem key={acc.id} value={acc.id}>
+                                  {acc.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormDescription>Select the primary account for this contact.</FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-lg bg-slate-50/50">
+                      <FormField
+                        control={form.control}
+                        name="new_account_name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs uppercase font-bold text-slate-500">New Account Name</FormLabel>
+                            <FormControl>
+                              <Input placeholder="e.g. City of Richmond" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="new_account_type"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs uppercase font-bold text-slate-500">Account Type</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select type" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {ACCOUNT_TYPES.map((type) => (
+                                  <SelectItem key={type} value={type}>
+                                    {type}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                   )}
-                />
+                </div>
 
                 <FormField
                   control={form.control}
@@ -181,6 +309,31 @@ function ContactForm() {
                           {RELATIONSHIP_HEALTHS.map((health) => (
                             <SelectItem key={health} value={health}>
                               {health}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="influence_level"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Influence Level (1-5)</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select level" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {[1, 2, 3, 4, 5].map((lvl) => (
+                            <SelectItem key={lvl} value={lvl.toString()}>
+                              {lvl} {lvl === 5 ? "(Critical)" : lvl === 1 ? "(Low)" : ""}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -217,31 +370,6 @@ function ContactForm() {
                     </FormItem>
                   )}
                 />
-
-                <FormField
-                  control={form.control}
-                  name="influence_level"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Influence Level (1-5)</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select level" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {[1, 2, 3, 4, 5].map((lvl) => (
-                            <SelectItem key={lvl} value={lvl.toString()}>
-                              {lvl} {lvl === 5 ? "(Critical)" : lvl === 1 ? "(Low)" : ""}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
               </div>
 
               <FormField
@@ -259,11 +387,11 @@ function ContactForm() {
               />
 
               <div className="flex justify-end gap-4">
-                <Button variant="outline" type="button" onClick={() => router.back()}>
+                <Button variant="outline" type="button" onClick={() => router.back()} disabled={isSubmitting}>
                   Cancel
                 </Button>
-                <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
-                  Create Contact
+                <Button type="submit" className="bg-blue-600 hover:bg-blue-700" disabled={isSubmitting}>
+                  {isSubmitting ? "Creating..." : "Create Contact"}
                 </Button>
               </div>
             </form>

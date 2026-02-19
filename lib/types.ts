@@ -17,8 +17,13 @@ export interface Account {
     status: AccountStatus;
     owner: string | null;
     notes: string | null;
+    parent_account_id: string | null;
     created_at: string;
     updated_at: string;
+    // Joined data
+    parent_account?: Account;
+    child_accounts?: Account[];
+    account_contacts?: { account_id: string; contact_id: string }[];
 }
 
 export interface Contact {
@@ -37,6 +42,7 @@ export interface Contact {
     updated_at: string;
     // Joined data
     accounts?: Account;
+    account_contacts?: { account_id: string; contact_id: string }[];
 }
 
 export interface Engagement {

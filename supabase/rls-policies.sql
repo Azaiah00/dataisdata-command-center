@@ -32,3 +32,6 @@ CREATE POLICY "Allow anon all on opportunity_partners" ON opportunity_partners F
 
 ALTER TABLE activity_contacts ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow anon all on activity_contacts" ON activity_contacts FOR ALL TO anon USING (true) WITH CHECK (true);
+
+ALTER TABLE account_contacts ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow anon all on account_contacts" ON account_contacts FOR ALL TO anon USING (true) WITH CHECK (true);

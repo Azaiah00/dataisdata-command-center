@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { Contact } from "@/lib/types";
 import { DataTable } from "@/components/data-table/DataTable";
 import { Button } from "@/components/ui/button";
-import { Plus, User, Mail, Building2, ArrowUpRight } from "lucide-react";
+import { Plus, User, Mail, Building2, ArrowUpRight, Pencil } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { cn, getStatusColor } from "@/lib/utils";
@@ -22,6 +22,11 @@ export default function ContactsPage() {
           *,
           accounts (
             name
+          ),
+          account_contacts (
+            accounts (
+              name
+            )
           )
         `)
         .order("full_name");
@@ -54,14 +59,31 @@ export default function ContactsPage() {
       ),
     },
     {
-      header: "Account",
+      header: "Accounts",
       accessorKey: "account_id",
-      cell: (contact: any) => (
-        <div className="flex items-center gap-1.5 text-[#6B7280] text-xs">
-          <Building2 className="w-3.5 h-3.5" />
-          {contact.accounts?.name || "No Account"}
-        </div>
-      ),
+      cell: (contact: any) => {
+        const linkedAccounts = contact.account_contacts?.map((ac: any) => ac.accounts?.name).filter(Boolean) || [];
+        const primaryAccount = contact.accounts?.name;
+        
+        // Combine primary and linked, ensuring no duplicates
+        const allAccounts = Array.from(new Set([primaryAccount, ...linkedAccounts])).filter(Boolean);
+
+        if (allAccounts.length === 0) return <span className="text-xs text-slate-400 italic">No Account</span>;
+
+        return (
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-1.5 text-[#6B7280] text-xs">
+              <Building2 className="w-3.5 h-3.5" />
+              <span className="truncate max-w-[150px]">{allAccounts[0]}</span>
+            </div>
+            {allAccounts.length > 1 && (
+              <span className="text-[10px] text-blue-600 font-medium ml-5">
+                +{allAccounts.length - 1} more
+              </span>
+            )}
+          </div>
+        );
+      },
     },
     {
       header: "Email",
@@ -108,9 +130,14 @@ export default function ContactsPage() {
       header: "",
       accessorKey: "actions",
       cell: (contact: Contact) => (
-        <div className="flex justify-end">
-          <Link href={`/contacts/${contact.id}`}>
+        <div className="flex justify-end gap-2">
+          <Link href={`/contacts/${contact.id}/edit`}>
             <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-blue-600 hover:bg-blue-50">
+              <Pencil className="w-3.5 h-3.5" />
+            </Button>
+          </Link>
+          <Link href={`/contacts/${contact.id}`}>
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-blue-600 hover:bg-blue-700 hover:text-white">
               <ArrowUpRight className="w-4 h-4" />
             </Button>
           </Link>

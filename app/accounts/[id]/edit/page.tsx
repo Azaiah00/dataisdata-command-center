@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { supabase } from "@/lib/supabase";
-import { ACCOUNT_TYPES, ACCOUNT_STATUSES, RELATIONSHIP_HEALTHS } from "@/lib/constants";
+import { ACCOUNT_TYPES, ACCOUNT_STATUSES } from "@/lib/constants";
 import { Account, Contact } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,17 +28,9 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronLeft, Plus, Trash2, UserPlus } from "lucide-react";
-import Link from "next/link";
+import { ChevronLeft, Trash2, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
-
-const contactSchema = z.object({
-  full_name: z.string().min(2, "Name must be at least 2 characters."),
-  title_role: z.string().optional(),
-  email: z.string().email("Invalid email address.").or(z.literal("")),
-  relationship_health: z.enum(RELATIONSHIP_HEALTHS),
-});
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
@@ -51,10 +43,10 @@ const formSchema = z.object({
   notes: z.string().optional(),
   parent_account_id: z.string().optional(),
   existing_contact_ids: z.array(z.string()),
-  inline_contacts: z.array(contactSchema),
 });
 
-export default function NewAccountPage() {
+export default function EditAccountPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const router = useRouter();
   const [accounts, setAccounts] = useState<Pick<Account, "id" | "name">[]>([]);
   const [contacts, setContacts] = useState<Pick<Contact, "id" | "full_name">[]>([]);
@@ -74,35 +66,65 @@ export default function NewAccountPage() {
       notes: "",
       parent_account_id: "",
       existing_contact_ids: [],
-      inline_contacts: [],
     },
-  });
-
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: "inline_contacts",
   });
 
   useEffect(() => {
     async function fetchData() {
-      const [accRes, conRes] = await Promise.all([
+      const [accRes, conRes, currentAccRes, currentLinksRes] = await Promise.all([
         supabase.from("accounts").select("id, name").order("name"),
         supabase.from("contacts").select("id, full_name").order("full_name"),
+        supabase.from("accounts").select("*").eq("id", id).single(),
+        supabase.from("account_contacts").select("contact_id").eq("account_id", id),
       ]);
+
+      if (currentAccRes.error) {
+        toast.error("Failed to load account");
+        router.push("/accounts");
+        return;
+      }
+
       setAccounts(accRes.data || []);
       setContacts(conRes.data || []);
+      
+      const account = currentAccRes.data;
+      form.reset({
+        name: account.name,
+        account_type: account.account_type,
+        region_state: account.region_state || "",
+        region_locality: account.region_locality || "",
+        primary_focus: account.primary_focus || "",
+        status: account.status,
+        owner: account.owner || "",
+        notes: account.notes || "",
+        parent_account_id: account.parent_account_id || "none",
+        existing_contact_ids: currentLinksRes.data?.map(l => l.contact_id) || [],
+      });
+      
       setLoading(false);
     }
     fetchData();
-  }, []);
+  }, [id, form, router]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
-      // 1. Create the account
-      const { data: newAccount, error: accError } = await supabase
+      // Basic cycle guard: check if the selected parent is one of the account's children
+      if (values.parent_account_id && values.parent_account_id !== "none") {
+        const { data: children } = await supabase
+          .from("accounts")
+          .select("id")
+          .eq("parent_account_id", id);
+        
+        if (children?.some(c => c.id === values.parent_account_id)) {
+          throw new Error("Cannot set a child account as a parent (this would create a cycle).");
+        }
+      }
+
+      // 1. Update the account
+      const { error: accError } = await supabase
         .from("accounts")
-        .insert([{
+        .update({
           name: values.name,
           account_type: values.account_type,
           region_state: values.region_state,
@@ -111,58 +133,43 @@ export default function NewAccountPage() {
           status: values.status,
           owner: values.owner,
           notes: values.notes,
-          parent_account_id: values.parent_account_id || null,
-        }])
-        .select()
-        .single();
+          parent_account_id: values.parent_account_id === "none" ? null : (values.parent_account_id || null),
+        })
+        .eq("id", id);
 
       if (accError) throw accError;
 
-      const accountId = newAccount.id;
+      // 2. Update contact links (delete all and re-insert for simplicity in this MVP)
+      // In a production app, you'd diff them to avoid unnecessary churn.
+      const { error: deleteError } = await supabase
+        .from("account_contacts")
+        .delete()
+        .eq("account_id", id);
+      
+      if (deleteError) throw deleteError;
 
-      // 2. Link existing contacts
       if (values.existing_contact_ids.length > 0) {
         const links = values.existing_contact_ids.map(contactId => ({
-          account_id: accountId,
+          account_id: id,
           contact_id: contactId,
         }));
         const { error: linkError } = await supabase.from("account_contacts").insert(links);
         if (linkError) throw linkError;
       }
 
-      // 3. Create and link inline contacts
-      if (values.inline_contacts.length > 0) {
-        const newContacts = values.inline_contacts.map(c => ({
-          ...c,
-          account_id: accountId, // Legacy link
-        }));
-        
-        const { data: createdContacts, error: conError } = await supabase
-          .from("contacts")
-          .insert(newContacts)
-          .select();
-
-        if (conError) throw conError;
-
-        if (createdContacts && createdContacts.length > 0) {
-          const inlineLinks = createdContacts.map(c => ({
-            account_id: accountId,
-            contact_id: c.id,
-          }));
-          const { error: inlineLinkError } = await supabase.from("account_contacts").insert(inlineLinks);
-          if (inlineLinkError) throw inlineLinkError;
-        }
-      }
-
-      toast.success("Account created successfully");
-      router.push(`/accounts/${accountId}`);
+      toast.success("Account updated successfully");
+      router.push(`/accounts/${id}`);
       router.refresh();
     } catch (error: any) {
-      console.error("Error creating account:", error);
-      toast.error(error.message || "Failed to create account");
+      console.error("Error updating account:", error);
+      toast.error(error.message || "Failed to update account");
     } finally {
       setIsSubmitting(false);
     }
+  }
+
+  if (loading) {
+    return <div className="flex items-center justify-center min-h-[400px]">Loading account details...</div>;
   }
 
   return (
@@ -171,7 +178,7 @@ export default function NewAccountPage() {
         <Button variant="ghost" size="icon" onClick={() => router.back()}>
           <ChevronLeft className="w-5 h-5" />
         </Button>
-        <h1 className="text-3xl font-bold tracking-tight">New Account</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Edit Account</h1>
       </div>
 
       <Form {...form}>
@@ -202,7 +209,7 @@ export default function NewAccountPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Account Type</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select type" />
@@ -235,7 +242,7 @@ export default function NewAccountPage() {
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="none">None</SelectItem>
-                          {accounts.map((acc) => (
+                          {accounts.filter(acc => acc.id !== id).map((acc) => (
                             <SelectItem key={acc.id} value={acc.id}>
                               {acc.name}
                             </SelectItem>
@@ -254,7 +261,7 @@ export default function NewAccountPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Status</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select status" />
@@ -340,16 +347,8 @@ export default function NewAccountPage() {
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Stakeholders</CardTitle>
-                <p className="text-sm text-slate-500 mt-1">Link existing contacts or create new ones for this account.</p>
+                <p className="text-sm text-slate-500 mt-1">Manage linked contacts for this account.</p>
               </div>
-              <Button 
-                type="button" 
-                variant="outline" 
-                size="sm"
-                onClick={() => append({ full_name: "", title_role: "", email: "", relationship_health: "Cold" })}
-              >
-                <UserPlus className="w-4 h-4 mr-2" /> Add New Contact
-              </Button>
             </CardHeader>
             <CardContent className="space-y-6">
               <FormField
@@ -357,19 +356,19 @@ export default function NewAccountPage() {
                 name="existing_contact_ids"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Link Existing Contacts</FormLabel>
+                    <FormLabel>Linked Contacts</FormLabel>
                     <div className="flex flex-wrap gap-2 mb-2">
-                      {field.value.map(id => {
-                        const contact = contacts.find(c => c.id === id);
+                      {field.value.map(contactId => {
+                        const contact = contacts.find(c => c.id === contactId);
                         return (
-                          <Badge key={id} variant="secondary" className="pl-2 pr-1 py-1 flex items-center gap-1">
+                          <Badge key={contactId} variant="secondary" className="pl-2 pr-1 py-1 flex items-center gap-1">
                             {contact?.full_name}
                             <Button 
                               type="button" 
                               variant="ghost" 
                               size="icon" 
                               className="h-4 w-4 hover:bg-transparent"
-                              onClick={() => field.onChange(field.value.filter(i => i !== id))}
+                              onClick={() => field.onChange(field.value.filter(i => i !== contactId))}
                             >
                               <Trash2 className="h-3 w-3 text-slate-400" />
                             </Button>
@@ -398,87 +397,6 @@ export default function NewAccountPage() {
                   </FormItem>
                 )}
               />
-
-              {fields.length > 0 && (
-                <div className="space-y-4 pt-4 border-t">
-                  <h4 className="text-sm font-semibold">New Contacts to Create</h4>
-                  {fields.map((field, index) => (
-                    <div key={field.id} className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border rounded-lg bg-slate-50 relative group">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-white border shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={() => remove(index)}
-                      >
-                        <Trash2 className="h-3 w-3 text-red-500" />
-                      </Button>
-                      
-                      <FormField
-                        control={form.control}
-                        name={`inline_contacts.${index}.full_name`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-[10px] uppercase font-bold text-slate-500">Full Name</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Name" {...field} className="h-8 text-sm" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name={`inline_contacts.${index}.title_role`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-[10px] uppercase font-bold text-slate-500">Title</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Title" {...field} className="h-8 text-sm" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name={`inline_contacts.${index}.email`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-[10px] uppercase font-bold text-slate-500">Email</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Email" {...field} className="h-8 text-sm" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name={`inline_contacts.${index}.relationship_health`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-[10px] uppercase font-bold text-slate-500">Health</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger className="h-8 text-sm">
-                                  <SelectValue placeholder="Health" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {RELATIONSHIP_HEALTHS.map((h) => (
-                                  <SelectItem key={h} value={h}>{h}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
             </CardContent>
           </Card>
 
@@ -487,7 +405,7 @@ export default function NewAccountPage() {
               Cancel
             </Button>
             <Button type="submit" className="bg-blue-600 hover:bg-blue-700" disabled={isSubmitting}>
-              {isSubmitting ? "Creating..." : "Create Account"}
+              {isSubmitting ? "Saving..." : "Save Changes"}
             </Button>
           </div>
         </form>

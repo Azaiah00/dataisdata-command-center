@@ -20,6 +20,7 @@ CREATE TABLE accounts (
     status account_status DEFAULT 'Prospect',
     owner TEXT,
     notes TEXT,
+    parent_account_id UUID REFERENCES accounts(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ DEFAULT now(),
     updated_at TIMESTAMPTZ DEFAULT now()
 );
@@ -133,6 +134,12 @@ CREATE TABLE activity_contacts (
     activity_id UUID REFERENCES activities(id) ON DELETE CASCADE,
     contact_id UUID REFERENCES contacts(id) ON DELETE CASCADE,
     PRIMARY KEY (activity_id, contact_id)
+);
+
+CREATE TABLE account_contacts (
+    account_id UUID REFERENCES accounts(id) ON DELETE CASCADE,
+    contact_id UUID REFERENCES contacts(id) ON DELETE CASCADE,
+    PRIMARY KEY (account_id, contact_id)
 );
 
 -- Seed Data

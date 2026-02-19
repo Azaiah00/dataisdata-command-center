@@ -30,6 +30,8 @@ import { ActivityFeed } from "@/components/dashboard/ActivityFeed";
 export default function AccountDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [account, setAccount] = useState<Account | null>(null);
+  const [parentAccount, setParentAccount] = useState<Account | null>(null);
+  const [childAccounts, setChildAccounts] = useState<Account[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [engagements, setEngagements] = useState<Engagement[]>([]);
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
@@ -45,17 +47,41 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
         .eq("id", id)
         .single();
       
-      if (accData) setAccount(accData);
+      if (accData) {
+        setAccount(accData);
+        
+        // Fetch Parent Account if exists
+        if (accData.parent_account_id) {
+          const { data: parentData } = await supabase
+            .from("accounts")
+            .select("*")
+            .eq("id", accData.parent_account_id)
+            .single();
+          setParentAccount(parentData);
+        }
+
+        // Fetch Child Accounts
+        const { data: childrenData } = await supabase
+          .from("accounts")
+          .select("*")
+          .eq("parent_account_id", id);
+        setChildAccounts(childrenData || []);
+      }
 
       // Fetch Related Data
-      const [contactsRes, engagementsRes, opportunitiesRes, activitiesRes] = await Promise.all([
-        supabase.from("contacts").select("*").eq("account_id", id),
+      const [linksRes, engagementsRes, opportunitiesRes, activitiesRes] = await Promise.all([
+        supabase.from("account_contacts").select("contacts(*)").eq("account_id", id),
         supabase.from("engagements").select("*").eq("account_id", id),
         supabase.from("opportunities").select("*").eq("account_id", id),
         supabase.from("activities").select("*, accounts(name)").eq("account_id", id).order("date_time", { ascending: false }),
       ]);
 
-      setContacts(contactsRes.data || []);
+      // Map contacts from junction table
+      const mappedContacts = (linksRes.data || [])
+        .map((link: any) => link.contacts)
+        .filter(Boolean) as Contact[];
+      
+      setContacts(mappedContacts);
       setEngagements(engagementsRes.data || []);
       setOpportunities(opportunitiesRes.data || []);
       setActivities(activitiesRes.data || []);
@@ -127,12 +153,16 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" className="border-slate-200 text-slate-700 bg-white">
-              Edit Account
-            </Button>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-              Add Interaction
-            </Button>
+            <Link href={`/accounts/${id}/edit`}>
+              <Button variant="outline" className="border-slate-200 text-slate-700 bg-white">
+                Edit Account
+              </Button>
+            </Link>
+            <Link href={`/activities/new?account_id=${id}`}>
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                Add Interaction
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
@@ -184,6 +214,34 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
                 <div className="text-sm text-[#4B5563] leading-relaxed">
                   {account.notes || "No additional notes available for this account."}
                 </div>
+                
+                {(parentAccount || childAccounts.length > 0) && (
+                  <div className="pt-6 border-t border-slate-100 space-y-4">
+                    {parentAccount && (
+                      <div>
+                        <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-widest block mb-1">Parent Account</span>
+                        <Link href={`/accounts/${parentAccount.id}`} className="text-sm font-semibold text-blue-600 hover:underline">
+                          {parentAccount.name}
+                        </Link>
+                      </div>
+                    )}
+                    {childAccounts.length > 0 && (
+                      <div>
+                        <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-widest block mb-1">Child Accounts</span>
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          {childAccounts.map(child => (
+                            <Link key={child.id} href={`/accounts/${child.id}`}>
+                              <Badge variant="outline" className="text-blue-600 border-blue-100 bg-blue-50/50 hover:bg-blue-50">
+                                {child.name}
+                              </Badge>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <div className="pt-6 border-t border-slate-100 flex flex-wrap gap-x-12 gap-y-4">
                   <div>
                     <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-widest block mb-1">Owner</span>
