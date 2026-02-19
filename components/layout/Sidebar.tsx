@@ -45,8 +45,8 @@ const mainNavItems: { path: string; label: string; icon: typeof Building2; count
 
 const quickActions = [
   { label: "New Activity", icon: Plus, href: "/activities/new" },
-  { label: "Reports", icon: BarChart3, href: "#" },
-  { label: "Documents", icon: FileText, href: "#" },
+  { label: "Reports", icon: BarChart3, href: "/reports" },
+  { label: "Documents", icon: FileText, href: "/documents" },
 ];
 
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
@@ -72,16 +72,16 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   return (
     <aside
       className={cn(
-        "fixed left-0 top-16 bottom-0 z-40 bg-slate-950 border-r border-slate-800 transition-all duration-300",
+        "fixed left-0 top-16 bottom-0 z-40 bg-white border-r border-gray-200 transition-all duration-300",
         collapsed ? "w-16" : "w-64"
       )}
     >
-      {/* Toggle button - styled for dark theme */}
+      {/* Toggle button */}
       <Button
         variant="ghost"
         size="icon"
         onClick={onToggle}
-        className="absolute -right-3 top-4 h-6 w-6 rounded-full bg-slate-950 border border-slate-800 shadow-sm hover:bg-slate-900 text-slate-400 hover:text-slate-100 z-50"
+        className="absolute -right-3 top-4 h-6 w-6 rounded-full bg-white border border-gray-200 shadow-sm hover:bg-gray-50 text-gray-500 hover:text-gray-900 z-50"
       >
         {collapsed ? (
           <ChevronRight className="h-3 w-3" />
@@ -104,7 +104,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                   "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors mb-1",
                   isActive 
                     ? "bg-blue-600 text-white" 
-                    : "text-slate-400 hover:bg-slate-900 hover:text-slate-200",
+                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
                   collapsed && "justify-center px-2"
                 )}
               >
@@ -113,7 +113,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                   <>
                     <span className="flex-1">{item.label}</span>
                     {item.countKey != null && (
-                      <Badge variant="secondary" className="h-5 px-1.5 text-[10px] bg-slate-800 text-slate-400 border-none">
+                      <Badge variant="secondary" className="h-5 px-1.5 text-[10px] bg-gray-100 text-gray-500 border-none">
                         {counts[item.countKey] ?? "—"}
                       </Badge>
                     )}
@@ -128,10 +128,10 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                   <TooltipTrigger asChild>
                     {navItem}
                   </TooltipTrigger>
-                  <TooltipContent side="right" className="flex items-center gap-2 bg-slate-900 text-slate-100 border-slate-800">
+                  <TooltipContent side="right" className="flex items-center gap-2 bg-gray-900 text-white border-gray-800">
                     {item.label}
                     {item.countKey != null && (
-                      <Badge variant="secondary" className="h-5 px-1.5 text-[10px] bg-slate-800 text-slate-400 border-none">
+                      <Badge variant="secondary" className="h-5 px-1.5 text-[10px] bg-gray-100 text-gray-500 border-none">
                         {counts[item.countKey] ?? "—"}
                       </Badge>
                     )}
@@ -146,8 +146,8 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
         {/* Quick Actions */}
         {!collapsed && (
-          <div className="px-4 py-4 border-t border-slate-800">
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-3 px-2">
+          <div className="px-4 py-4 border-t border-gray-200">
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3 px-2">
               Quick Actions
             </p>
             <div className="space-y-1">
@@ -157,7 +157,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                   <Link
                     key={action.label}
                     href={action.href}
-                    className="flex items-center gap-2 px-2 py-1.5 text-sm text-slate-400 hover:text-slate-200 hover:bg-slate-900 rounded-md transition-colors"
+                    className="flex items-center gap-2 px-2 py-1.5 text-sm text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
                   >
                     <Icon className="w-4 h-4" />
                     {action.label}
@@ -169,20 +169,20 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         )}
 
         {/* Settings */}
-        <div className="px-2 py-2 border-t border-slate-800">
+        <div className="px-2 py-2 border-t border-gray-200">
           {collapsed ? (
             <Tooltip delayDuration={0}>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="w-full text-slate-400 hover:text-slate-100 hover:bg-slate-900">
+                <Button variant="ghost" size="icon" className="w-full text-gray-500 hover:text-gray-900 hover:bg-gray-100">
                   <Settings className="w-5 h-5" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="right" className="bg-slate-900 text-slate-100 border-slate-800">Settings</TooltipContent>
+              <TooltipContent side="right" className="bg-gray-900 text-white border-gray-800">Settings</TooltipContent>
             </Tooltip>
           ) : (
             <Link
               href="/settings"
-              className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-900 rounded-lg transition-colors"
+              className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <Settings className="w-4 h-4" />
               Settings
