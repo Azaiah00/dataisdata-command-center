@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -51,15 +50,7 @@ export function Header() {
         {/* Left: Logo */}
         <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center gap-3">
-            <div className="relative w-32 h-8">
-              <Image
-                src="/dataisdata-logo.png"
-                alt="DataIsData"
-                fill
-                className="object-contain"
-                priority
-              />
-            </div>
+            <span className="text-xl font-bold text-[#111827] tracking-tight">DataIsData</span>
           </Link>
           
           {/* Center: Navigation (desktop) */}
