@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FileAttachments } from "@/components/ui/FileAttachments";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 
@@ -34,6 +35,7 @@ const formSchema = z.object({
   capabilities: z.string().optional(),
   contract_vehicles: z.string().optional(),
   notes: z.string().optional(),
+  attachments: z.array(z.string()),
 });
 
 export default function NewPartnerPage() {
@@ -46,11 +48,13 @@ export default function NewPartnerPage() {
       capabilities: "",
       contract_vehicles: "",
       notes: "",
+      attachments: [],
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const { error } = await supabase.from("partners").insert([values]);
+    const payload = { ...values, attachments: values.attachments?.length ? values.attachments : null };
+    const { error } = await supabase.from("partners").insert([payload]);
 
     if (error) {
       console.error("Error creating partner:", error);
@@ -160,6 +164,20 @@ export default function NewPartnerPage() {
                         className="min-h-[100px]"
                         {...field}
                       />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="attachments"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Attachments</FormLabel>
+                    <FormControl>
+                      <FileAttachments label="" value={field.value} onChange={field.onChange} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

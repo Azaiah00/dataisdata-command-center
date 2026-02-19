@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FileAttachments } from "@/components/ui/FileAttachments";
 import { ChevronLeft } from "lucide-react";
 
 const formSchema = z.object({
@@ -39,6 +40,7 @@ const formSchema = z.object({
   outcome: z.enum(OUTCOME_TYPES),
   next_action: z.string().optional(),
   next_action_due: z.string().optional(),
+  attachments: z.array(z.string()),
 });
 
 function ActivityForm() {
@@ -65,6 +67,7 @@ function ActivityForm() {
       outcome: "Neutral",
       next_action: "",
       next_action_due: "",
+      attachments: [],
     },
   });
 
@@ -105,6 +108,7 @@ function ActivityForm() {
       engagement_id: values.engagement_id || null,
       opportunity_id: values.opportunity_id || null,
       next_action_due: values.next_action_due || null,
+      attachments: values.attachments?.length ? values.attachments : null,
     };
 
     const { error } = await supabase.from("activities").insert([payload]);
@@ -340,6 +344,20 @@ function ActivityForm() {
                   )}
                 />
               </div>
+
+              <FormField
+                control={form.control}
+                name="attachments"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Attachments</FormLabel>
+                    <FormControl>
+                      <FileAttachments label="" value={field.value} onChange={field.onChange} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <div className="flex justify-end gap-4">
                 <Button variant="outline" type="button" onClick={() => router.back()}>

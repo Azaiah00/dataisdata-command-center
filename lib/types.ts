@@ -54,6 +54,7 @@ export interface Engagement {
     end_date: string | null;
     status: EngagementStatus;
     scope_summary: string | null;
+    attachments: string[] | null;
     budget: number | null;
     contract_value: number | null;
     margin_pct: number | null;
@@ -100,6 +101,7 @@ export interface Opportunity {
     notes: string | null;
     next_step: string | null;
     next_step_due: string | null;
+    attachments: string[] | null;
     created_at: string;
     updated_at: string;
     // Joined data
@@ -114,6 +116,7 @@ export interface Partner {
     capabilities: string | null;
     contract_vehicles: string | null;
     notes: string | null;
+    attachments: string[] | null;
     created_at: string;
     updated_at: string;
 }

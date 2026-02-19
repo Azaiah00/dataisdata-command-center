@@ -27,9 +27,10 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
 
   useEffect(() => {
     async function fetchContactData() {
+      // Use FK hint to disambiguate (account_contacts also links contacts to accounts)
       const { data, error } = await supabase
         .from("contacts")
-        .select("*, accounts(*)")
+        .select("*, accounts!contacts_account_id_fkey(*)")
         .eq("id", id)
         .single();
 
@@ -92,8 +93,12 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
           <p className="text-slate-500 mt-1">{contact.title_role} at {contact.accounts?.name}</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">Edit Contact</Button>
-          <Button className="bg-blue-600 hover:bg-blue-700">Log Activity</Button>
+          <Link href={`/contacts/${id}/edit`}>
+            <Button variant="outline">Edit Contact</Button>
+          </Link>
+          <Link href={`/activities/new?account_id=${contact?.account_id || ""}`}>
+            <Button className="bg-blue-600 hover:bg-blue-700">Log Activity</Button>
+          </Link>
         </div>
       </div>
 

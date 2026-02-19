@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FileAttachments } from "@/components/ui/FileAttachments";
 import { ChevronLeft } from "lucide-react";
 
 const formSchema = z.object({
@@ -43,6 +44,7 @@ const formSchema = z.object({
   next_step: z.string().optional(),
   next_step_due: z.string().optional(),
   notes: z.string().optional(),
+  attachments: z.array(z.string()),
 });
 
 function OpportunityForm() {
@@ -70,6 +72,7 @@ function OpportunityForm() {
       next_step: "",
       next_step_due: "",
       notes: "",
+      attachments: [],
     },
   });
 
@@ -103,6 +106,7 @@ function OpportunityForm() {
       expected_start: values.expected_start || null,
       expected_end: values.expected_end || null,
       next_step_due: values.next_step_due || null,
+      attachments: values.attachments?.length ? values.attachments : null,
     };
 
     const { error } = await supabase.from("opportunities").insert([payload]);
@@ -359,6 +363,20 @@ function OpportunityForm() {
                         className="min-h-[100px]"
                         {...field}
                       />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="attachments"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Attachments</FormLabel>
+                    <FormControl>
+                      <FileAttachments label="" value={field.value} onChange={field.onChange} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

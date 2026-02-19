@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
@@ -31,14 +33,14 @@ interface SidebarProps {
   onToggle: () => void;
 }
 
-const mainNavItems = [
+const mainNavItems: { path: string; label: string; icon: typeof Building2; countKey?: string }[] = [
   { path: "/", label: "Dashboard", icon: LayoutDashboard },
-  { path: "/accounts", label: "Accounts", icon: Building2, count: 8 },
-  { path: "/contacts", label: "Contacts", icon: Users, count: 10 },
-  { path: "/engagements", label: "Engagements", icon: Briefcase, count: 5 },
-  { path: "/activities", label: "Activities", icon: Calendar, count: 7 },
-  { path: "/pipeline", label: "Pipeline", icon: TrendingUp, count: 8 },
-  { path: "/partners", label: "Partners", icon: Handshake, count: 6 },
+  { path: "/accounts", label: "Accounts", icon: Building2, countKey: "accounts" },
+  { path: "/contacts", label: "Contacts", icon: Users, countKey: "contacts" },
+  { path: "/engagements", label: "Engagements", icon: Briefcase, countKey: "engagements" },
+  { path: "/activities", label: "Activities", icon: Calendar, countKey: "activities" },
+  { path: "/pipeline", label: "Pipeline", icon: TrendingUp, countKey: "opportunities" },
+  { path: "/partners", label: "Partners", icon: Handshake, countKey: "partners" },
 ];
 
 const quickActions = [
@@ -49,6 +51,23 @@ const quickActions = [
 
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const pathname = usePathname();
+  const [counts, setCounts] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    async function fetchCounts() {
+      const keys = ["accounts", "contacts", "engagements", "activities", "opportunities", "partners"];
+      const tableNames = ["accounts", "contacts", "engagements", "activities", "opportunities", "partners"];
+      const result: Record<string, number> = {};
+      await Promise.all(
+        tableNames.map(async (table, i) => {
+          const { count, error } = await supabase.from(table).select("id", { count: "exact", head: true });
+          result[keys[i]] = error ? 0 : count ?? 0;
+        })
+      );
+      setCounts(result);
+    }
+    fetchCounts();
+  }, []);
 
   return (
     <aside
@@ -93,9 +112,9 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                 {!collapsed && (
                   <>
                     <span className="flex-1">{item.label}</span>
-                    {item.count && (
+                    {item.countKey != null && (
                       <Badge variant="secondary" className="h-5 px-1.5 text-[10px] bg-slate-800 text-slate-400 border-none">
-                        {item.count}
+                        {counts[item.countKey] ?? "—"}
                       </Badge>
                     )}
                   </>
@@ -111,9 +130,9 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                   </TooltipTrigger>
                   <TooltipContent side="right" className="flex items-center gap-2 bg-slate-900 text-slate-100 border-slate-800">
                     {item.label}
-                    {item.count && (
+                    {item.countKey != null && (
                       <Badge variant="secondary" className="h-5 px-1.5 text-[10px] bg-slate-800 text-slate-400 border-none">
-                        {item.count}
+                        {counts[item.countKey] ?? "—"}
                       </Badge>
                     )}
                   </TooltipContent>

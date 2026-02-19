@@ -34,6 +34,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { FileAttachments } from "@/components/ui/FileAttachments";
 import { Account } from "@/lib/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -58,6 +59,7 @@ const formSchema = z.object({
   end_date: z.string().optional(),
   status: z.enum(ENGAGEMENT_STATUSES),
   scope_summary: z.string().optional(),
+  attachments: z.array(z.string()),
   budget: z.string().optional(),
   contract_value: z.string().optional(),
   margin_pct: z.string().optional(),
@@ -88,6 +90,7 @@ export default function EngagementDetailPage({
       end_date: "",
       status: "Planned",
       scope_summary: "",
+      attachments: [],
       budget: "",
       contract_value: "",
       margin_pct: "",
@@ -115,6 +118,7 @@ export default function EngagementDetailPage({
       end_date: data.end_date ?? "",
       status: data.status,
       scope_summary: data.scope_summary ?? "",
+      attachments: data.attachments ?? [],
       budget: data.budget != null ? String(data.budget) : "",
       contract_value: data.contract_value != null ? String(data.contract_value) : "",
       margin_pct: data.margin_pct != null ? String(data.margin_pct) : "",
@@ -144,6 +148,7 @@ export default function EngagementDetailPage({
       end_date: values.end_date || null,
       status: values.status,
       scope_summary: values.scope_summary || null,
+      attachments: values.attachments?.length ? values.attachments : null,
       budget: values.budget === "" || values.budget == null ? null : parseFloat(values.budget),
       contract_value: values.contract_value === "" || values.contract_value == null ? null : parseFloat(values.contract_value),
       margin_pct: values.margin_pct === "" || values.margin_pct == null ? null : parseFloat(values.margin_pct),
@@ -431,6 +436,19 @@ export default function EngagementDetailPage({
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="attachments"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Attachments</FormLabel>
+                      <FormControl>
+                        <FileAttachments label="" value={field.value} onChange={field.onChange} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <div className="flex gap-2">
                   <Button type="submit" disabled={saving} className="bg-blue-600 hover:bg-blue-700">
                     {saving ? "Saving..." : "Save changes"}
@@ -510,6 +528,30 @@ export default function EngagementDetailPage({
           </CardHeader>
           <CardContent>
             <p className="text-sm text-[#4B5563] whitespace-pre-wrap">{engagement.scope_summary}</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {!isEditing && engagement.attachments && engagement.attachments.length > 0 && (
+        <Card className="border-none shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-lg font-bold text-[#111827]">Attachments</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              {engagement.attachments.map((url) => (
+                <li key={url}>
+                  <a
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-600 hover:underline"
+                  >
+                    {decodeURIComponent(url.split("/").pop() || "file")}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </CardContent>
         </Card>
       )}

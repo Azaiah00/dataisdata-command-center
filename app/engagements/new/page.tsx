@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FileAttachments } from "@/components/ui/FileAttachments";
 import { ChevronLeft } from "lucide-react";
 
 const formSchema = z.object({
@@ -37,6 +38,7 @@ const formSchema = z.object({
   end_date: z.string().optional(),
   status: z.enum(ENGAGEMENT_STATUSES),
   scope_summary: z.string().optional(),
+  attachments: z.array(z.string()),
   budget: z.string().transform((v) => (v === "" ? null : parseFloat(v))),
   contract_value: z.string().transform((v) => (v === "" ? null : parseFloat(v))),
   margin_pct: z.string().transform((v) => (v === "" ? null : parseFloat(v))),
@@ -60,6 +62,7 @@ function EngagementForm() {
       end_date: "",
       status: "Planned",
       scope_summary: "",
+      attachments: [],
       budget: "",
       contract_value: "",
       margin_pct: "",
@@ -76,7 +79,8 @@ function EngagementForm() {
   }, []);
 
   async function onSubmit(values: any) {
-    const { error } = await supabase.from("engagements").insert([values]);
+    const payload = { ...values, attachments: values.attachments?.length ? values.attachments : null };
+    const { error } = await supabase.from("engagements").insert([payload]);
 
     if (error) {
       console.error("Error creating engagement:", error);
@@ -244,6 +248,24 @@ function EngagementForm() {
                         placeholder="Briefly describe what this project covers..."
                         className="min-h-[100px]"
                         {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="attachments"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Attachments</FormLabel>
+                    <FormControl>
+                      <FileAttachments
+                        label=""
+                        value={field.value}
+                        onChange={field.onChange}
                       />
                     </FormControl>
                     <FormMessage />

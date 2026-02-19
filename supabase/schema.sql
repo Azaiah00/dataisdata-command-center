@@ -52,6 +52,7 @@ CREATE TABLE engagements (
     end_date DATE,
     status engagement_status DEFAULT 'Planned',
     scope_summary TEXT,
+    attachments TEXT[],
     budget DECIMAL(15,2),
     contract_value DECIMAL(15,2),
     margin_pct DECIMAL(5,2),
@@ -78,6 +79,7 @@ CREATE TABLE opportunities (
     notes TEXT,
     next_step TEXT,
     next_step_due DATE,
+    attachments TEXT[],
     created_at TIMESTAMPTZ DEFAULT now(),
     updated_at TIMESTAMPTZ DEFAULT now()
 );
@@ -106,6 +108,7 @@ CREATE TABLE partners (
     capabilities TEXT,
     contract_vehicles TEXT,
     notes TEXT,
+    attachments TEXT[],
     created_at TIMESTAMPTZ DEFAULT now(),
     updated_at TIMESTAMPTZ DEFAULT now()
 );

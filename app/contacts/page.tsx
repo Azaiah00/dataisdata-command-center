@@ -16,26 +16,17 @@ export default function ContactsPage() {
 
   useEffect(() => {
     async function fetchContacts() {
+      // Use simple join so list always loads even if account_contacts is missing or empty
+      // Disambiguate the accounts join via the direct FK (not through account_contacts)
       const { data, error } = await supabase
         .from("contacts")
-        .select(`
-          *,
-          accounts (
-            name
-          ),
-          account_contacts (
-            accounts (
-              name
-            )
-          )
-        `)
+        .select("*, accounts!contacts_account_id_fkey ( name )")
         .order("full_name");
 
       if (error) {
         console.error("Error fetching contacts:", error);
-      } else {
-        setContacts(data || []);
       }
+      setContacts(data ?? []);
       setLoading(false);
     }
 
@@ -59,31 +50,14 @@ export default function ContactsPage() {
       ),
     },
     {
-      header: "Accounts",
+      header: "Account",
       accessorKey: "account_id",
-      cell: (contact: any) => {
-        const linkedAccounts = contact.account_contacts?.map((ac: any) => ac.accounts?.name).filter(Boolean) || [];
-        const primaryAccount = contact.accounts?.name;
-        
-        // Combine primary and linked, ensuring no duplicates
-        const allAccounts = Array.from(new Set([primaryAccount, ...linkedAccounts])).filter(Boolean);
-
-        if (allAccounts.length === 0) return <span className="text-xs text-slate-400 italic">No Account</span>;
-
-        return (
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-1.5 text-[#6B7280] text-xs">
-              <Building2 className="w-3.5 h-3.5" />
-              <span className="truncate max-w-[150px]">{allAccounts[0]}</span>
-            </div>
-            {allAccounts.length > 1 && (
-              <span className="text-[10px] text-blue-600 font-medium ml-5">
-                +{allAccounts.length - 1} more
-              </span>
-            )}
-          </div>
-        );
-      },
+      cell: (contact: any) => (
+        <div className="flex items-center gap-1.5 text-[#6B7280] text-xs">
+          <Building2 className="w-3.5 h-3.5" />
+          {contact.accounts?.name ?? <span className="italic text-slate-400">No Account</span>}
+        </div>
+      ),
     },
     {
       header: "Email",
