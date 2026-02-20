@@ -211,7 +211,7 @@ export default function PipelinePage() {
     }
 
     // Dropping an opportunity over a stage column
-    const isOverAColumn = PIPELINE_STAGES.includes(overId as string);
+    const isOverAColumn = typeof overId === "string" && PIPELINE_STAGES.some((stage) => stage === overId);
     if (isActiveAnOpportunity && isOverAColumn && activeOpData) {
       const overStage = overId as string;
       if (activeOpData.stage !== overStage) {
@@ -239,7 +239,7 @@ export default function PipelinePage() {
 
     // Determine target stage
     let targetStage = activeOp.stage;
-    if (PIPELINE_STAGES.includes(overId as any)) {
+    if (typeof overId === "string" && PIPELINE_STAGES.some((stage) => stage === overId)) {
       targetStage = overId;
     } else {
       const overOp = opportunities.find((op) => op.id === overId);
