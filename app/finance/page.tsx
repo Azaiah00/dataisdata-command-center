@@ -47,7 +47,7 @@ export default function FinanceDashboardPage() {
         .map(([category, total]) => ({ category, total }))
         .sort((a, b) => b.total - a.total);
 
-      // Overdue invoices
+      // Overdue invoices (normalize accounts to single object; Supabase join can type it as array)
       const { data: overdue } = await supabase
         .from("invoices")
         .select("id, invoice_number, total, due_date, accounts(name)")
@@ -55,20 +55,40 @@ export default function FinanceDashboardPage() {
         .order("due_date")
         .limit(5);
 
-      // Recent payments
+      const overdueInvoices: { id: string; invoice_number: string; total: number; due_date: string; accounts: { name: string } | null }[] = (overdue || []).map((inv: any) => ({
+        id: inv.id,
+        invoice_number: inv.invoice_number,
+        total: inv.total,
+        due_date: inv.due_date,
+        accounts: Array.isArray(inv.accounts) ? (inv.accounts[0] ?? null) : inv.accounts ?? null,
+      }));
+
+      // Recent payments (normalize nested invoices.accounts to single object)
       const { data: recent } = await supabase
         .from("payments")
         .select("id, amount, payment_date, invoices(invoice_number, accounts(name))")
         .order("payment_date", { ascending: false })
         .limit(5);
 
+      const recentPayments: { id: string; amount: number; payment_date: string; invoices: { invoice_number: string; accounts: { name: string } | null } | null }[] = (recent || []).map((p: any) => ({
+        id: p.id,
+        amount: p.amount,
+        payment_date: p.payment_date,
+        invoices: p.invoices
+          ? {
+              invoice_number: p.invoices.invoice_number,
+              accounts: Array.isArray(p.invoices.accounts) ? (p.invoices.accounts[0] ?? null) : p.invoices.accounts ?? null,
+            }
+          : null,
+      }));
+
       setData({
         totalRevenue: totalPaid,
         outstandingAR,
         totalExpenses,
         netProfit: totalPaid - totalExpenses,
-        overdueInvoices: overdue || [],
-        recentPayments: recent || [],
+        overdueInvoices,
+        recentPayments,
         expenseByCategory,
       });
       setLoading(false);
