@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
@@ -35,7 +35,7 @@ interface InvoiceOption {
   balance?: number;
 }
 
-export default function NewPaymentPage() {
+function NewPaymentPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const preselectedInvoice = searchParams.get("invoice_id") || "";
@@ -204,5 +204,19 @@ export default function NewPaymentPage() {
         </form>
       </Form>
     </div>
+  );
+}
+
+export default function NewPaymentPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+        </div>
+      }
+    >
+      <NewPaymentPageContent />
+    </Suspense>
   );
 }
