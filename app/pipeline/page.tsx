@@ -195,30 +195,26 @@ export default function PipelinePage() {
 
     if (!isActiveAnOpportunity) return;
 
-    // Dropping an opportunity over another opportunity
-    if (isActiveAnOpportunity && isOverAnOpportunity) {
-      const activeOp = active.data.current.opportunity;
-      const overOp = over.data.current.opportunity;
-
-      if (activeOp.stage !== overOp.stage) {
+    // Dropping an opportunity over another opportunity (guard .current for strict TS)
+    const activeOpData = active.data?.current?.opportunity;
+    const overOpData = over.data?.current?.opportunity;
+    if (isActiveAnOpportunity && isOverAnOpportunity && activeOpData && overOpData) {
+      if (activeOpData.stage !== overOpData.stage) {
         setOpportunities((prev) => {
           const activeIndex = prev.findIndex((op) => op.id === activeId);
           const overIndex = prev.findIndex((op) => op.id === overId);
-          
           const updated = [...prev];
-          updated[activeIndex].stage = overOp.stage;
+          updated[activeIndex].stage = overOpData.stage;
           return arrayMove(updated, activeIndex, overIndex);
         });
       }
     }
 
     // Dropping an opportunity over a stage column
-    const isOverAColumn = PIPELINE_STAGES.includes(overId as any);
-    if (isActiveAnOpportunity && isOverAColumn) {
-      const activeOp = active.data.current.opportunity;
+    const isOverAColumn = PIPELINE_STAGES.includes(overId as string);
+    if (isActiveAnOpportunity && isOverAColumn && activeOpData) {
       const overStage = overId as string;
-
-      if (activeOp.stage !== overStage) {
+      if (activeOpData.stage !== overStage) {
         setOpportunities((prev) => {
           const activeIndex = prev.findIndex((op) => op.id === activeId);
           const updated = [...prev];
