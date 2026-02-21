@@ -20,25 +20,32 @@ export function KPICard({
   description,
 }: KPICardProps) {
   return (
-    <Card className="hover:shadow-md transition-shadow duration-200 border-none shadow-sm">
+    <Card className="hover:shadow-lg transition-all duration-300 border-none shadow-md rounded-3xl group">
       <CardContent className="p-6">
         <div className="flex items-start justify-between">
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-[#6B7280]">{title}</p>
-            <p className="text-2xl font-bold text-[#111827]">{value}</p>
+          <div className="space-y-3">
+            <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{title}</p>
+            <p className="text-3xl font-bold text-foreground tracking-tight">{value}</p>
             {change && (
-              <div className="flex items-center gap-1">
-                {changeType === "positive" ? (
-                  <TrendingUp className="w-4 h-4 text-green-500" />
-                ) : changeType === "negative" ? (
-                  <TrendingDown className="w-4 h-4 text-red-500" />
-                ) : null}
+              <div className="flex items-center gap-1.5">
+                <div className={cn(
+                  "p-1 rounded-full",
+                  changeType === "positive" && "bg-green-100",
+                  changeType === "negative" && "bg-red-100",
+                  changeType === "neutral" && "bg-slate-100"
+                )}>
+                  {changeType === "positive" ? (
+                    <TrendingUp className="w-3 h-3 text-green-600" />
+                  ) : changeType === "negative" ? (
+                    <TrendingDown className="w-3 h-3 text-red-600" />
+                  ) : null}
+                </div>
                 <span
                   className={cn(
-                    "text-xs font-medium",
+                    "text-xs font-bold",
                     changeType === "positive" && "text-green-600",
                     changeType === "negative" && "text-red-600",
-                    changeType === "neutral" && "text-[#6B7280]"
+                    changeType === "neutral" && "text-muted-foreground"
                   )}
                 >
                   {change}
@@ -46,11 +53,11 @@ export function KPICard({
               </div>
             )}
             {description && (
-              <p className="text-xs text-[#6B7280]">{description}</p>
+              <p className="text-xs font-medium text-muted-foreground">{description}</p>
             )}
           </div>
-          <div className="p-3 rounded-xl bg-[#E8F1FB]">
-            <Icon className="w-5 h-5 text-blue-600" />
+          <div className="p-4 rounded-2xl bg-muted group-hover:bg-primary/10 transition-colors">
+            <Icon className="w-6 h-6 text-primary" />
           </div>
         </div>
       </CardContent>

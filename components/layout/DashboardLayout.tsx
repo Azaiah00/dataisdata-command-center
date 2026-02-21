@@ -1,9 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
-import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -12,25 +9,15 @@ interface DashboardLayoutProps {
 }
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-
   return (
     <TooltipProvider delayDuration={0}>
-      <div className="min-h-screen bg-[#F4F6F8]">
+      <div className="min-h-screen bg-background">
         <Header />
-        <Sidebar 
-          collapsed={sidebarCollapsed} 
-          onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} 
-        />
         
         <main 
-          className={cn(
-            "transition-all duration-300 ease-in-out",
-            "pt-16", // Space for fixed navigation
-            sidebarCollapsed ? "pl-16" : "pl-64"
-          )}
+          className="transition-all duration-300 ease-in-out pt-16"
         >
-          <div className="p-6">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             {children}
           </div>
         </main>
