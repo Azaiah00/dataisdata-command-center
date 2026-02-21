@@ -31,8 +31,8 @@ export default function PaymentsPage() {
       accessorKey: "invoice_id",
       cell: (p: Payment) => (
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-            <Banknote className="w-4 h-4 text-blue-600" />
+          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+            <Banknote className="w-4 h-4 text-primary" />
           </div>
           <span className="font-bold text-[#111827] text-sm">{p.invoices?.invoice_number || "—"}</span>
         </div>
@@ -83,13 +83,13 @@ export default function PaymentsPage() {
           <p className="text-[#6B7280]">All payments received against invoices.</p>
         </div>
         <Link href="/finance/payments/new">
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+          <Button className="bg-primary hover:bg-primary/90 text-white">
             <Plus className="w-4 h-4 mr-2" /> Record Payment
           </Button>
         </Link>
       </div>
       {loading ? (
-        <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" /></div>
+        <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" /></div>
       ) : (
         <DataTable columns={columns} data={payments} onRowClick={(p) => { window.location.href = `/finance/invoices/${p.invoice_id}`; }} />
       )}

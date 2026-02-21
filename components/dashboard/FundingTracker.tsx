@@ -29,7 +29,7 @@ export function FundingTracker({ items }: FundingTrackerProps) {
         {items.map((item) => (
           <div key={item.id} className="rounded-lg border border-slate-100 p-3">
             <div className="flex items-center justify-between gap-2">
-              <Link href={`/engagements/${item.id}`} className="text-sm font-semibold text-[#111827] hover:text-blue-600">
+              <Link href={`/engagements/${item.id}`} className="text-sm font-semibold text-[#111827] hover:text-primary">
                 {item.name}
               </Link>
               <Badge variant="outline" className="border-slate-200 text-xs">{item.funding_stage || "Unstaged"}</Badge>

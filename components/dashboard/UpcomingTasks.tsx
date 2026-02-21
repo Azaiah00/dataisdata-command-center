@@ -29,7 +29,7 @@ export function UpcomingTasks({ tasks }: UpcomingTasksProps) {
             <CardDescription>Next actions and follow-ups</CardDescription>
           </div>
           <Link href="/activities">
-            <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
+            <Button variant="ghost" size="sm" className="text-primary hover:text-primary/90 hover:bg-primary/10">
               View All
               <ArrowRight className="w-4 h-4 ml-1" />
             </Button>
@@ -48,9 +48,9 @@ export function UpcomingTasks({ tasks }: UpcomingTasksProps) {
               tasks.map((task) => (
                 <div
                   key={task.id}
-                  className="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer border border-slate-100 hover:border-blue-100"
+                  className="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer border border-slate-100 hover:border-primary/20"
                 >
-                  <div className="p-2 rounded-lg bg-blue-50 text-blue-600 flex-shrink-0">
+                  <div className="p-2 rounded-lg bg-primary/10 text-primary flex-shrink-0">
                     <Clock className="w-4 h-4" />
                   </div>
                   <div className="flex-1 min-w-0">

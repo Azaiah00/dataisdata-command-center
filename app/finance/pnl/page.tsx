@@ -129,7 +129,7 @@ export default function ProfitAndLossPage() {
   return (
     <div className="space-y-6" ref={reportRef}>
       {/* Print header */}
-      <div className="hidden print:block mb-8 pb-6 border-b-2 border-blue-600">
+      <div className="hidden print:block mb-8 pb-6 border-b-2 border-primary">
         <div className="flex justify-between items-start">
           <div>
             <h1 className="text-3xl font-bold text-[#111827]">DataIsData</h1>
@@ -161,14 +161,14 @@ export default function ProfitAndLossPage() {
           <Button variant="outline" onClick={() => window.print()}>
             <Printer className="w-4 h-4 mr-2" /> Print
           </Button>
-          <Button onClick={() => window.print()} className="bg-blue-600 hover:bg-blue-700">
+          <Button onClick={() => window.print()} className="bg-primary hover:bg-primary/90">
             <Download className="w-4 h-4 mr-2" /> Download PDF
           </Button>
         </div>
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" /></div>
+        <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" /></div>
       ) : data ? (
         <>
           {/* Revenue section */}
@@ -270,7 +270,7 @@ export default function ProfitAndLossPage() {
       ) : null}
 
       {/* Print footer */}
-      <div className="hidden print:block mt-12 pt-6 border-t-2 border-blue-600">
+      <div className="hidden print:block mt-12 pt-6 border-t-2 border-primary">
         <p className="text-sm text-[#6B7280]">DataIsData Command Center | Profit & Loss Report | {new Date().toLocaleDateString()}</p>
       </div>
     </div>

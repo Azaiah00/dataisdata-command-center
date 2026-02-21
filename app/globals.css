@@ -174,7 +174,8 @@
 
   /* Progress bars print with color */
   [class*="bg-slate-500"],
-  [class*="bg-blue-500"],
+  [class*="bg-primary"],
+  [class*="bg-brand-green-bright"],
   [class*="bg-indigo-500"],
   [class*="bg-purple-500"],
   [class*="bg-green-500"],

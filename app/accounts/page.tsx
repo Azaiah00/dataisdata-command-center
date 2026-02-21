@@ -38,8 +38,8 @@ export default function AccountsPage() {
       accessorKey: "name",
       cell: (account: Account) => (
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#E8F1FB] flex items-center justify-center flex-shrink-0">
-            <Building2 className="w-4 h-4 text-blue-600" />
+          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <Building2 className="w-4 h-4 text-primary" />
           </div>
           <div className="flex flex-col min-w-0">
             <span className="font-bold text-[#111827] text-sm truncate">{account.name}</span>
@@ -95,7 +95,7 @@ export default function AccountsPage() {
       cell: (account: Account) => (
         <div className="flex justify-end">
           <Link href={`/accounts/${account.id}`}>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-blue-600 hover:bg-blue-50">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-white hover:bg-primary">
               <ArrowUpRight className="w-4 h-4" />
             </Button>
           </Link>
@@ -112,7 +112,7 @@ export default function AccountsPage() {
           <p className="text-[#6B7280]">Manage your public-sector clients and partners.</p>
         </div>
         <Link href="/accounts/new">
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+          <Button className="bg-primary hover:bg-primary/90 text-white">
             <Plus className="w-4 h-4 mr-2" />
             New Account
           </Button>
@@ -121,7 +121,7 @@ export default function AccountsPage() {
 
       {loading ? (
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
       ) : (
         <DataTable

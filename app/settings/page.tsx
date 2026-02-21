@@ -48,8 +48,8 @@ export default function SettingsPage() {
       <Card className="border-none shadow-sm">
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-[#E8F1FB]">
-              <User className="w-5 h-5 text-blue-600" />
+            <div className="p-2 rounded-lg bg-primary/10">
+              <User className="w-5 h-5 text-primary" />
             </div>
             <div>
               <CardTitle className="text-lg font-bold text-[#111827]">Profile</CardTitle>
@@ -99,7 +99,7 @@ export default function SettingsPage() {
             />
           </div>
           <div className="flex justify-end">
-            <Button onClick={saveProfile} className="bg-blue-600 hover:bg-blue-700">
+            <Button onClick={saveProfile} className="bg-primary hover:bg-primary/90">
               Save Changes
             </Button>
           </div>

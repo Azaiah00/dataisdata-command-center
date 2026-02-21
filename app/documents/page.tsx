@@ -34,7 +34,7 @@ const sourceIcons = {
 };
 
 const sourceColors = {
-  Engagement: "bg-blue-100 text-blue-700",
+  Engagement: "bg-primary/10 text-primary",
   Opportunity: "bg-purple-100 text-purple-700",
   Partner: "bg-amber-100 text-amber-700",
   Activity: "bg-green-100 text-green-700",
@@ -149,7 +149,7 @@ export default function DocumentsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
       </div>
     );
   }
@@ -185,15 +185,15 @@ export default function DocumentsPage() {
                 const Icon = sourceIcons[doc.sourceType];
                 return (
                   <div key={`${doc.url}-${idx}`} className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 border border-gray-100">
-                    <div className="w-9 h-9 rounded-lg bg-[#E8F1FB] flex items-center justify-center flex-shrink-0">
-                      <FileText className="w-4 h-4 text-blue-600" />
+                    <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <FileText className="w-4 h-4 text-primary" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <a
                         href={doc.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm font-bold text-blue-600 hover:underline truncate block"
+                        className="text-sm font-bold text-primary hover:underline truncate block"
                       >
                         {doc.fileName}
                       </a>
@@ -201,7 +201,7 @@ export default function DocumentsPage() {
                         <Icon className="w-3 h-3 text-gray-400" />
                         <Link
                           href={`${sourceLinks[doc.sourceType]}/${doc.sourceId}`}
-                          className="text-xs text-[#6B7280] hover:text-blue-600 truncate"
+                          className="text-xs text-[#6B7280] hover:text-primary truncate"
                         >
                           {doc.sourceName}
                         </Link>
@@ -211,7 +211,7 @@ export default function DocumentsPage() {
                       {doc.sourceType}
                     </Badge>
                     <span className="text-xs text-gray-400 hidden sm:block">{formatDate(doc.sourceDate)}</span>
-                    <a href={doc.url} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-600">
+                    <a href={doc.url} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-primary">
                       <ExternalLink className="w-4 h-4" />
                     </a>
                   </div>

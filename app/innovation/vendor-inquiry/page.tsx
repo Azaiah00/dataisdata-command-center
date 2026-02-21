@@ -64,7 +64,7 @@ export default function VendorInquiryPage() {
           <Link href={`/innovation/vendor-application/new?inquiry_id=${item.id}`}>
             <Button size="sm" variant="outline">View</Button>
           </Link>
-          <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={(e) => { e.stopPropagation(); inviteToApply(item); }}>
+          <Button size="sm" className="bg-primary hover:bg-primary/90" onClick={(e) => { e.stopPropagation(); inviteToApply(item); }}>
             Invite to Apply
           </Button>
         </div>
@@ -80,7 +80,7 @@ export default function VendorInquiryPage() {
           <p className="text-[#6B7280]">Stage 1 of partner enrollment.</p>
         </div>
         <Link href="/innovation/vendor-inquiry/new">
-          <Button className="bg-blue-600 hover:bg-blue-700">Open Public Form</Button>
+          <Button className="bg-primary hover:bg-primary/90">Open Public Form</Button>
         </Link>
       </div>
       {loading ? <p className="text-sm text-[#6B7280]">Loading...</p> : <DataTable columns={columns} data={data} />}

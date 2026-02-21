@@ -81,13 +81,13 @@ export default function ExpensesPage() {
           <p className="text-[#6B7280]">Track project costs, contractor payments, and overhead.</p>
         </div>
         <Link href="/finance/expenses/new">
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+          <Button className="bg-primary hover:bg-primary/90 text-white">
             <Plus className="w-4 h-4 mr-2" /> New Expense
           </Button>
         </Link>
       </div>
       {loading ? (
-        <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" /></div>
+        <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" /></div>
       ) : (
         <DataTable columns={columns} data={expenses} onRowClick={(e) => { window.location.href = `/finance/expenses/${e.id}`; }} />
       )}

@@ -43,8 +43,8 @@ export default function EngagementsPage() {
       accessorKey: "name",
       cell: (engagement: any) => (
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#E8F1FB] flex items-center justify-center flex-shrink-0">
-            <Briefcase className="w-4 h-4 text-blue-600" />
+          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <Briefcase className="w-4 h-4 text-primary" />
           </div>
           <div className="flex flex-col min-w-0">
             <span className="font-bold text-[#111827] text-sm truncate">{engagement.name}</span>
@@ -102,7 +102,7 @@ export default function EngagementsPage() {
       cell: (engagement: Engagement) => (
         <div className="flex justify-end">
           <Link href={`/engagements/${engagement.id}`}>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-blue-600 hover:bg-blue-50">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-white hover:bg-primary">
               <ArrowUpRight className="w-4 h-4" />
             </Button>
           </Link>
@@ -119,7 +119,7 @@ export default function EngagementsPage() {
           <p className="text-[#6B7280]">Track active projects and service delivery.</p>
         </div>
         <Link href="/engagements/new">
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+          <Button className="bg-primary hover:bg-primary/90 text-white">
             <Plus className="w-4 h-4 mr-2" />
             New Engagement
           </Button>
@@ -128,7 +128,7 @@ export default function EngagementsPage() {
 
       {loading ? (
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
       ) : (
         <DataTable

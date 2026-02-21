@@ -133,7 +133,7 @@ export default function ReportsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
       </div>
     );
   }
@@ -163,7 +163,7 @@ export default function ReportsPage() {
   return (
     <div className="space-y-6" ref={reportRef}>
       {/* Print-only branded header */}
-      <div className="hidden print:block mb-8 pb-6 border-b-2 border-blue-600">
+      <div className="hidden print:block mb-8 pb-6 border-b-2 border-primary">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-extrabold text-[#111827] tracking-tight">DataIsData</h1>
@@ -187,7 +187,7 @@ export default function ReportsPage() {
             <Printer className="w-4 h-4 mr-2" />
             Print Report
           </Button>
-          <Button onClick={handlePrint} className="bg-blue-600 hover:bg-blue-700">
+          <Button onClick={handlePrint} className="bg-primary hover:bg-primary/90">
             <Download className="w-4 h-4 mr-2" />
             Download PDF
           </Button>
@@ -204,8 +204,8 @@ export default function ReportsPage() {
                 <p className="text-2xl font-bold text-[#111827]">{formatCompactCurrency(totalPipeline)}</p>
                 <p className="text-xs text-[#6B7280] mt-1">Weighted: {formatCompactCurrency(totalWeighted)}</p>
               </div>
-              <div className="p-3 rounded-xl bg-[#E8F1FB]">
-                <TrendingUp className="w-5 h-5 text-blue-600" />
+              <div className="p-3 rounded-xl bg-primary/10">
+                <TrendingUp className="w-5 h-5 text-primary" />
               </div>
             </div>
           </CardContent>
@@ -262,7 +262,7 @@ export default function ReportsPage() {
         <Card className="border-none shadow-sm">
           <CardHeader>
             <CardTitle className="text-lg font-bold text-[#111827] flex items-center gap-2">
-              <Target className="w-5 h-5 text-blue-600" />
+              <Target className="w-5 h-5 text-primary" />
               Pipeline by Stage
             </CardTitle>
           </CardHeader>
@@ -297,7 +297,7 @@ export default function ReportsPage() {
         <Card className="border-none shadow-sm">
           <CardHeader>
             <CardTitle className="text-lg font-bold text-[#111827] flex items-center gap-2">
-              <Briefcase className="w-5 h-5 text-blue-600" />
+              <Briefcase className="w-5 h-5 text-primary" />
               Engagements by Status
             </CardTitle>
           </CardHeader>
@@ -327,7 +327,7 @@ export default function ReportsPage() {
       <Card className="border-none shadow-sm print:shadow-none print:border print:border-gray-200">
         <CardHeader>
           <CardTitle className="text-lg font-bold text-[#111827] flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-blue-600 print:text-blue-600" />
+            <BarChart3 className="w-5 h-5 text-primary" />
             Top Accounts by Engagement Value
           </CardTitle>
         </CardHeader>
@@ -337,8 +337,8 @@ export default function ReportsPage() {
               {topAccounts.map((acc, idx) => (
                 <div key={acc.id} className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 border border-gray-100">
                   <span className="text-lg font-bold text-gray-300 w-6 text-center">{idx + 1}</span>
-                  <div className="w-9 h-9 rounded-lg bg-[#E8F1FB] flex items-center justify-center flex-shrink-0">
-                    <Building2 className="w-4 h-4 text-blue-600" />
+                  <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Building2 className="w-4 h-4 text-primary" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-bold text-[#111827] text-sm truncate">{acc.name}</p>
@@ -355,7 +355,7 @@ export default function ReportsPage() {
       </Card>
 
       {/* Print-only branded footer */}
-      <div className="hidden print:block mt-12 pt-6 border-t-2 border-blue-600">
+      <div className="hidden print:block mt-12 pt-6 border-t-2 border-primary">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs text-[#6B7280]">Confidential &mdash; For internal use only</p>

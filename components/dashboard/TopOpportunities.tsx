@@ -30,7 +30,7 @@ export function TopOpportunities({ opportunities }: TopOpportunitiesProps) {
             <CardDescription>Highest value opportunities in pipeline</CardDescription>
           </div>
           <Link href="/pipeline">
-            <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
+            <Button variant="ghost" size="sm" className="text-primary hover:text-primary/90 hover:bg-primary/10">
               View All
               <ArrowRight className="w-4 h-4 ml-1" />
             </Button>
@@ -45,10 +45,10 @@ export function TopOpportunities({ opportunities }: TopOpportunitiesProps) {
             opportunities.map((opp) => (
               <div
                 key={opp.id}
-                className="flex items-center justify-between p-4 rounded-xl border border-slate-100 hover:border-blue-100 hover:bg-blue-50/30 transition-all cursor-pointer group"
+                className="flex items-center justify-between p-4 rounded-xl border border-slate-100 hover:border-primary/20 hover:bg-primary/5 transition-all cursor-pointer group"
               >
                 <div className="flex-1 min-w-0">
-                  <p className="font-bold text-[#111827] text-sm truncate group-hover:text-blue-700 transition-colors">
+                  <p className="font-bold text-[#111827] text-sm truncate group-hover:text-primary transition-colors">
                     {opp.name}
                   </p>
                   <div className="flex items-center gap-2 mt-1.5">

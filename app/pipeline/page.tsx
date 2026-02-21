@@ -67,7 +67,7 @@ function SortableOpportunityCard({ op, onClick }: { op: any; onClick: () => void
         <CardContent className="p-4 space-y-3">
           <div className="flex justify-between items-start gap-2">
             <div className="flex flex-col flex-1">
-              <h4 className="font-bold text-[#111827] text-sm leading-snug group-hover:text-blue-600 transition-colors">
+              <h4 className="font-bold text-[#111827] text-sm leading-snug group-hover:text-primary transition-colors">
                 {op.name}
               </h4>
               <div className="flex items-center gap-1.5 text-[11px] text-[#6B7280] mt-1.5">
@@ -87,7 +87,7 @@ function SortableOpportunityCard({ op, onClick }: { op: any; onClick: () => void
             <div className="flex items-center gap-1 text-[#111827] font-bold text-sm">
               {formatCurrency(op.estimated_value)}
             </div>
-            <div className="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
+            <div className="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded">
               {op.probability_pct}%
             </div>
           </div>
@@ -272,7 +272,7 @@ export default function PipelinePage() {
           <p className="text-[#6B7280]">Track potential work and weighted revenue forecasts.</p>
         </div>
         <Link href="/pipeline/new">
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+          <Button className="bg-primary hover:bg-primary/90 text-white">
             <Plus className="w-4 h-4 mr-2" />
             New Opportunity
           </Button>
@@ -281,7 +281,7 @@ export default function PipelinePage() {
 
       {loading ? (
         <div className="flex items-center justify-center flex-1">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
       ) : (
         <DndContext
@@ -368,7 +368,7 @@ export default function PipelinePage() {
                       <div className="flex items-center gap-1 text-[#111827] font-bold text-sm">
                         {formatCurrency(activeOp.estimated_value)}
                       </div>
-                      <div className="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
+                      <div className="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded">
                         {activeOp.probability_pct}%
                       </div>
                     </div>

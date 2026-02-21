@@ -76,12 +76,12 @@ export default function ContractorsPage() {
       cell: (c: Contractor) => (
         <div className="flex justify-end gap-2">
           <Link href={`/contractors/${c.id}/edit`}>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-blue-600 hover:bg-blue-50">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-primary hover:bg-primary/10">
               <Pencil className="w-3.5 h-3.5" />
             </Button>
           </Link>
           <Link href={`/contractors/${c.id}`}>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-blue-600 hover:bg-blue-50">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-white hover:bg-primary">
               <ArrowUpRight className="w-4 h-4" />
             </Button>
           </Link>
@@ -98,7 +98,7 @@ export default function ContractorsPage() {
           <p className="text-[#6B7280]">Manage contractors placed at client accounts.</p>
         </div>
         <Link href="/contractors/new">
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+          <Button className="bg-primary hover:bg-primary/90 text-white">
             <Plus className="w-4 h-4 mr-2" />
             New Contractor
           </Button>
@@ -107,7 +107,7 @@ export default function ContractorsPage() {
 
       {loading ? (
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
         </div>
       ) : (
         <DataTable

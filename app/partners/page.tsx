@@ -38,8 +38,8 @@ export default function PartnersPage() {
       accessorKey: "name",
       cell: (partner: Partner) => (
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#E8F1FB] flex items-center justify-center flex-shrink-0">
-            <ShieldCheck className="w-4 h-4 text-blue-600" />
+          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <ShieldCheck className="w-4 h-4 text-primary" />
           </div>
           <span className="font-bold text-[#111827] text-sm truncate">{partner.name}</span>
         </div>
@@ -85,12 +85,12 @@ export default function PartnersPage() {
       cell: (partner: Partner) => (
         <div className="flex justify-end gap-2">
           <Link href={`/partners/${partner.id}/edit`}>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-blue-600 hover:bg-blue-50">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-primary hover:bg-primary/10">
               <Pencil className="w-3.5 h-3.5" />
             </Button>
           </Link>
           <Link href={`/partners/${partner.id}`}>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-blue-600 hover:bg-blue-50">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-white hover:bg-primary">
               <ArrowUpRight className="w-4 h-4" />
             </Button>
           </Link>
@@ -107,7 +107,7 @@ export default function PartnersPage() {
           <p className="text-[#6B7280]">Manage vendor, prime, sub, and university ecosystem.</p>
         </div>
         <Link href="/partners/new">
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+          <Button className="bg-primary hover:bg-primary/90 text-white">
             <Plus className="w-4 h-4 mr-2" />
             New Partner
           </Button>
@@ -116,7 +116,7 @@ export default function PartnersPage() {
 
       {loading ? (
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
       ) : (
         <DataTable

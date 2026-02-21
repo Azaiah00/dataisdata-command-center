@@ -68,7 +68,7 @@ export default function ExpenseDetailPage({ params }: { params: Promise<{ id: st
     router.push("/finance/expenses");
   }
 
-  if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" /></div>;
+  if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" /></div>;
   if (!expense) return <div className="text-center py-20"><h2 className="text-2xl font-bold">Expense not found</h2><Link href="/finance/expenses" className="text-blue-600 hover:underline mt-4 inline-block">Back to Expenses</Link></div>;
 
   return (

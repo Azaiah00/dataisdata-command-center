@@ -52,7 +52,7 @@ export default function EventsPage() {
       accessorKey: "actions",
       cell: (item: EventRow) => (
         <Link href={`/innovation/events/${item.id}`}>
-          <Button size="sm" className="bg-blue-600 hover:bg-blue-700">View</Button>
+          <Button size="sm" className="bg-primary hover:bg-primary/90">View</Button>
         </Link>
       ),
     },
@@ -66,7 +66,7 @@ export default function EventsPage() {
           <p className="text-[#6B7280]">Track event strategy, sponsors, and outcomes.</p>
         </div>
         <Link href="/innovation/events/new">
-          <Button className="bg-blue-600 hover:bg-blue-700">New Event</Button>
+          <Button className="bg-primary hover:bg-primary/90">New Event</Button>
         </Link>
       </div>
       {loading ? <p className="text-sm text-[#6B7280]">Loading...</p> : <DataTable columns={columns} data={events} />}

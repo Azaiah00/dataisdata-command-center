@@ -31,7 +31,7 @@ export function PipelineChart({ stages }: PipelineChartProps) {
             <CardDescription>Opportunity distribution across stages</CardDescription>
           </div>
           <Link href="/pipeline">
-            <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
+            <Button variant="ghost" size="sm" className="text-primary hover:text-primary/90 hover:bg-primary/10">
               View All
               <ArrowRight className="w-4 h-4 ml-1" />
             </Button>
@@ -54,13 +54,13 @@ export function PipelineChart({ stages }: PipelineChartProps) {
                         {stage.count}
                       </Badge>
                     </div>
-                    <span className="font-medium text-blue-600">
+                    <span className="font-medium text-primary">
                       {formatCompactCurrency(stage.value)}
                     </span>
                   </div>
                   <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-blue-600 rounded-full transition-all duration-500"
+                      className="h-full bg-primary rounded-full transition-all duration-500"
                       style={{ width: `${percentage}%` }}
                     />
                   </div>

@@ -29,7 +29,7 @@ export function CostAvoidanceCard({ items }: CostAvoidanceCardProps) {
         {items.map((item) => (
           <div key={item.id} className="rounded-lg border border-slate-100 p-3">
             <div className="flex items-center justify-between gap-2">
-              <Link href={`/engagements/${item.id}`} className="text-sm font-semibold text-[#111827] hover:text-blue-600">
+              <Link href={`/engagements/${item.id}`} className="text-sm font-semibold text-[#111827] hover:text-primary">
                 {item.name}
               </Link>
               <div className="flex items-center gap-1">

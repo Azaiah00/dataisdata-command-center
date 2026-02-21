@@ -43,7 +43,7 @@ export function formatDateRelative(dateString: string | null | undefined) {
 export function getStatusColor(status: string) {
   const s = status?.toLowerCase();
   if (s === 'active' || s === 'awarded' || s === 'good' || s === 'complete' || s === 'on-track' || s === 'paid' || s === 'approved' || s === 'reimbursed') return 'bg-green-100 text-green-700 border-green-200';
-  if (s === 'prospect' || s === 'proposal' || s === 'lead' || s === 'planned' || s === 'discovery' || s === 'draft' || s === 'pending') return 'bg-blue-100 text-blue-700 border-blue-200';
+  if (s === 'prospect' || s === 'proposal' || s === 'lead' || s === 'planned' || s === 'discovery' || s === 'draft' || s === 'pending') return 'bg-primary/10 text-primary border-primary/20';
   if (s === 'negotiation' || s === 'in progress' || s === 'warm' || s === 'sent') return 'bg-purple-100 text-purple-700 border-purple-200';
   if (s === 'on hold' || s === 'neutral' || s === 'cancelled') return 'bg-gray-100 text-gray-700 border-gray-200';
   if (s === 'lost' || s === 'dormant' || s === 'bad' || s === 'at-risk' || s === 'overdue') return 'bg-red-100 text-red-700 border-red-200';

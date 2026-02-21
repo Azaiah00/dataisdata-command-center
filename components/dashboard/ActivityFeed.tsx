@@ -44,7 +44,7 @@ export function ActivityFeed({ activities }: ActivityFeedProps) {
             <CardDescription>Latest interactions and updates</CardDescription>
           </div>
           <Link href="/activities">
-            <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
+            <Button variant="ghost" size="sm" className="text-primary hover:text-primary/90 hover:bg-primary/10">
               View All
               <ArrowRight className="w-4 h-4 ml-1" />
             </Button>

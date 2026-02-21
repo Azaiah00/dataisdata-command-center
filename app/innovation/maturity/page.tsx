@@ -153,9 +153,9 @@ export default function MaturityPage() {
                   <Radar
                     name="Maturity Score"
                     dataKey="score"
-                    stroke="#2563eb"
+                    stroke="var(--primary)"
                     strokeWidth={2}
-                    fill="#3b82f6"
+                    fill="var(--primary)"
                     fillOpacity={0.15}
                   />
                   <Tooltip 
@@ -167,9 +167,9 @@ export default function MaturityPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-none shadow-sm bg-gradient-to-br from-blue-600 to-indigo-700 text-white">
+        <Card className="border-none shadow-sm bg-gradient-to-br from-brand-green-dark via-primary to-brand-green-muted text-white">
           <CardHeader>
-            <CardTitle className="text-blue-100 text-sm font-medium uppercase tracking-wider">Overall Maturity</CardTitle>
+            <CardTitle className="text-white/80 text-sm font-medium uppercase tracking-wider">Overall Maturity</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center justify-center pt-4 pb-8">
             <div className="relative flex items-center justify-center">
@@ -181,7 +181,7 @@ export default function MaturityPage() {
                   stroke="currentColor"
                   strokeWidth="8"
                   fill="transparent"
-                  className="text-blue-500/30"
+                  className="text-white/20"
                 />
                 <circle
                   cx="80"
@@ -200,19 +200,19 @@ export default function MaturityPage() {
                 <span className="text-5xl font-extrabold tracking-tight">
                   {latest?.overall_score ?? overallScore}
                 </span>
-                <span className="text-blue-100 text-xs font-medium mt-1">INDEX SCORE</span>
+                <span className="text-white/80 text-xs font-medium mt-1">INDEX SCORE</span>
               </div>
             </div>
             
             <div className="mt-8 grid grid-cols-2 gap-4 w-full px-4">
-              <div className="bg-white/10 rounded-xl p-3 backdrop-blur-sm">
-                <p className="text-blue-100 text-[10px] font-bold uppercase tracking-tight">Status</p>
+              <div className="bg-white/10 rounded-xl p-3 backdrop-blur-sm text-center">
+                <p className="text-white/70 text-[10px] font-bold uppercase tracking-tight">Status</p>
                 <p className="text-sm font-semibold mt-0.5">
                   {(latest?.overall_score ?? overallScore) > 75 ? 'Advanced' : (latest?.overall_score ?? overallScore) > 40 ? 'Developing' : 'Initial'}
                 </p>
               </div>
-              <div className="bg-white/10 rounded-xl p-3 backdrop-blur-sm">
-                <p className="text-blue-100 text-[10px] font-bold uppercase tracking-tight">Target</p>
+              <div className="bg-white/10 rounded-xl p-3 backdrop-blur-sm text-center">
+                <p className="text-white/70 text-[10px] font-bold uppercase tracking-tight">Target</p>
                 <p className="text-sm font-semibold mt-0.5">90+</p>
               </div>
             </div>
@@ -237,7 +237,7 @@ export default function MaturityPage() {
               </div>
             ))}
           </div>
-          <Button onClick={saveSnapshot} disabled={saving} className="bg-blue-600 hover:bg-blue-700">
+          <Button onClick={saveSnapshot} disabled={saving} className="bg-primary hover:bg-primary/90">
             {saving ? "Saving..." : "Record New Snapshot"}
           </Button>
         </CardContent>

@@ -39,7 +39,7 @@ export default function ContactsPage() {
       accessorKey: "full_name",
       cell: (contact: any) => (
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs">
+          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
             {contact.full_name.charAt(0)}
           </div>
           <div className="flex flex-col min-w-0">
@@ -106,12 +106,12 @@ export default function ContactsPage() {
       cell: (contact: Contact) => (
         <div className="flex justify-end gap-2">
           <Link href={`/contacts/${contact.id}/edit`}>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-blue-600 hover:bg-blue-50">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-primary hover:bg-primary/10">
               <Pencil className="w-3.5 h-3.5" />
             </Button>
           </Link>
           <Link href={`/contacts/${contact.id}`}>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-blue-600 hover:bg-blue-700 hover:text-white">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-white hover:bg-primary">
               <ArrowUpRight className="w-4 h-4" />
             </Button>
           </Link>
@@ -128,7 +128,7 @@ export default function ContactsPage() {
           <p className="text-[#6B7280]">Manage stakeholders and key decision makers.</p>
         </div>
         <Link href="/contacts/new">
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+          <Button className="bg-primary hover:bg-primary/90 text-white">
             <Plus className="w-4 h-4 mr-2" />
             New Contact
           </Button>
@@ -137,7 +137,7 @@ export default function ContactsPage() {
 
       {loading ? (
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
       ) : (
         <DataTable

@@ -44,7 +44,7 @@ export default function VendorApplicationListPage() {
       accessorKey: "actions",
       cell: (item: VendorApplicationRow) => (
         <Link href={`/innovation/vendor-application/${item.id}`}>
-          <Button size="sm" className="bg-blue-600 hover:bg-blue-700">Review</Button>
+          <Button size="sm" className="bg-primary hover:bg-primary/90">Review</Button>
         </Link>
       ),
     },
@@ -58,7 +58,7 @@ export default function VendorApplicationListPage() {
           <p className="text-[#6B7280]">Stage 2 and 3 of partner enrollment.</p>
         </div>
         <Link href="/innovation/vendor-application/new">
-          <Button className="bg-blue-600 hover:bg-blue-700">New Application</Button>
+          <Button className="bg-primary hover:bg-primary/90">New Application</Button>
         </Link>
       </div>
       {loading ? <p className="text-sm text-[#6B7280]">Loading...</p> : <DataTable columns={columns} data={data} />}

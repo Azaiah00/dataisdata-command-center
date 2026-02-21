@@ -46,8 +46,8 @@ export default function ActivitiesPage() {
       accessorKey: "activity_type",
       cell: (activity: Activity) => (
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#E8F1FB] flex items-center justify-center flex-shrink-0">
-            <MessageSquare className="w-4 h-4 text-blue-600" />
+          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <MessageSquare className="w-4 h-4 text-primary" />
           </div>
           <div className="flex flex-col min-w-0">
             <span className="font-bold text-[#111827] text-sm truncate">{activity.activity_type}</span>
@@ -99,7 +99,7 @@ export default function ActivitiesPage() {
       accessorKey: "next_action",
       cell: (activity: Activity) => (
         <div className="flex flex-col">
-          <span className="text-xs font-bold text-blue-600 truncate max-w-[120px]">
+          <span className="text-xs font-bold text-primary truncate max-w-[120px]">
             {activity.next_action || "None"}
           </span>
           {activity.next_action_due && (
@@ -116,7 +116,7 @@ export default function ActivitiesPage() {
       cell: (activity: Activity) => (
         <div className="flex justify-end">
           <Link href={`/activities/${activity.id}`}>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-blue-600 hover:bg-blue-50">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-white hover:bg-primary">
               <ArrowUpRight className="w-4 h-4" />
             </Button>
           </Link>
@@ -133,7 +133,7 @@ export default function ActivitiesPage() {
           <p className="text-[#6B7280]">Timeline of meetings, calls, and communications.</p>
         </div>
         <Link href="/activities/new">
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+          <Button className="bg-primary hover:bg-primary/90 text-white">
             <Plus className="w-4 h-4 mr-2" />
             Log Activity
           </Button>
@@ -142,7 +142,7 @@ export default function ActivitiesPage() {
 
       {loading ? (
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
       ) : (
         <DataTable

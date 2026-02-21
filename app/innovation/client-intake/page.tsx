@@ -44,7 +44,7 @@ export default function ClientIntakeListPage() {
       accessorKey: "actions",
       cell: (item: Intake) => (
         <Link href={`/innovation/client-intake/${item.id}`}>
-          <Button size="sm" className="bg-blue-600 hover:bg-blue-700">Review</Button>
+          <Button size="sm" className="bg-primary hover:bg-primary/90">Review</Button>
         </Link>
       ),
     },
@@ -58,7 +58,7 @@ export default function ClientIntakeListPage() {
           <p className="text-[#6B7280]">Assess city/agency interest and readiness.</p>
         </div>
         <Link href="/innovation/client-intake/new">
-          <Button className="bg-blue-600 hover:bg-blue-700">Open Public Form</Button>
+          <Button className="bg-primary hover:bg-primary/90">Open Public Form</Button>
         </Link>
       </div>
       {loading ? <p className="text-sm text-[#6B7280]">Loading...</p> : <DataTable columns={columns} data={data} />}

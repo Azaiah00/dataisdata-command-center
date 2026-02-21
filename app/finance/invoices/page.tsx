@@ -94,7 +94,7 @@ export default function InvoicesPage() {
           <p className="text-[#6B7280]">Manage invoices for your accounts and engagements.</p>
         </div>
         <Link href="/finance/invoices/new">
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+          <Button className="bg-primary hover:bg-primary/90 text-white">
             <Plus className="w-4 h-4 mr-2" /> New Invoice
           </Button>
         </Link>
@@ -108,7 +108,7 @@ export default function InvoicesPage() {
       )}
       {loading ? (
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
         </div>
       ) : !errorMessage ? (
         <DataTable

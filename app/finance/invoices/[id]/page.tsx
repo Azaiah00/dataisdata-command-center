@@ -89,7 +89,7 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
   }
 
   if (loading) {
-    return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" /></div>;
+    return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" /></div>;
   }
   if (!invoice) {
     return <div className="text-center py-20"><h2 className="text-2xl font-bold text-slate-900">Invoice not found</h2><Link href="/finance/invoices" className="text-blue-600 hover:underline mt-4 inline-block">Back to Invoices</Link></div>;
@@ -98,7 +98,7 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
   return (
     <div className="max-w-5xl mx-auto space-y-6" ref={printRef}>
       {/* Print-only header */}
-      <div className="hidden print:block mb-8 pb-6 border-b-2 border-blue-600">
+      <div className="hidden print:block mb-8 pb-6 border-b-2 border-primary">
         <div className="flex justify-between items-start">
           <div>
             <h1 className="text-3xl font-bold text-[#111827]">DataIsData</h1>
@@ -106,7 +106,7 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
           </div>
           <div className="text-right">
             <h2 className="text-2xl font-bold text-[#111827]">INVOICE</h2>
-            <p className="text-lg font-bold text-blue-600">{invoice.invoice_number}</p>
+            <p className="text-lg font-bold text-primary">{invoice.invoice_number}</p>
           </div>
         </div>
       </div>
@@ -315,7 +315,7 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
       )}
 
       {/* Print footer */}
-      <div className="hidden print:block mt-12 pt-6 border-t-2 border-blue-600">
+      <div className="hidden print:block mt-12 pt-6 border-t-2 border-primary">
         <p className="text-sm text-[#6B7280]">DataIsData Command Center | Generated {new Date().toLocaleDateString()}</p>
       </div>
     </div>
