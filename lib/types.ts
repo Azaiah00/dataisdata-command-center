@@ -113,6 +113,7 @@ export interface Opportunity {
     id: string;
     name: string;
     account_id: string;
+    related_account_ids?: string[] | null;
     primary_contact_id: string | null;
     service_line: string | null;
     stage: PipelineStage;
@@ -133,6 +134,7 @@ export interface Opportunity {
     // Joined data
     accounts?: Account;
     contacts?: Contact;
+    related_accounts?: { id: string; name: string }[];
 }
 
 export interface Partner {

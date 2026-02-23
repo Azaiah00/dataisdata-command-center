@@ -33,6 +33,7 @@ import { ChevronLeft } from "lucide-react";
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
   account_id: z.string().uuid("Please select an account."),
+  related_account_ids: z.array(z.string().uuid()).optional().default([]),
   primary_contact_id: z.string().optional(),
   service_line: z.string().optional(),
   stage: z.enum(PIPELINE_STAGES),
@@ -61,6 +62,7 @@ function OpportunityForm() {
     defaultValues: {
       name: "",
       account_id: preselectedAccountId || "",
+      related_account_ids: [],
       primary_contact_id: "",
       service_line: "",
       stage: "Lead",
@@ -102,6 +104,9 @@ function OpportunityForm() {
   async function onSubmit(values: any) {
     const payload = {
       ...values,
+      related_account_ids: values.related_account_ids?.length
+        ? values.related_account_ids
+        : null,
       primary_contact_id: values.primary_contact_id || null,
       expected_start: values.expected_start || null,
       expected_end: values.expected_end || null,
@@ -179,6 +184,56 @@ function OpportunityForm() {
                           ))}
                         </SelectContent>
                       </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="related_account_ids"
+                  render={({ field }) => (
+                    <FormItem className="md:col-span-2">
+                      <FormLabel>Additional Accounts (optional)</FormLabel>
+                      <FormControl>
+                        <div className="flex flex-wrap gap-2">
+                          {accounts
+                            .filter((acc) => acc.id !== selectedAccountId)
+                            .map((acc) => {
+                              const selected = (field.value || []).includes(acc.id);
+                              return (
+                                <button
+                                  key={acc.id}
+                                  type="button"
+                                  onClick={() => {
+                                    const current: string[] = field.value || [];
+                                    if (current.includes(acc.id)) {
+                                      field.onChange(current.filter((id) => id !== acc.id));
+                                    } else {
+                                      field.onChange([...current, acc.id]);
+                                    }
+                                  }}
+                                  className={`
+                                    px-3 py-1 rounded-full text-xs font-medium border 
+                                    transition-colors max-w-full truncate
+                                    ${
+                                      selected
+                                        ? "bg-primary/10 text-primary border-primary/30"
+                                        : "bg-muted/40 text-muted-foreground border-border hover:bg-muted"
+                                    }
+                                  `}
+                                >
+                                  {acc.name}
+                                </button>
+                              );
+                            })}
+                          {accounts.length <= 1 && (
+                            <p className="text-xs text-muted-foreground">
+                              Add more accounts first to link them here.
+                            </p>
+                          )}
+                        </div>
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -387,7 +442,7 @@ function OpportunityForm() {
                 <Button variant="outline" type="button" onClick={() => router.back()}>
                   Cancel
                 </Button>
-                <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+                <Button type="submit" className="bg-primary hover:bg-primary/90">
                   Create Opportunity
                 </Button>
               </div>

@@ -33,6 +33,7 @@ import { ChevronLeft, Loader2 } from "lucide-react";
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
   account_id: z.string().uuid("Please select an account."),
+  related_account_ids: z.array(z.string()).optional().nullable(),
   primary_contact_id: z.string().optional().nullable(),
   service_line: z.string().optional().nullable(),
   stage: z.enum(PIPELINE_STAGES),
@@ -61,6 +62,7 @@ function EditOpportunityForm() {
     defaultValues: {
       name: "",
       account_id: "",
+      related_account_ids: [],
       primary_contact_id: "",
       service_line: "",
       stage: "Lead",
@@ -100,6 +102,7 @@ function EditOpportunityForm() {
       // Set form values
       form.reset({
         ...opportunity,
+        related_account_ids: opportunity.related_account_ids || [],
         probability_pct: opportunity.probability_pct?.toString() || "0",
         estimated_value: opportunity.estimated_value?.toString() || "0",
         primary_contact_id: opportunity.primary_contact_id || "none",
@@ -130,6 +133,10 @@ function EditOpportunityForm() {
   async function onSubmit(values: any) {
     const payload = {
       ...values,
+      related_account_ids:
+        values.related_account_ids && values.related_account_ids.length
+          ? values.related_account_ids
+          : null,
       primary_contact_id: values.primary_contact_id === "none" ? null : values.primary_contact_id,
       expected_start: values.expected_start || null,
       expected_end: values.expected_end || null,
@@ -154,7 +161,7 @@ function EditOpportunityForm() {
   if (fetching) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -214,6 +221,50 @@ function EditOpportunityForm() {
                           ))}
                         </SelectContent>
                       </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="related_account_ids"
+                  render={({ field }) => (
+                    <FormItem className="md:col-span-2">
+                      <FormLabel>Additional Accounts (optional)</FormLabel>
+                      <FormControl>
+                        <div className="flex flex-wrap gap-2">
+                          {accounts
+                            .filter((acc) => acc.id !== selectedAccountId)
+                            .map((acc) => {
+                              const current: string[] = field.value || [];
+                              const selected = current.includes(acc.id);
+                              return (
+                                <button
+                                  key={acc.id}
+                                  type="button"
+                                  onClick={() => {
+                                    if (selected) {
+                                      field.onChange(current.filter((id) => id !== acc.id));
+                                    } else {
+                                      field.onChange([...current, acc.id]);
+                                    }
+                                  }}
+                                  className={`
+                                    px-3 py-1 rounded-full text-xs font-medium border
+                                    transition-colors max-w-full truncate
+                                    ${selected ? "bg-primary/10 text-primary border-primary/30" : "bg-muted/40 text-muted-foreground border-border hover:bg-muted"}
+                                  `}
+                                >
+                                  {acc.name}
+                                </button>
+                              );
+                            })}
+                          {accounts.length <= 1 && (
+                            <p className="text-xs text-muted-foreground">Add more accounts first to link them here.</p>
+                          )}
+                        </div>
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -422,7 +473,7 @@ function EditOpportunityForm() {
                 <Button variant="outline" type="button" onClick={() => router.back()}>
                   Cancel
                 </Button>
-                <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+                <Button type="submit" className="bg-primary hover:bg-primary/90">
                   Save Changes
                 </Button>
               </div>

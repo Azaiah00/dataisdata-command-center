@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,6 +48,15 @@ import {
   CalendarDays,
   HardHat,
 } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+
+type SearchItem = {
+  id: string;
+  title: string;
+  subtitle: string;
+  href: string;
+  type: "Account" | "Contact" | "Opportunity" | "Engagement" | "Partner";
+};
 
 const crmItems = [
   { path: "/accounts", label: "Accounts", icon: Building2 },
@@ -81,7 +90,127 @@ const innovationItems = [
 
 export function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<SearchItem[]>([]);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const searchContainerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchContainerRef.current &&
+        !searchContainerRef.current.contains(event.target as Node)
+      ) {
+        setSearchOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const query = searchQuery.trim();
+
+    if (query.length < 2) {
+      setSearchResults([]);
+      setSearchLoading(false);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setSearchLoading(true);
+
+      const [accountsRes, contactsRes, opportunitiesRes, engagementsRes, partnersRes] =
+        await Promise.all([
+          supabase
+            .from("accounts")
+            .select("id, name")
+            .ilike("name", `%${query}%`)
+            .limit(4),
+          supabase
+            .from("contacts")
+            .select("id, full_name, title_role")
+            .ilike("full_name", `%${query}%`)
+            .limit(4),
+          supabase
+            .from("opportunities")
+            .select("id, name, stage")
+            .ilike("name", `%${query}%`)
+            .limit(4),
+          supabase
+            .from("engagements")
+            .select("id, name, status")
+            .ilike("name", `%${query}%`)
+            .limit(4),
+          supabase
+            .from("partners")
+            .select("id, name, partner_type")
+            .ilike("name", `%${query}%`)
+            .limit(4),
+        ]);
+
+      const nextResults: SearchItem[] = [];
+
+      (accountsRes.data || []).forEach((item: any) => {
+        nextResults.push({
+          id: item.id,
+          title: item.name,
+          subtitle: "Account",
+          href: `/accounts/${item.id}`,
+          type: "Account",
+        });
+      });
+
+      (contactsRes.data || []).forEach((item: any) => {
+        nextResults.push({
+          id: item.id,
+          title: item.full_name,
+          subtitle: item.title_role || "Contact",
+          href: `/contacts/${item.id}`,
+          type: "Contact",
+        });
+      });
+
+      (opportunitiesRes.data || []).forEach((item: any) => {
+        nextResults.push({
+          id: item.id,
+          title: item.name,
+          subtitle: item.stage || "Opportunity",
+          href: `/pipeline/${item.id}`,
+          type: "Opportunity",
+        });
+      });
+
+      (engagementsRes.data || []).forEach((item: any) => {
+        nextResults.push({
+          id: item.id,
+          title: item.name,
+          subtitle: item.status || "Engagement",
+          href: `/engagements/${item.id}`,
+          type: "Engagement",
+        });
+      });
+
+      (partnersRes.data || []).forEach((item: any) => {
+        nextResults.push({
+          id: item.id,
+          title: item.name,
+          subtitle: item.partner_type || "Partner",
+          href: `/partners/${item.id}`,
+          type: "Partner",
+        });
+      });
+
+      setSearchResults(nextResults.slice(0, 12));
+      setSearchOpen(true);
+      setSearchLoading(false);
+    }, 250);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const NavLink = ({ href, label, icon: Icon, active }: any) => (
     <Link
@@ -158,13 +287,61 @@ export function Header() {
         {/* Right: Actions & Mobile Menu */}
         <div className="flex items-center gap-2">
           {/* Search (Desktop) */}
-          <div className="hidden md:flex items-center relative">
+          <div ref={searchContainerRef} className="hidden md:flex items-center relative">
             <Search className="absolute left-3 w-4 h-4 text-muted-foreground" />
             <input
               type="text"
               placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => {
+                if (searchResults.length > 0 || searchQuery.trim().length >= 2) {
+                  setSearchOpen(true);
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && searchResults.length > 0) {
+                  router.push(searchResults[0].href);
+                  setSearchOpen(false);
+                }
+              }}
               className="pl-9 pr-4 py-1.5 bg-muted/50 border-none rounded-full text-sm focus:ring-2 focus:ring-primary/20 transition-all w-40 lg:w-64"
             />
+            {searchOpen && (
+              <div className="absolute top-11 left-0 w-full rounded-xl border border-border bg-white shadow-lg z-50 overflow-hidden">
+                {searchLoading ? (
+                  <div className="px-3 py-3 text-sm text-muted-foreground">
+                    Searching...
+                  </div>
+                ) : searchResults.length > 0 ? (
+                  <div className="max-h-80 overflow-y-auto">
+                    {searchResults.map((result) => (
+                      <button
+                        key={`${result.type}-${result.id}`}
+                        type="button"
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          router.push(result.href);
+                          setSearchOpen(false);
+                        }}
+                        className="w-full text-left px-3 py-2.5 hover:bg-muted/60 transition-colors border-b border-border/50 last:border-b-0"
+                      >
+                        <p className="text-sm font-semibold text-foreground truncate">
+                          {result.title}
+                        </p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {result.type} • {result.subtitle}
+                        </p>
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="px-3 py-3 text-sm text-muted-foreground">
+                    No results found.
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <Button variant="ghost" size="icon" className="text-muted-foreground md:hidden">

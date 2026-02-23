@@ -25,6 +25,7 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
   const { id } = use(params);
   const router = useRouter();
   const [opportunity, setOpportunity] = useState<(Opportunity & { accounts?: { name: string }; contacts?: { full_name: string } }) | null>(null);
+  const [relatedAccounts, setRelatedAccounts] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -38,8 +39,24 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
         .single();
       if (error || !data) {
         setOpportunity(null);
+        setRelatedAccounts([]);
       } else {
         setOpportunity(data);
+
+        if (data.related_account_ids && data.related_account_ids.length > 0) {
+          const { data: related, error: relatedError } = await supabase
+            .from("accounts")
+            .select("id, name")
+            .in("id", data.related_account_ids);
+
+          if (!relatedError && related) {
+            setRelatedAccounts(related as { id: string; name: string }[]);
+          } else {
+            setRelatedAccounts([]);
+          }
+        } else {
+          setRelatedAccounts([]);
+        }
       }
       setLoading(false);
     }
@@ -83,7 +100,7 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
     <div className="max-w-5xl mx-auto space-y-6">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-xs font-medium text-[#6B7280] uppercase tracking-wider">
-        <Link href="/pipeline" className="hover:text-blue-600 transition-colors">
+        <Link href="/pipeline" className="hover:text-primary transition-colors">
           Pipeline
         </Link>
         <span>/</span>
@@ -94,8 +111,8 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
       <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center">
-              <TrendingUp className="w-7 h-7 text-blue-700" />
+            <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
+              <TrendingUp className="w-7 h-7 text-primary" />
             </div>
             <div>
               <div className="flex items-center gap-3 flex-wrap">
@@ -114,11 +131,28 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
                   <Building2 className="w-4 h-4" />
                   <Link
                     href={`/accounts/${opportunity.account_id}`}
-                    className="hover:text-blue-600 font-medium"
+                    className="hover:text-primary font-medium"
                   >
                     {opportunity.accounts?.name ?? "Unknown account"}
                   </Link>
                 </div>
+                {relatedAccounts.length > 0 && (
+                  <div className="flex items-center gap-1.5 text-xs text-[#6B7280]">
+                    <span className="text-slate-300">•</span>
+                    <span>Also linked to</span>
+                    <div className="flex flex-wrap gap-1">
+                      {relatedAccounts.map((acc) => (
+                        <Link
+                          key={acc.id}
+                          href={`/accounts/${acc.id}`}
+                          className="text-xs font-medium text-primary hover:underline"
+                        >
+                          {acc.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 {opportunity.service_line && (
                   <>
                     <span className="text-slate-300">|</span>
@@ -214,7 +248,7 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
               <span className="text-sm text-[#6B7280]">Primary contact</span>
               <span className="font-bold text-[#111827]">
                 {opportunity.contacts?.full_name ? (
-                  <Link href={`/contacts/${opportunity.primary_contact_id}`} className="hover:text-blue-600">
+                  <Link href={`/contacts/${opportunity.primary_contact_id}`} className="hover:text-primary">
                     {opportunity.contacts.full_name}
                   </Link>
                 ) : (
@@ -275,7 +309,7 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
                     href={url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-blue-600 hover:underline"
+                    className="text-sm text-primary hover:underline"
                   >
                     {decodeURIComponent(url.split("/").pop() || "file")}
                   </a>

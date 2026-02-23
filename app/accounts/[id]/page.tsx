@@ -74,11 +74,12 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
         setChildAccounts(childrenData || []);
       }
 
-      // Fetch Related Data
-      const [linksRes, engagementsRes, opportunitiesRes, activitiesRes] = await Promise.all([
+      // Fetch Related Data (opportunities: primary account + linked via related_account_ids)
+      const [linksRes, engagementsRes, opportunitiesPrimaryRes, opportunitiesLinkedRes, activitiesRes] = await Promise.all([
         supabase.from("account_contacts").select("contacts(*)").eq("account_id", id),
         supabase.from("engagements").select("*").eq("account_id", id),
         supabase.from("opportunities").select("*").eq("account_id", id),
+        supabase.from("opportunities").select("*").contains("related_account_ids", [id]),
         supabase.from("activities").select("*, accounts(name)").eq("account_id", id).order("date_time", { ascending: false }),
       ]);
 
@@ -90,7 +91,18 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
       setContacts(mappedContacts);
       const engs = engagementsRes.data || [];
       setEngagements(engs);
-      setOpportunities(opportunitiesRes.data || []);
+      // Merge primary + linked opportunities and dedupe by id (linked only if related_account_ids column exists)
+      const primary = (opportunitiesPrimaryRes.data || []) as Opportunity[];
+      const linked = opportunitiesLinkedRes.error ? [] : (opportunitiesLinkedRes.data || []) as Opportunity[];
+      const seenIds = new Set<string>();
+      const merged: Opportunity[] = [];
+      [...primary, ...linked].forEach((op) => {
+        if (!seenIds.has(op.id)) {
+          seenIds.add(op.id);
+          merged.push(op);
+        }
+      });
+      setOpportunities(merged);
       setActivities(activitiesRes.data || []);
 
       // Fetch contractors linked to this account's engagements
