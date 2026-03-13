@@ -269,7 +269,7 @@ export function Header() {
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
               <span className="text-white font-bold text-lg">D</span>
             </div>
-            <span className="text-xl font-bold text-foreground tracking-tight hidden sm:block">
+            <span className="text-xl font-bold text-foreground tracking-tight hidden sm:block font-mono">
               DataIsData
             </span>
           </Link>
@@ -422,7 +422,7 @@ export function Header() {
                   <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
                     <span className="text-white font-bold text-lg">D</span>
                   </div>
-                  <span>DataIsData</span>
+                  <span className="font-mono">DataIsData</span>
                 </SheetTitle>
               </SheetHeader>
               <div className="flex flex-col py-4 overflow-y-auto h-[calc(100vh-5rem)]">

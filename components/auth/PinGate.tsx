@@ -9,7 +9,7 @@ import { Lock } from "lucide-react";
 const PIN_VERIFIED_KEY = "did-pin-verified";
 
 /** Correct 4-digit PIN (temporary until real auth is in place). */
-const CORRECT_PIN = "1998";
+const CORRECT_PIN = "2345";
 
 interface PinGateProps {
   children: React.ReactNode;
