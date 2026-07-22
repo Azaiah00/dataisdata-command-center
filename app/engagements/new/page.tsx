@@ -277,7 +277,7 @@ function EngagementForm() {
                 <Button variant="outline" type="button" onClick={() => router.back()}>
                   Cancel
                 </Button>
-                <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+                <Button type="submit" className="bg-neutral-900 hover:bg-neutral-800">
                   Create Engagement
                 </Button>
               </div>

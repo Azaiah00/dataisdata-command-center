@@ -14,7 +14,7 @@ type Inquiry = { id: string; company_name: string };
 
 export default function VendorApplicationNewPage() {
   return (
-    <Suspense fallback={<p className="text-sm text-[#6B7280]">Loading form...</p>}>
+    <Suspense fallback={<p className="text-sm text-[#737373]">Loading form...</p>}>
       <VendorApplicationForm />
     </Suspense>
   );
@@ -85,7 +85,7 @@ function VendorApplicationForm() {
           <form onSubmit={onSubmit} className="space-y-4">
             <div>
               <Label>Related Inquiry</Label>
-              <select value={form.inquiry_id} onChange={(e) => setForm({ ...form, inquiry_id: e.target.value })} className="mt-1 w-full rounded-md border border-slate-200 bg-white p-2 text-sm">
+              <select value={form.inquiry_id} onChange={(e) => setForm({ ...form, inquiry_id: e.target.value })} className="mt-1 w-full rounded-md border border-neutral-200 bg-white p-2 text-sm">
                 <option value="">None</option>
                 {inquiries.map((i) => <option key={i.id} value={i.id}>{i.company_name}</option>)}
               </select>
@@ -116,7 +116,7 @@ function VendorApplicationForm() {
             <div><Label>Compliance Standards</Label><Textarea value={form.compliance_standards} onChange={(e) => setForm({ ...form, compliance_standards: e.target.value })} /></div>
             <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.open_to_revenue_share} onChange={(e) => setForm({ ...form, open_to_revenue_share: e.target.checked })} />Open to revenue share models</label>
 
-            <Button type="submit" disabled={saving} className="bg-blue-600 hover:bg-blue-700">{saving ? "Submitting..." : "Submit Application"}</Button>
+            <Button type="submit" disabled={saving} className="bg-neutral-900 hover:bg-neutral-800">{saving ? "Submitting..." : "Submit Application"}</Button>
           </form>
         </CardContent>
       </Card>

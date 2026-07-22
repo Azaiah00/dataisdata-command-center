@@ -129,13 +129,13 @@ export default function NewInvoicePage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center gap-2 text-xs font-medium text-[#6B7280] uppercase tracking-wider">
-        <Link href="/finance/invoices" className="hover:text-blue-600">Invoices</Link>
+      <div className="flex items-center gap-2 text-xs font-medium text-[#737373] uppercase tracking-wider">
+        <Link href="/finance/invoices" className="hover:text-neutral-900">Invoices</Link>
         <span>/</span>
-        <span className="text-[#111827]">New Invoice</span>
+        <span className="text-[#0a0a0a]">New Invoice</span>
       </div>
 
-      <h1 className="text-2xl font-bold text-[#111827]">Create Invoice</h1>
+      <h1 className="text-2xl font-bold text-[#0a0a0a]">Create Invoice</h1>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -203,7 +203,7 @@ export default function NewInvoicePage() {
             </CardHeader>
             <CardContent className="space-y-3">
               {/* Column headers */}
-              <div className="grid grid-cols-12 gap-2 text-xs font-bold text-[#6B7280] uppercase tracking-wider px-1">
+              <div className="grid grid-cols-12 gap-2 text-xs font-bold text-[#737373] uppercase tracking-wider px-1">
                 <div className="col-span-6">Description</div>
                 <div className="col-span-2">Qty</div>
                 <div className="col-span-3">Unit Price</div>
@@ -228,7 +228,7 @@ export default function NewInvoicePage() {
                   </div>
                   <div className="col-span-1 flex justify-center pt-2">
                     {fields.length > 1 && (
-                      <Button type="button" variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:text-red-700" onClick={() => remove(index)}>
+                      <Button type="button" variant="ghost" size="icon" className="h-8 w-8 text-red-600 hover:text-red-600" onClick={() => remove(index)}>
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     )}
@@ -237,27 +237,27 @@ export default function NewInvoicePage() {
               ))}
 
               {/* Totals */}
-              <div className="border-t border-slate-200 pt-4 space-y-2">
+              <div className="border-t border-neutral-200 pt-4 space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-[#6B7280]">Subtotal</span>
-                  <span className="font-bold text-[#111827]">${subtotal.toFixed(2)}</span>
+                  <span className="text-[#737373]">Subtotal</span>
+                  <span className="font-bold text-[#0a0a0a]">${subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center text-sm">
-                  <span className="text-[#6B7280]">Tax</span>
+                  <span className="text-[#737373]">Tax</span>
                   <FormField control={form.control} name="tax_amount" render={({ field }) => (
                     <FormItem className="w-32"><FormControl><Input type="number" step="0.01" min="0" {...field} className="text-right" /></FormControl></FormItem>
                   )} />
                 </div>
-                <div className="flex justify-between text-lg font-bold border-t border-slate-200 pt-2">
-                  <span className="text-[#111827]">Total</span>
-                  <span className="text-emerald-600">${total.toFixed(2)}</span>
+                <div className="flex justify-between text-lg font-bold border-t border-neutral-200 pt-2">
+                  <span className="text-[#0a0a0a]">Total</span>
+                  <span className="text-neutral-900">${total.toFixed(2)}</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <div className="flex gap-3">
-            <Button type="submit" disabled={submitting} className="bg-blue-600 hover:bg-blue-700">
+            <Button type="submit" disabled={submitting} className="bg-neutral-900 hover:bg-neutral-800">
               {submitting ? "Creating..." : "Create Invoice"}
             </Button>
             <Link href="/finance/invoices">

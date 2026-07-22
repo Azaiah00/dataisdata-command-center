@@ -347,7 +347,7 @@ export default function EditAccountPage({ params }: { params: Promise<{ id: stri
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Stakeholders</CardTitle>
-                <p className="text-sm text-slate-500 mt-1">Manage linked contacts for this account.</p>
+                <p className="text-sm text-neutral-500 mt-1">Manage linked contacts for this account.</p>
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -370,7 +370,7 @@ export default function EditAccountPage({ params }: { params: Promise<{ id: stri
                               className="h-4 w-4 hover:bg-transparent"
                               onClick={() => field.onChange(field.value.filter(i => i !== contactId))}
                             >
-                              <Trash2 className="h-3 w-3 text-slate-400" />
+                              <Trash2 className="h-3 w-3 text-neutral-400" />
                             </Button>
                           </Badge>
                         );
@@ -404,7 +404,7 @@ export default function EditAccountPage({ params }: { params: Promise<{ id: stri
             <Button variant="outline" type="button" onClick={() => router.back()} disabled={isSubmitting}>
               Cancel
             </Button>
-            <Button type="submit" className="bg-blue-600 hover:bg-blue-700" disabled={isSubmitting}>
+            <Button type="submit" className="bg-neutral-900 hover:bg-neutral-800" disabled={isSubmitting}>
               {isSubmitting ? "Saving..." : "Save Changes"}
             </Button>
           </div>

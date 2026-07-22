@@ -62,7 +62,7 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neutral-900"></div>
       </div>
     );
   }
@@ -72,9 +72,9 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
   }
 
   const healthColors: Record<string, string> = {
-    Strong: "text-green-600 bg-green-50",
-    Warm: "text-amber-600 bg-amber-50",
-    Cold: "text-blue-600 bg-blue-50",
+    Strong: "text-neutral-900 bg-neutral-100",
+    Warm: "text-neutral-600 bg-neutral-100",
+    Cold: "text-neutral-900 bg-neutral-100",
   };
 
   return (
@@ -85,19 +85,19 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
         </Button>
         <div className="flex-1">
           <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900">{contact.full_name}</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-neutral-900">{contact.full_name}</h1>
             <Badge className={cn("font-medium border-none", healthColors[contact.relationship_health])}>
               {contact.relationship_health} Relationship
             </Badge>
           </div>
-          <p className="text-slate-500 mt-1">{contact.title_role} at {contact.accounts?.name}</p>
+          <p className="text-neutral-500 mt-1">{contact.title_role} at {contact.accounts?.name}</p>
         </div>
         <div className="flex gap-2">
           <Link href={`/contacts/${id}/edit`}>
             <Button variant="outline">Edit Contact</Button>
           </Link>
           <Link href={`/activities/new?account_id=${contact?.account_id || ""}`}>
-            <Button className="bg-blue-600 hover:bg-blue-700">Log Activity</Button>
+            <Button className="bg-neutral-900 hover:bg-neutral-800">Log Activity</Button>
           </Link>
         </div>
       </div>
@@ -106,36 +106,36 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-sm font-bold uppercase text-slate-500 tracking-wider">Contact Info</CardTitle>
+              <CardTitle className="text-sm font-bold uppercase text-neutral-500 tracking-wider">Contact Info</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center gap-3 text-slate-600">
+              <div className="flex items-center gap-3 text-neutral-600">
                 <Mail className="w-4 h-4" />
                 <span className="text-sm">{contact.email || "No email"}</span>
               </div>
-              <div className="flex items-center gap-3 text-slate-600">
+              <div className="flex items-center gap-3 text-neutral-600">
                 <Phone className="w-4 h-4" />
                 <span className="text-sm">{contact.phone || "No phone"}</span>
               </div>
-              <div className="flex items-center gap-3 text-slate-600">
+              <div className="flex items-center gap-3 text-neutral-600">
                 <Building2 className="w-4 h-4" />
-                <Link href={`/accounts/${contact.account_id}`} className="text-sm text-blue-600 hover:underline">
+                <Link href={`/accounts/${contact.account_id}`} className="text-sm text-neutral-900 hover:underline">
                   {contact.accounts?.name}
                 </Link>
               </div>
               <div className="pt-4 border-t">
-                 <span className="text-xs font-semibold text-slate-400 uppercase block mb-2">Influence</span>
+                 <span className="text-xs font-semibold text-neutral-400 uppercase block mb-2">Influence</span>
                  <div className="flex items-center gap-1">
                     {[...Array(5)].map((_, i) => (
                       <div
                         key={i}
                         className={cn(
                           "w-2 h-2 rounded-full",
-                          i < (contact.influence_level || 0) ? "bg-amber-500" : "bg-slate-200"
+                          i < (contact.influence_level || 0) ? "bg-neutral-900" : "bg-neutral-200"
                         )}
                       />
                     ))}
-                    <span className="text-xs text-slate-500 ml-2">{contact.influence_level}/5</span>
+                    <span className="text-xs text-neutral-500 ml-2">{contact.influence_level}/5</span>
                  </div>
               </div>
             </CardContent>
@@ -143,19 +143,19 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-sm font-bold uppercase text-slate-500 tracking-wider">Strategy</CardTitle>
+              <CardTitle className="text-sm font-bold uppercase text-neutral-500 tracking-wider">Strategy</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <span className="text-xs font-semibold text-slate-400 uppercase block mb-1">Next Step</span>
-                <p className="text-sm text-slate-700 font-medium">{contact.next_step || "No next step defined."}</p>
+                <span className="text-xs font-semibold text-neutral-400 uppercase block mb-1">Next Step</span>
+                <p className="text-sm text-neutral-700 font-medium">{contact.next_step || "No next step defined."}</p>
               </div>
               <div>
-                <span className="text-xs font-semibold text-slate-400 uppercase block mb-1">Tags</span>
+                <span className="text-xs font-semibold text-neutral-400 uppercase block mb-1">Tags</span>
                 <div className="flex flex-wrap gap-1 mt-1">
                   {contact.tags?.map(tag => (
                     <Badge key={tag} variant="secondary" className="text-[10px]">{tag}</Badge>
-                  )) || <span className="text-xs text-slate-400 italic">No tags</span>}
+                  )) || <span className="text-xs text-neutral-400 italic">No tags</span>}
                 </div>
               </div>
             </CardContent>
@@ -165,8 +165,8 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
         <div className="md:col-span-2 space-y-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg font-semibold text-slate-800">Recent Activity</CardTitle>
-              <CalendarDays className="w-5 h-5 text-slate-400" />
+              <CardTitle className="text-lg font-semibold text-neutral-800">Recent Activity</CardTitle>
+              <CalendarDays className="w-5 h-5 text-neutral-400" />
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
@@ -174,20 +174,20 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
                   activities.map((activity, idx) => (
                     <div key={activity.id} className="relative pl-6 pb-6 last:pb-0">
                       {idx !== activities.length - 1 && (
-                        <div className="absolute left-[11px] top-6 bottom-0 w-[2px] bg-slate-100" />
+                        <div className="absolute left-[11px] top-6 bottom-0 w-[2px] bg-neutral-100" />
                       )}
-                      <div className="absolute left-0 top-1 w-[24px] h-[24px] rounded-full bg-white border-2 border-blue-500 flex items-center justify-center z-10">
-                        <MessageSquare className="w-3 h-3 text-blue-500" />
+                      <div className="absolute left-0 top-1 w-[24px] h-[24px] rounded-full bg-white border-2 border-neutral-700 flex items-center justify-center z-10">
+                        <MessageSquare className="w-3 h-3 text-neutral-500" />
                       </div>
                       <div className="flex flex-col">
                         <div className="flex justify-between items-center">
-                          <span className="font-semibold text-slate-900">{activity.activity_type}</span>
-                          <span className="text-xs text-slate-500">{formatDate(activity.date_time)}</span>
+                          <span className="font-semibold text-neutral-900">{activity.activity_type}</span>
+                          <span className="text-xs text-neutral-500">{formatDate(activity.date_time)}</span>
                         </div>
-                        <p className="text-sm text-slate-600 mt-1">{activity.summary}</p>
+                        <p className="text-sm text-neutral-600 mt-1">{activity.summary}</p>
                         {activity.next_action && (
-                          <div className="mt-2 p-2 bg-slate-50 rounded text-xs border border-slate-100">
-                            <span className="font-bold text-blue-600 mr-2">NEXT:</span>
+                          <div className="mt-2 p-2 bg-neutral-50 rounded text-xs border border-neutral-200">
+                            <span className="font-bold text-neutral-900 mr-2">NEXT:</span>
                             {activity.next_action}
                           </div>
                         )}
@@ -195,7 +195,7 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
                     </div>
                   ))
                 ) : (
-                  <div className="text-center py-12 text-slate-500 italic border border-dashed rounded-lg">
+                  <div className="text-center py-12 text-neutral-500 italic border border-dashed rounded-lg">
                     No recent activities recorded.
                   </div>
                 )}

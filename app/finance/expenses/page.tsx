@@ -32,12 +32,12 @@ export default function ExpensesPage() {
       accessorKey: "description",
       cell: (e: Expense) => (
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center">
-            <CreditCard className="w-4 h-4 text-orange-600" />
+          <div className="w-8 h-8 rounded-lg bg-neutral-100 flex items-center justify-center">
+            <CreditCard className="w-4 h-4 text-neutral-600" />
           </div>
           <div>
-            <span className="font-bold text-[#111827] text-sm block">{e.description}</span>
-            {e.engagements?.name && <span className="text-[10px] text-[#6B7280]">{e.engagements.name}</span>}
+            <span className="font-bold text-[#0a0a0a] text-sm block">{e.description}</span>
+            {e.engagements?.name && <span className="text-[10px] text-[#737373]">{e.engagements.name}</span>}
           </div>
         </div>
       ),
@@ -45,7 +45,7 @@ export default function ExpensesPage() {
     {
       header: "Category",
       accessorKey: "category",
-      cell: (e: Expense) => <span className="text-sm text-[#6B7280]">{e.category}</span>,
+      cell: (e: Expense) => <span className="text-sm text-[#737373]">{e.category}</span>,
     },
     {
       header: "Amount",
@@ -55,12 +55,12 @@ export default function ExpensesPage() {
     {
       header: "Contractor",
       accessorKey: "contractor_id",
-      cell: (e: Expense) => <span className="text-sm text-[#6B7280]">{e.contractors?.full_name || "—"}</span>,
+      cell: (e: Expense) => <span className="text-sm text-[#737373]">{e.contractors?.full_name || "—"}</span>,
     },
     {
       header: "Date",
       accessorKey: "expense_date",
-      cell: (e: Expense) => <span className="text-xs text-[#6B7280]">{formatDate(e.expense_date)}</span>,
+      cell: (e: Expense) => <span className="text-xs text-[#737373]">{formatDate(e.expense_date)}</span>,
     },
     {
       header: "Status",
@@ -77,8 +77,8 @@ export default function ExpensesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#111827]">Expenses</h1>
-          <p className="text-[#6B7280]">Track project costs, contractor payments, and overhead.</p>
+          <h1 className="text-2xl font-bold text-[#0a0a0a]">Expenses</h1>
+          <p className="text-[#737373]">Track project costs, contractor payments, and overhead.</p>
         </div>
         <Link href="/finance/expenses/new">
           <Button className="bg-primary hover:bg-primary/90 text-white">

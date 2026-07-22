@@ -40,8 +40,8 @@ export default function SettingsPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#111827]">Settings</h1>
-        <p className="text-[#6B7280]">Manage your profile and preferences.</p>
+        <h1 className="text-2xl font-bold text-[#0a0a0a]">Settings</h1>
+        <p className="text-[#737373]">Manage your profile and preferences.</p>
       </div>
 
       {/* Profile */}
@@ -52,7 +52,7 @@ export default function SettingsPage() {
               <User className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <CardTitle className="text-lg font-bold text-[#111827]">Profile</CardTitle>
+              <CardTitle className="text-lg font-bold text-[#0a0a0a]">Profile</CardTitle>
               <CardDescription>Your personal information.</CardDescription>
             </div>
           </div>
@@ -110,24 +110,24 @@ export default function SettingsPage() {
       <Card className="border-none shadow-sm">
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-amber-50">
-              <Shield className="w-5 h-5 text-amber-600" />
+            <div className="p-2 rounded-lg bg-neutral-100">
+              <Shield className="w-5 h-5 text-neutral-600" />
             </div>
             <div>
-              <CardTitle className="text-lg font-bold text-[#111827]">Security</CardTitle>
+              <CardTitle className="text-lg font-bold text-[#0a0a0a]">Security</CardTitle>
               <CardDescription>Authentication and access control.</CardDescription>
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between p-4 rounded-lg bg-amber-50 border border-amber-100">
+          <div className="flex items-center justify-between p-4 rounded-lg bg-neutral-100 border border-neutral-200">
             <div>
-              <p className="text-sm font-bold text-amber-800">No authentication configured</p>
-              <p className="text-xs text-amber-600 mt-0.5">
+              <p className="text-sm font-bold text-neutral-900">No authentication configured</p>
+              <p className="text-xs text-neutral-600 mt-0.5">
                 This app currently runs without login. Add Supabase Auth to secure access.
               </p>
             </div>
-            <Badge className="bg-amber-100 text-amber-700 border-none text-[10px]">Internal Only</Badge>
+            <Badge className="bg-neutral-200 text-neutral-700 border-none text-[10px]">Internal Only</Badge>
           </div>
         </CardContent>
       </Card>
@@ -136,31 +136,31 @@ export default function SettingsPage() {
       <Card className="border-none shadow-sm">
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-green-50">
-              <Database className="w-5 h-5 text-green-600" />
+            <div className="p-2 rounded-lg bg-neutral-100">
+              <Database className="w-5 h-5 text-neutral-900" />
             </div>
             <div>
-              <CardTitle className="text-lg font-bold text-[#111827]">Database</CardTitle>
+              <CardTitle className="text-lg font-bold text-[#0a0a0a]">Database</CardTitle>
               <CardDescription>Supabase connection info.</CardDescription>
             </div>
           </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 border border-gray-100">
-              <span className="text-sm text-[#6B7280]">Provider</span>
-              <Badge className="bg-green-100 text-green-700 border-none">Supabase (PostgreSQL)</Badge>
+            <div className="flex items-center justify-between p-3 rounded-lg bg-neutral-50 border border-neutral-200">
+              <span className="text-sm text-[#737373]">Provider</span>
+              <Badge className="bg-neutral-200 text-neutral-900 border-none">Supabase (PostgreSQL)</Badge>
             </div>
-            <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 border border-gray-100">
-              <span className="text-sm text-[#6B7280]">Status</span>
+            <div className="flex items-center justify-between p-3 rounded-lg bg-neutral-50 border border-neutral-200">
+              <span className="text-sm text-[#737373]">Status</span>
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                <span className="text-sm font-medium text-green-600">Connected</span>
+                <div className="w-2 h-2 rounded-full bg-neutral-900 animate-pulse" />
+                <span className="text-sm font-medium text-neutral-900">Connected</span>
               </div>
             </div>
-            <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 border border-gray-100">
-              <span className="text-sm text-[#6B7280]">Storage Bucket</span>
-              <span className="text-sm font-medium text-[#111827]">crm-attachments</span>
+            <div className="flex items-center justify-between p-3 rounded-lg bg-neutral-50 border border-neutral-200">
+              <span className="text-sm text-[#737373]">Storage Bucket</span>
+              <span className="text-sm font-medium text-[#0a0a0a]">crm-attachments</span>
             </div>
           </div>
         </CardContent>

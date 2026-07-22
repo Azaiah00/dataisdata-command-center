@@ -106,8 +106,8 @@ export default function FinanceDashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#111827]">Finance Dashboard</h1>
-        <p className="text-[#6B7280]">Overview of revenue, expenses, and cash flow.</p>
+        <h1 className="text-2xl font-bold text-[#0a0a0a]">Finance Dashboard</h1>
+        <p className="text-[#737373]">Overview of revenue, expenses, and cash flow.</p>
       </div>
 
       {/* KPI Cards */}
@@ -128,8 +128,8 @@ export default function FinanceDashboardPage() {
         {/* Overdue invoices */}
         <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-bold text-[#111827] flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-red-500" />
+            <CardTitle className="text-lg font-bold text-[#0a0a0a] flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-red-600" />
               Overdue Invoices ({data.overdueInvoices.length})
             </CardTitle>
           </CardHeader>
@@ -140,19 +140,19 @@ export default function FinanceDashboardPage() {
                   <Link key={inv.id} href={`/finance/invoices/${inv.id}`}>
                     <div className="flex items-center justify-between p-3 rounded-lg hover:bg-red-50 border border-red-100 cursor-pointer">
                       <div>
-                        <p className="text-sm font-bold text-[#111827]">{inv.invoice_number}</p>
-                        <p className="text-xs text-[#6B7280]">{inv.accounts?.name}</p>
+                        <p className="text-sm font-bold text-[#0a0a0a]">{inv.invoice_number}</p>
+                        <p className="text-xs text-[#737373]">{inv.accounts?.name}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-bold text-red-600">{formatCurrency(inv.total)}</p>
-                        <p className="text-[10px] text-[#6B7280]">Due {formatDate(inv.due_date)}</p>
+                        <p className="text-[10px] text-[#737373]">Due {formatDate(inv.due_date)}</p>
                       </div>
                     </div>
                   </Link>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-green-600 text-center py-6 font-medium">No overdue invoices</p>
+              <p className="text-sm text-neutral-900 text-center py-6 font-medium">No overdue invoices</p>
             )}
           </CardContent>
         </Card>
@@ -160,23 +160,23 @@ export default function FinanceDashboardPage() {
         {/* Recent Payments */}
         <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-bold text-[#111827]">Recent Payments</CardTitle>
+            <CardTitle className="text-lg font-bold text-[#0a0a0a]">Recent Payments</CardTitle>
           </CardHeader>
           <CardContent>
             {data.recentPayments.length > 0 ? (
               <div className="space-y-3">
                 {data.recentPayments.map((p) => (
-                  <div key={p.id} className="flex items-center justify-between p-3 rounded-lg border border-slate-100">
+                  <div key={p.id} className="flex items-center justify-between p-3 rounded-lg border border-neutral-200">
                     <div>
-                      <p className="text-sm font-bold text-[#111827]">{formatCurrency(p.amount)}</p>
-                      <p className="text-xs text-[#6B7280]">{p.invoices?.invoice_number} — {p.invoices?.accounts?.name}</p>
+                      <p className="text-sm font-bold text-[#0a0a0a]">{formatCurrency(p.amount)}</p>
+                      <p className="text-xs text-[#737373]">{p.invoices?.invoice_number} — {p.invoices?.accounts?.name}</p>
                     </div>
-                    <span className="text-xs text-[#6B7280]">{formatDate(p.payment_date)}</span>
+                    <span className="text-xs text-[#737373]">{formatDate(p.payment_date)}</span>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-[#6B7280] text-center py-6">No payments recorded yet</p>
+              <p className="text-sm text-[#737373] text-center py-6">No payments recorded yet</p>
             )}
           </CardContent>
         </Card>
@@ -185,7 +185,7 @@ export default function FinanceDashboardPage() {
       {/* Expense breakdown */}
       <Card className="border-none shadow-sm">
         <CardHeader>
-          <CardTitle className="text-lg font-bold text-[#111827]">Expenses by Category</CardTitle>
+          <CardTitle className="text-lg font-bold text-[#0a0a0a]">Expenses by Category</CardTitle>
         </CardHeader>
         <CardContent>
           {data.expenseByCategory.length > 0 ? (
@@ -195,18 +195,18 @@ export default function FinanceDashboardPage() {
                 return (
                   <div key={cat.category}>
                     <div className="flex justify-between text-sm mb-1">
-                      <span className="font-medium text-[#111827]">{cat.category}</span>
-                      <span className="font-bold text-[#111827]">{formatCurrency(cat.total)}</span>
+                      <span className="font-medium text-[#0a0a0a]">{cat.category}</span>
+                      <span className="font-bold text-[#0a0a0a]">{formatCurrency(cat.total)}</span>
                     </div>
-                    <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-orange-500 rounded-full transition-all duration-500" style={{ width: `${pct}%` }} />
+                    <div className="h-2 bg-neutral-100 rounded-full overflow-hidden">
+                      <div className="h-full bg-neutral-700 rounded-full transition-all duration-500" style={{ width: `${pct}%` }} />
                     </div>
                   </div>
                 );
               })}
             </div>
           ) : (
-            <p className="text-sm text-[#6B7280] text-center py-6">No expenses recorded yet</p>
+            <p className="text-sm text-[#737373] text-center py-6">No expenses recorded yet</p>
           )}
         </CardContent>
       </Card>

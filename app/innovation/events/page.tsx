@@ -62,14 +62,14 @@ export default function EventsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-[#111827]">Vendor Showcase Events</h1>
-          <p className="text-[#6B7280]">Track event strategy, sponsors, and outcomes.</p>
+          <h1 className="text-2xl font-bold text-[#0a0a0a]">Vendor Showcase Events</h1>
+          <p className="text-[#737373]">Track event strategy, sponsors, and outcomes.</p>
         </div>
         <Link href="/innovation/events/new">
           <Button className="bg-primary hover:bg-primary/90">New Event</Button>
         </Link>
       </div>
-      {loading ? <p className="text-sm text-[#6B7280]">Loading...</p> : <DataTable columns={columns} data={events} />}
+      {loading ? <p className="text-sm text-[#737373]">Loading...</p> : <DataTable columns={columns} data={events} />}
     </div>
   );
 }

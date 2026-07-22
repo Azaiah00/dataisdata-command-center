@@ -82,13 +82,13 @@ export default function EventDetailPage() {
     loadData();
   }
 
-  if (!event) return <p className="text-sm text-[#6B7280]">Loading event...</p>;
+  if (!event) return <p className="text-sm text-[#737373]">Loading event...</p>;
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#111827]">{event.name}</h1>
-        <p className="text-[#6B7280]">{formatDate(event.event_date)} • {event.theme || "No theme"}</p>
+        <h1 className="text-2xl font-bold text-[#0a0a0a]">{event.name}</h1>
+        <p className="text-[#737373]">{formatDate(event.event_date)} • {event.theme || "No theme"}</p>
       </div>
 
       <Card className="border-none shadow-sm">
@@ -105,22 +105,22 @@ export default function EventDetailPage() {
         <CardHeader><CardTitle>Participating Vendors</CardTitle></CardHeader>
         <CardContent className="space-y-3">
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
-            <select value={selectedPartner} onChange={(e) => setSelectedPartner(e.target.value)} className="rounded-md border border-slate-200 bg-white p-2 text-sm">
+            <select value={selectedPartner} onChange={(e) => setSelectedPartner(e.target.value)} className="rounded-md border border-neutral-200 bg-white p-2 text-sm">
               <option value="">Select partner</option>
               {partners.map((partner) => <option key={partner.id} value={partner.id}>{partner.name}</option>)}
             </select>
-            <select value={tier} onChange={(e) => setTier(e.target.value)} className="rounded-md border border-slate-200 bg-white p-2 text-sm">
+            <select value={tier} onChange={(e) => setTier(e.target.value)} className="rounded-md border border-neutral-200 bg-white p-2 text-sm">
               <option>Showcase</option>
               <option>Premium Sponsor</option>
               <option>Strategic Partner</option>
             </select>
             <Input placeholder="Fee" value={fee} onChange={(e) => setFee(e.target.value)} />
-            <Button onClick={addVendor} className="bg-blue-600 hover:bg-blue-700">Add Vendor</Button>
+            <Button onClick={addVendor} className="bg-neutral-900 hover:bg-neutral-800">Add Vendor</Button>
           </div>
           <div className="space-y-2">
-            {eventVendors.length === 0 && <p className="text-sm text-[#6B7280]">No vendors added yet.</p>}
+            {eventVendors.length === 0 && <p className="text-sm text-[#737373]">No vendors added yet.</p>}
             {eventVendors.map((row, idx) => (
-              <div key={`${row.partner_id}-${idx}`} className="flex items-center justify-between rounded-md border border-slate-100 p-3 text-sm">
+              <div key={`${row.partner_id}-${idx}`} className="flex items-center justify-between rounded-md border border-neutral-200 p-3 text-sm">
                 <span>{row.partners?.name || "Unknown Partner"}</span>
                 <span>{row.sponsorship_tier || "Showcase"} • {formatCurrency(row.fee)}</span>
               </div>
@@ -134,7 +134,7 @@ export default function EventDetailPage() {
         <CardContent className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div><Label>Leads Generated</Label><Input value={leads} onChange={(e) => setLeads(e.target.value)} /></div>
           <div><Label>Revenue Generated</Label><Input value={revenue} onChange={(e) => setRevenue(e.target.value)} /></div>
-          <div className="pt-6"><Button onClick={updateMetrics} className="w-full bg-blue-600 hover:bg-blue-700">Save Metrics</Button></div>
+          <div className="pt-6"><Button onClick={updateMetrics} className="w-full bg-neutral-900 hover:bg-neutral-800">Save Metrics</Button></div>
         </CardContent>
       </Card>
     </div>

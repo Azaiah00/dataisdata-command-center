@@ -76,14 +76,14 @@ export default function VendorInquiryPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-[#111827]">Vendor Inquiries</h1>
-          <p className="text-[#6B7280]">Stage 1 of partner enrollment.</p>
+          <h1 className="text-2xl font-bold text-[#0a0a0a]">Vendor Inquiries</h1>
+          <p className="text-[#737373]">Stage 1 of partner enrollment.</p>
         </div>
         <Link href="/innovation/vendor-inquiry/new">
           <Button className="bg-primary hover:bg-primary/90">Open Public Form</Button>
         </Link>
       </div>
-      {loading ? <p className="text-sm text-[#6B7280]">Loading...</p> : <DataTable columns={columns} data={data} />}
+      {loading ? <p className="text-sm text-[#737373]">Loading...</p> : <DataTable columns={columns} data={data} />}
     </div>
   );
 }

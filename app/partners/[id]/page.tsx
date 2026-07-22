@@ -95,7 +95,7 @@ export default function PartnerDetailPage({ params }: { params: Promise<{ id: st
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neutral-900" />
       </div>
     );
   }
@@ -103,8 +103,8 @@ export default function PartnerDetailPage({ params }: { params: Promise<{ id: st
   if (!partner) {
     return (
       <div className="text-center py-20">
-        <h2 className="text-2xl font-bold text-slate-900">Partner not found</h2>
-        <Link href="/partners" className="text-blue-600 hover:underline mt-4 inline-block">
+        <h2 className="text-2xl font-bold text-neutral-900">Partner not found</h2>
+        <Link href="/partners" className="text-neutral-900 hover:underline mt-4 inline-block">
           Return to Partners
         </Link>
       </div>
@@ -114,28 +114,28 @@ export default function PartnerDetailPage({ params }: { params: Promise<{ id: st
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-xs font-medium text-[#6B7280] uppercase tracking-wider">
-        <Link href="/partners" className="hover:text-blue-600 transition-colors">Partners</Link>
+      <div className="flex items-center gap-2 text-xs font-medium text-[#737373] uppercase tracking-wider">
+        <Link href="/partners" className="hover:text-neutral-900 transition-colors">Partners</Link>
         <span>/</span>
-        <span className="text-[#111827]">{partner.name}</span>
+        <span className="text-[#0a0a0a]">{partner.name}</span>
       </div>
 
       {/* Header */}
-      <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+      <div className="bg-white rounded-2xl p-6 border border-neutral-200 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex items-start gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-[#E8F1FB] flex items-center justify-center">
-              <ShieldCheck className="w-8 h-8 text-blue-600" />
+            <div className="w-16 h-16 rounded-2xl bg-[#f5f5f5] flex items-center justify-center">
+              <ShieldCheck className="w-8 h-8 text-neutral-900" />
             </div>
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="text-2xl font-bold text-[#111827]">{partner.name}</h1>
+                <h1 className="text-2xl font-bold text-[#0a0a0a]">{partner.name}</h1>
                 <Badge className={cn("font-medium border-none text-[10px] h-5 px-2", getStatusColor(partner.partner_type))}>
                   {partner.partner_type}
                 </Badge>
               </div>
               {partner.capabilities && (
-                <div className="flex items-center gap-1.5 mt-2 text-[#6B7280] text-sm">
+                <div className="flex items-center gap-1.5 mt-2 text-[#737373] text-sm">
                   <Tag className="w-4 h-4" />
                   {partner.capabilities}
                 </div>
@@ -144,7 +144,7 @@ export default function PartnerDetailPage({ params }: { params: Promise<{ id: st
           </div>
           <div className="flex items-center gap-2">
             <Link href={`/partners/${id}/edit`}>
-              <Button variant="outline" size="sm" className="border-slate-200 text-slate-700 bg-white">
+              <Button variant="outline" size="sm" className="border-neutral-200 text-neutral-700 bg-white">
                 <Pencil className="w-4 h-4 mr-2" /> Edit
               </Button>
             </Link>
@@ -177,34 +177,34 @@ export default function PartnerDetailPage({ params }: { params: Promise<{ id: st
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-bold text-[#111827]">Partner Details</CardTitle>
+            <CardTitle className="text-lg font-bold text-[#0a0a0a]">Partner Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex justify-between items-center py-2 border-b border-slate-100">
-              <span className="text-sm text-[#6B7280]">Type</span>
-              <span className="font-bold text-[#111827]">{partner.partner_type}</span>
+            <div className="flex justify-between items-center py-2 border-b border-neutral-200">
+              <span className="text-sm text-[#737373]">Type</span>
+              <span className="font-bold text-[#0a0a0a]">{partner.partner_type}</span>
             </div>
-            <div className="flex justify-between items-center py-2 border-b border-slate-100">
-              <span className="text-sm text-[#6B7280]">Capabilities</span>
-              <span className="font-bold text-[#111827] text-right max-w-[200px]">{partner.capabilities || "—"}</span>
+            <div className="flex justify-between items-center py-2 border-b border-neutral-200">
+              <span className="text-sm text-[#737373]">Capabilities</span>
+              <span className="font-bold text-[#0a0a0a] text-right max-w-[200px]">{partner.capabilities || "—"}</span>
             </div>
-            <div className="flex justify-between items-center py-2 border-b border-slate-100">
-              <span className="text-sm text-[#6B7280]">Contract Vehicles</span>
-              <span className="font-bold text-[#111827] text-right max-w-[200px]">{partner.contract_vehicles || "—"}</span>
+            <div className="flex justify-between items-center py-2 border-b border-neutral-200">
+              <span className="text-sm text-[#737373]">Contract Vehicles</span>
+              <span className="font-bold text-[#0a0a0a] text-right max-w-[200px]">{partner.contract_vehicles || "—"}</span>
             </div>
             <div className="flex justify-between items-center py-2">
-              <span className="text-sm text-[#6B7280]">Created</span>
-              <span className="font-bold text-[#111827]">{formatDate(partner.created_at)}</span>
+              <span className="text-sm text-[#737373]">Created</span>
+              <span className="font-bold text-[#0a0a0a]">{formatDate(partner.created_at)}</span>
             </div>
           </CardContent>
         </Card>
 
         <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-bold text-[#111827]">Notes</CardTitle>
+            <CardTitle className="text-lg font-bold text-[#0a0a0a]">Notes</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-[#4B5563] whitespace-pre-wrap">
+            <p className="text-sm text-[#525252] whitespace-pre-wrap">
               {partner.notes || "No additional notes for this partner."}
             </p>
           </CardContent>
@@ -214,7 +214,7 @@ export default function PartnerDetailPage({ params }: { params: Promise<{ id: st
       {/* Linked Engagements */}
       <Card className="border-none shadow-sm">
         <CardHeader>
-          <CardTitle className="text-lg font-bold text-[#111827]">
+          <CardTitle className="text-lg font-bold text-[#0a0a0a]">
             Linked Engagements ({engagements.length})
           </CardTitle>
         </CardHeader>
@@ -223,12 +223,12 @@ export default function PartnerDetailPage({ params }: { params: Promise<{ id: st
             <div className="space-y-3">
               {engagements.map((eng) => (
                 <Link key={eng.id} href={`/engagements/${eng.id}`}>
-                  <div className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 border border-slate-100 cursor-pointer">
+                  <div className="flex items-center justify-between p-3 rounded-lg hover:bg-neutral-50 border border-neutral-200 cursor-pointer">
                     <div className="flex items-center gap-3">
-                      <Briefcase className="w-4 h-4 text-blue-600" />
+                      <Briefcase className="w-4 h-4 text-neutral-900" />
                       <div>
-                        <p className="text-sm font-bold text-[#111827]">{eng.name}</p>
-                        <p className="text-xs text-[#6B7280]">{eng.accounts?.name}</p>
+                        <p className="text-sm font-bold text-[#0a0a0a]">{eng.name}</p>
+                        <p className="text-xs text-[#737373]">{eng.accounts?.name}</p>
                       </div>
                     </div>
                     <Badge className={cn("text-[10px] h-5 px-2 border-none", getStatusColor(eng.status))}>
@@ -239,7 +239,7 @@ export default function PartnerDetailPage({ params }: { params: Promise<{ id: st
               ))}
             </div>
           ) : (
-            <p className="text-sm text-slate-400 italic text-center py-8">No linked engagements.</p>
+            <p className="text-sm text-neutral-400 italic text-center py-8">No linked engagements.</p>
           )}
         </CardContent>
       </Card>
@@ -247,7 +247,7 @@ export default function PartnerDetailPage({ params }: { params: Promise<{ id: st
       {/* Linked Opportunities */}
       <Card className="border-none shadow-sm">
         <CardHeader>
-          <CardTitle className="text-lg font-bold text-[#111827]">
+          <CardTitle className="text-lg font-bold text-[#0a0a0a]">
             Linked Opportunities ({opportunities.length})
           </CardTitle>
         </CardHeader>
@@ -256,16 +256,16 @@ export default function PartnerDetailPage({ params }: { params: Promise<{ id: st
             <div className="space-y-3">
               {opportunities.map((opp) => (
                 <Link key={opp.id} href={`/pipeline/${opp.id}`}>
-                  <div className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 border border-slate-100 cursor-pointer">
+                  <div className="flex items-center justify-between p-3 rounded-lg hover:bg-neutral-50 border border-neutral-200 cursor-pointer">
                     <div className="flex items-center gap-3">
-                      <TrendingUp className="w-4 h-4 text-blue-600" />
+                      <TrendingUp className="w-4 h-4 text-neutral-900" />
                       <div>
-                        <p className="text-sm font-bold text-[#111827]">{opp.name}</p>
-                        <p className="text-xs text-[#6B7280]">{opp.accounts?.name}</p>
+                        <p className="text-sm font-bold text-[#0a0a0a]">{opp.name}</p>
+                        <p className="text-xs text-[#737373]">{opp.accounts?.name}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-green-600">{formatCurrency(opp.estimated_value)}</span>
+                      <span className="text-xs font-bold text-neutral-900">{formatCurrency(opp.estimated_value)}</span>
                       <Badge className={cn("text-[10px] h-5 px-2 border-none", getStatusColor(opp.stage))}>
                         {opp.stage}
                       </Badge>
@@ -275,7 +275,7 @@ export default function PartnerDetailPage({ params }: { params: Promise<{ id: st
               ))}
             </div>
           ) : (
-            <p className="text-sm text-slate-400 italic text-center py-8">No linked opportunities.</p>
+            <p className="text-sm text-neutral-400 italic text-center py-8">No linked opportunities.</p>
           )}
         </CardContent>
       </Card>
@@ -284,13 +284,13 @@ export default function PartnerDetailPage({ params }: { params: Promise<{ id: st
       {partner.attachments && partner.attachments.length > 0 && (
         <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-bold text-[#111827]">Attachments</CardTitle>
+            <CardTitle className="text-lg font-bold text-[#0a0a0a]">Attachments</CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">
               {partner.attachments.map((url) => (
                 <li key={url}>
-                  <a href={url} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline">
+                  <a href={url} target="_blank" rel="noopener noreferrer" className="text-sm text-neutral-900 hover:underline">
                     {decodeURIComponent(url.split("/").pop() || "file")}
                   </a>
                 </li>

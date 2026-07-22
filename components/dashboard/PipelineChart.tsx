@@ -27,7 +27,7 @@ export function PipelineChart({ stages }: PipelineChartProps) {
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-lg font-semibold text-[#111827]">Pipeline by Stage</CardTitle>
+            <CardTitle className="text-lg font-semibold text-[#0a0a0a]">Pipeline by Stage</CardTitle>
             <CardDescription>Opportunity distribution across stages</CardDescription>
           </div>
           <Link href="/pipeline">
@@ -41,7 +41,7 @@ export function PipelineChart({ stages }: PipelineChartProps) {
       <CardContent className="pt-4">
         <div className="space-y-4">
           {activeStages.length === 0 ? (
-            <div className="py-8 text-center text-[#6B7280]">No active opportunities</div>
+            <div className="py-8 text-center text-[#737373]">No active opportunities</div>
           ) : (
             activeStages.map((stage) => {
               const percentage = totalValue > 0 ? (stage.value / totalValue) * 100 : 0;
@@ -49,8 +49,8 @@ export function PipelineChart({ stages }: PipelineChartProps) {
                 <div key={stage.stage} className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-[#111827]">{stage.stage}</span>
-                      <Badge variant="secondary" className="text-[10px] h-5 px-1.5 bg-slate-100 text-[#6B7280] border-none">
+                      <span className="font-medium text-[#0a0a0a]">{stage.stage}</span>
+                      <Badge variant="secondary" className="text-[10px] h-5 px-1.5 bg-neutral-100 text-[#737373] border-none">
                         {stage.count}
                       </Badge>
                     </div>
@@ -58,7 +58,7 @@ export function PipelineChart({ stages }: PipelineChartProps) {
                       {formatCompactCurrency(stage.value)}
                     </span>
                   </div>
-                  <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-2 bg-neutral-100 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-primary rounded-full transition-all duration-500"
                       style={{ width: `${percentage}%` }}
@@ -70,11 +70,11 @@ export function PipelineChart({ stages }: PipelineChartProps) {
           )}
         </div>
         
-        <Separator className="my-4 bg-slate-100" />
+        <Separator className="my-4 bg-neutral-100" />
         
         <div className="flex items-center justify-between">
-          <span className="text-sm text-[#6B7280]">Total Pipeline</span>
-          <span className="text-lg font-bold text-[#111827]">
+          <span className="text-sm text-[#737373]">Total Pipeline</span>
+          <span className="text-lg font-bold text-[#0a0a0a]">
             {formatCurrency(totalValue)}
           </span>
         </div>

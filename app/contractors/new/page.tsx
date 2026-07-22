@@ -69,7 +69,7 @@ export default function NewContractorPage() {
         <Link href="/contractors">
           <Button variant="ghost" size="icon"><ChevronLeft className="w-5 h-5" /></Button>
         </Link>
-        <h1 className="text-3xl font-bold tracking-tight text-[#111827]">New Contractor</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-[#0a0a0a]">New Contractor</h1>
       </div>
 
       <Card className="border-none shadow-sm">
@@ -129,7 +129,7 @@ export default function NewContractorPage() {
               )} />
               <div className="flex justify-end gap-4">
                 <Link href="/contractors"><Button variant="outline" type="button">Cancel</Button></Link>
-                <Button type="submit" className="bg-blue-600 hover:bg-blue-700">Create Contractor</Button>
+                <Button type="submit" className="bg-neutral-900 hover:bg-neutral-800">Create Contractor</Button>
               </div>
             </form>
           </Form>

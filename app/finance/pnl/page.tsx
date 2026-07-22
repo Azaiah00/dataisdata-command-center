@@ -132,12 +132,12 @@ export default function ProfitAndLossPage() {
       <div className="hidden print:block mb-8 pb-6 border-b-2 border-primary">
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold text-[#111827]">DataIsData</h1>
-            <p className="text-sm text-[#6B7280]">Innovation as a Service</p>
+            <h1 className="text-3xl font-bold text-[#0a0a0a]">DataIsData</h1>
+            <p className="text-sm text-[#737373]">Innovation as a Service</p>
           </div>
           <div className="text-right">
-            <h2 className="text-xl font-bold text-[#111827]">Profit & Loss Report</h2>
-            <p className="text-sm text-[#6B7280]">{rangeLabel} | {new Date().toLocaleDateString()}</p>
+            <h2 className="text-xl font-bold text-[#0a0a0a]">Profit & Loss Report</h2>
+            <p className="text-sm text-[#737373]">{rangeLabel} | {new Date().toLocaleDateString()}</p>
           </div>
         </div>
       </div>
@@ -145,8 +145,8 @@ export default function ProfitAndLossPage() {
       {/* Screen header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 print:hidden">
         <div>
-          <h1 className="text-2xl font-bold text-[#111827]">Profit & Loss</h1>
-          <p className="text-[#6B7280]">Revenue, expenses, and profitability analysis.</p>
+          <h1 className="text-2xl font-bold text-[#0a0a0a]">Profit & Loss</h1>
+          <p className="text-[#737373]">Revenue, expenses, and profitability analysis.</p>
         </div>
         <div className="flex items-center gap-2">
           <Select value={range} onValueChange={(v) => setRange(v as DateRange)}>
@@ -173,57 +173,57 @@ export default function ProfitAndLossPage() {
         <>
           {/* Revenue section */}
           <Card className="border-none shadow-sm">
-            <CardHeader><CardTitle className="text-lg font-bold text-[#111827]">Revenue</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-lg font-bold text-[#0a0a0a]">Revenue</CardTitle></CardHeader>
             <CardContent className="space-y-3">
-              <div className="flex justify-between py-2 border-b border-slate-100">
-                <span className="text-sm text-[#6B7280]">Total Invoiced</span>
-                <span className="font-bold text-[#111827]">{formatCurrency(data.totalInvoiced)}</span>
+              <div className="flex justify-between py-2 border-b border-neutral-200">
+                <span className="text-sm text-[#737373]">Total Invoiced</span>
+                <span className="font-bold text-[#0a0a0a]">{formatCurrency(data.totalInvoiced)}</span>
               </div>
               <div className="flex justify-between py-2">
-                <span className="text-sm font-bold text-[#111827]">Total Collected (Cash In)</span>
-                <span className="font-bold text-emerald-600 text-lg">{formatCurrency(data.totalCollected)}</span>
+                <span className="text-sm font-bold text-[#0a0a0a]">Total Collected (Cash In)</span>
+                <span className="font-bold text-neutral-900 text-lg">{formatCurrency(data.totalCollected)}</span>
               </div>
             </CardContent>
           </Card>
 
           {/* Expenses section */}
           <Card className="border-none shadow-sm">
-            <CardHeader><CardTitle className="text-lg font-bold text-[#111827]">Expenses</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-lg font-bold text-[#0a0a0a]">Expenses</CardTitle></CardHeader>
             <CardContent className="space-y-3">
               {data.expensesByCategory.map((cat) => (
-                <div key={cat.category} className="flex justify-between py-2 border-b border-slate-50">
-                  <span className="text-sm text-[#6B7280]">{cat.category}</span>
-                  <span className="font-bold text-[#111827]">{formatCurrency(cat.total)}</span>
+                <div key={cat.category} className="flex justify-between py-2 border-b border-neutral-200">
+                  <span className="text-sm text-[#737373]">{cat.category}</span>
+                  <span className="font-bold text-[#0a0a0a]">{formatCurrency(cat.total)}</span>
                 </div>
               ))}
-              <div className="flex justify-between py-2 border-t border-slate-200">
-                <span className="text-sm font-bold text-[#111827]">Total Expenses</span>
+              <div className="flex justify-between py-2 border-t border-neutral-200">
+                <span className="text-sm font-bold text-[#0a0a0a]">Total Expenses</span>
                 <span className="font-bold text-red-600 text-lg">{formatCurrency(data.totalExpenses)}</span>
               </div>
             </CardContent>
           </Card>
 
           {/* Net Profit */}
-          <Card className={cn("border-none shadow-sm", data.netProfit >= 0 ? "bg-green-50/50" : "bg-red-50/50")}>
+          <Card className={cn("border-none shadow-sm", data.netProfit >= 0 ? "bg-neutral-100/50" : "bg-red-50/50")}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   {data.netProfit >= 0 ? (
-                    <TrendingUp className="w-8 h-8 text-green-600" />
+                    <TrendingUp className="w-8 h-8 text-neutral-900" />
                   ) : (
                     <TrendingDown className="w-8 h-8 text-red-600" />
                   )}
                   <div>
-                    <p className="text-sm font-bold text-[#6B7280] uppercase tracking-wider">Net Profit / Loss</p>
-                    <p className="text-sm text-[#6B7280]">{rangeLabel}</p>
+                    <p className="text-sm font-bold text-[#737373] uppercase tracking-wider">Net Profit / Loss</p>
+                    <p className="text-sm text-[#737373]">{rangeLabel}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className={cn("text-3xl font-bold", data.netProfit >= 0 ? "text-green-600" : "text-red-600")}>
+                  <p className={cn("text-3xl font-bold", data.netProfit >= 0 ? "text-neutral-900" : "text-red-600")}>
                     {formatCurrency(data.netProfit)}
                   </p>
                   {data.totalCollected > 0 && (
-                    <p className="text-sm text-[#6B7280]">
+                    <p className="text-sm text-[#737373]">
                       {((data.netProfit / data.totalCollected) * 100).toFixed(1)}% margin
                     </p>
                   )}
@@ -235,28 +235,28 @@ export default function ProfitAndLossPage() {
           {/* Per-engagement profitability */}
           {data.engagementProfitability.length > 0 && (
             <Card className="border-none shadow-sm">
-              <CardHeader><CardTitle className="text-lg font-bold text-[#111827]">Profitability by Engagement</CardTitle></CardHeader>
+              <CardHeader><CardTitle className="text-lg font-bold text-[#0a0a0a]">Profitability by Engagement</CardTitle></CardHeader>
               <CardContent>
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-slate-200">
-                      <th className="text-left py-2 text-xs font-bold text-[#6B7280] uppercase">Engagement</th>
-                      <th className="text-right py-2 text-xs font-bold text-[#6B7280] uppercase">Revenue</th>
-                      <th className="text-right py-2 text-xs font-bold text-[#6B7280] uppercase">Expenses</th>
-                      <th className="text-right py-2 text-xs font-bold text-[#6B7280] uppercase">Profit</th>
-                      <th className="text-right py-2 text-xs font-bold text-[#6B7280] uppercase">Margin</th>
+                    <tr className="border-b border-neutral-200">
+                      <th className="text-left py-2 text-xs font-bold text-[#737373] uppercase">Engagement</th>
+                      <th className="text-right py-2 text-xs font-bold text-[#737373] uppercase">Revenue</th>
+                      <th className="text-right py-2 text-xs font-bold text-[#737373] uppercase">Expenses</th>
+                      <th className="text-right py-2 text-xs font-bold text-[#737373] uppercase">Profit</th>
+                      <th className="text-right py-2 text-xs font-bold text-[#737373] uppercase">Margin</th>
                     </tr>
                   </thead>
                   <tbody>
                     {data.engagementProfitability.map((eng) => (
-                      <tr key={eng.id} className="border-b border-slate-50">
-                        <td className="py-3 text-[#111827] font-medium">{eng.name}</td>
-                        <td className="py-3 text-right text-emerald-600 font-bold">{formatCurrency(eng.revenue)}</td>
+                      <tr key={eng.id} className="border-b border-neutral-200">
+                        <td className="py-3 text-[#0a0a0a] font-medium">{eng.name}</td>
+                        <td className="py-3 text-right text-neutral-900 font-bold">{formatCurrency(eng.revenue)}</td>
                         <td className="py-3 text-right text-red-600">{formatCurrency(eng.expenses)}</td>
-                        <td className={cn("py-3 text-right font-bold", eng.profit >= 0 ? "text-green-600" : "text-red-600")}>
+                        <td className={cn("py-3 text-right font-bold", eng.profit >= 0 ? "text-neutral-900" : "text-red-600")}>
                           {formatCurrency(eng.profit)}
                         </td>
-                        <td className="py-3 text-right text-[#6B7280]">
+                        <td className="py-3 text-right text-[#737373]">
                           {eng.revenue > 0 ? `${((eng.profit / eng.revenue) * 100).toFixed(1)}%` : "—"}
                         </td>
                       </tr>
@@ -271,7 +271,7 @@ export default function ProfitAndLossPage() {
 
       {/* Print footer */}
       <div className="hidden print:block mt-12 pt-6 border-t-2 border-primary">
-        <p className="text-sm text-[#6B7280]">DataIsData Command Center | Profit & Loss Report | {new Date().toLocaleDateString()}</p>
+        <p className="text-sm text-[#737373]">DataIsData Command Center | Profit & Loss Report | {new Date().toLocaleDateString()}</p>
       </div>
     </div>
   );

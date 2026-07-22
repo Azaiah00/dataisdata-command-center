@@ -19,19 +19,20 @@ export const SPONSORSHIP_TIERS = ['Showcase', 'Premium Sponsor', 'Strategic Part
 export const EVENT_THEMES = ['AI', 'Cyber', 'Broadband', 'Resiliency'] as const;
 export const MATURITY_CATEGORIES = ['governance', 'cyber_resilience', 'broadband_readiness', 'data_maturity', 'ai_readiness', 'workforce_capacity', 'vendor_alignment', 'grant_capture'] as const;
 
+/** Monochrome progression — tone darkens as the deal advances. Ember marks a loss. */
 export const STAGE_COLORS: Record<string, string> = {
-  Lead: 'bg-slate-500',
-  Discovery: 'bg-blue-500',
-  Proposal: 'bg-indigo-500',
-  Negotiation: 'bg-purple-500',
-  Awarded: 'bg-green-500',
-  Lost: 'bg-red-500',
+  Lead: 'bg-neutral-300',
+  Discovery: 'bg-neutral-400',
+  Proposal: 'bg-neutral-500',
+  Negotiation: 'bg-neutral-700',
+  Awarded: 'bg-neutral-900',
+  Lost: 'bg-red-600',
 };
 
 export const STATUS_COLORS: Record<string, string> = {
-  Active: 'text-green-600 bg-green-50',
-  Prospect: 'text-blue-600 bg-blue-50',
-  Dormant: 'text-slate-600 bg-slate-50',
+  Active: 'text-neutral-50 bg-neutral-900',
+  Prospect: 'text-neutral-700 bg-neutral-100',
+  Dormant: 'text-neutral-500 bg-neutral-50',
 };
 
 // Finance Hub constants

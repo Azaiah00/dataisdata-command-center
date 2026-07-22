@@ -40,14 +40,23 @@ export function formatDateRelative(dateString: string | null | undefined) {
   });
 }
 
+/**
+ * Status tone, encoded monochromatically: the further a record has advanced,
+ * the darker its badge. Ember red stays exclusive to negative outcomes.
+ */
 export function getStatusColor(status: string) {
   const s = status?.toLowerCase();
-  if (s === 'active' || s === 'awarded' || s === 'good' || s === 'complete' || s === 'on-track' || s === 'paid' || s === 'approved' || s === 'reimbursed') return 'bg-green-100 text-green-700 border-green-200';
-  if (s === 'prospect' || s === 'proposal' || s === 'lead' || s === 'planned' || s === 'discovery' || s === 'draft' || s === 'pending') return 'bg-primary/10 text-primary border-primary/20';
-  if (s === 'negotiation' || s === 'in progress' || s === 'warm' || s === 'sent') return 'bg-purple-100 text-purple-700 border-purple-200';
-  if (s === 'on hold' || s === 'neutral' || s === 'cancelled') return 'bg-gray-100 text-gray-700 border-gray-200';
-  if (s === 'lost' || s === 'dormant' || s === 'bad' || s === 'at-risk' || s === 'overdue') return 'bg-red-100 text-red-700 border-red-200';
-  return 'bg-gray-100 text-gray-700 border-gray-200';
+  // Resolved & positive — solid ink
+  if (s === 'active' || s === 'awarded' || s === 'good' || s === 'complete' || s === 'on-track' || s === 'paid' || s === 'approved' || s === 'reimbursed') return 'bg-neutral-900 text-neutral-50 border-neutral-900';
+  // Underway — soft fill
+  if (s === 'negotiation' || s === 'in progress' || s === 'warm' || s === 'sent') return 'bg-neutral-200 text-neutral-900 border-neutral-300';
+  // Early stage — outline only
+  if (s === 'prospect' || s === 'proposal' || s === 'lead' || s === 'planned' || s === 'discovery' || s === 'draft' || s === 'pending') return 'bg-transparent text-neutral-700 border-neutral-300';
+  // Paused / inert — muted canvas
+  if (s === 'on hold' || s === 'neutral' || s === 'cancelled') return 'bg-neutral-100 text-neutral-500 border-neutral-200';
+  // Negative — the one permitted accent
+  if (s === 'lost' || s === 'dormant' || s === 'bad' || s === 'at-risk' || s === 'overdue') return 'bg-red-50 text-red-600 border-red-200';
+  return 'bg-neutral-100 text-neutral-700 border-neutral-200';
 }
 
 export function formatDate(dateString: string | null | undefined) {

@@ -203,7 +203,7 @@ function ContactForm() {
                       type="button" 
                       variant="ghost" 
                       size="sm" 
-                      className="text-blue-600 hover:text-blue-700 h-8 px-2"
+                      className="text-neutral-900 hover:text-neutral-900 h-8 px-2"
                       onClick={() => {
                         setIsCreatingAccount(!isCreatingAccount);
                         if (!isCreatingAccount) {
@@ -251,13 +251,13 @@ function ContactForm() {
                       )}
                     />
                   ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-lg bg-slate-50/50">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-lg bg-neutral-50/50">
                       <FormField
                         control={form.control}
                         name="new_account_name"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-xs uppercase font-bold text-slate-500">New Account Name</FormLabel>
+                            <FormLabel className="text-xs uppercase font-bold text-neutral-500">New Account Name</FormLabel>
                             <FormControl>
                               <Input placeholder="e.g. City of Richmond" {...field} />
                             </FormControl>
@@ -270,7 +270,7 @@ function ContactForm() {
                         name="new_account_type"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-xs uppercase font-bold text-slate-500">Account Type</FormLabel>
+                            <FormLabel className="text-xs uppercase font-bold text-neutral-500">Account Type</FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                                 <SelectTrigger>
@@ -390,7 +390,7 @@ function ContactForm() {
                 <Button variant="outline" type="button" onClick={() => router.back()} disabled={isSubmitting}>
                   Cancel
                 </Button>
-                <Button type="submit" className="bg-blue-600 hover:bg-blue-700" disabled={isSubmitting}>
+                <Button type="submit" className="bg-neutral-900 hover:bg-neutral-800" disabled={isSubmitting}>
                   {isSubmitting ? "Creating..." : "Create Contact"}
                 </Button>
               </div>

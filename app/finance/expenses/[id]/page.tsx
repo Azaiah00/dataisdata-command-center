@@ -69,28 +69,28 @@ export default function ExpenseDetailPage({ params }: { params: Promise<{ id: st
   }
 
   if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" /></div>;
-  if (!expense) return <div className="text-center py-20"><h2 className="text-2xl font-bold">Expense not found</h2><Link href="/finance/expenses" className="text-blue-600 hover:underline mt-4 inline-block">Back to Expenses</Link></div>;
+  if (!expense) return <div className="text-center py-20"><h2 className="text-2xl font-bold">Expense not found</h2><Link href="/finance/expenses" className="text-neutral-900 hover:underline mt-4 inline-block">Back to Expenses</Link></div>;
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center gap-2 text-xs font-medium text-[#6B7280] uppercase tracking-wider">
-        <Link href="/finance/expenses" className="hover:text-blue-600">Expenses</Link>
+      <div className="flex items-center gap-2 text-xs font-medium text-[#737373] uppercase tracking-wider">
+        <Link href="/finance/expenses" className="hover:text-neutral-900">Expenses</Link>
         <span>/</span>
-        <span className="text-[#111827]">{expense.description}</span>
+        <span className="text-[#0a0a0a]">{expense.description}</span>
       </div>
 
       {/* Header */}
-      <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+      <div className="bg-white rounded-2xl p-6 border border-neutral-200 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-orange-100 flex items-center justify-center">
-              <CreditCard className="w-7 h-7 text-orange-700" />
+            <div className="w-14 h-14 rounded-2xl bg-neutral-200 flex items-center justify-center">
+              <CreditCard className="w-7 h-7 text-neutral-700" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-[#111827]">{expense.description}</h1>
+              <h1 className="text-2xl font-bold text-[#0a0a0a]">{expense.description}</h1>
               <div className="flex items-center gap-3 mt-1">
                 <Badge className={cn("font-medium border-none text-[10px] h-5 px-2", getStatusColor(expense.status))}>{expense.status}</Badge>
-                <span className="text-sm text-[#6B7280]">{expense.category}</span>
+                <span className="text-sm text-[#737373]">{expense.category}</span>
               </div>
             </div>
           </div>
@@ -139,7 +139,7 @@ export default function ExpenseDetailPage({ params }: { params: Promise<{ id: st
               </div>
             </div>
             <div className="flex gap-2">
-              <Button onClick={onSave} disabled={saving} className="bg-blue-600 hover:bg-blue-700">{saving ? "Saving..." : "Save"}</Button>
+              <Button onClick={onSave} disabled={saving} className="bg-neutral-900 hover:bg-neutral-800">{saving ? "Saving..." : "Save"}</Button>
               <Button variant="outline" onClick={() => setIsEditing(false)}>Cancel</Button>
             </div>
           </CardContent>
@@ -148,35 +148,35 @@ export default function ExpenseDetailPage({ params }: { params: Promise<{ id: st
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="border-none shadow-sm">
-          <CardHeader><CardTitle className="text-lg font-bold text-[#111827]">Details</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-lg font-bold text-[#0a0a0a]">Details</CardTitle></CardHeader>
           <CardContent className="space-y-3">
-            <div className="flex justify-between py-2 border-b border-slate-100">
-              <span className="text-sm text-[#6B7280]">Amount</span>
+            <div className="flex justify-between py-2 border-b border-neutral-200">
+              <span className="text-sm text-[#737373]">Amount</span>
               <span className="font-bold text-red-600 text-lg">{formatCurrency(expense.amount)}</span>
             </div>
-            <div className="flex justify-between py-2 border-b border-slate-100">
-              <span className="text-sm text-[#6B7280]">Date</span>
-              <span className="font-bold text-[#111827]">{formatDate(expense.expense_date)}</span>
+            <div className="flex justify-between py-2 border-b border-neutral-200">
+              <span className="text-sm text-[#737373]">Date</span>
+              <span className="font-bold text-[#0a0a0a]">{formatDate(expense.expense_date)}</span>
             </div>
-            <div className="flex justify-between py-2 border-b border-slate-100">
-              <span className="text-sm text-[#6B7280]">Account</span>
-              <span className="font-bold text-[#111827]">{expense.accounts?.name || "—"}</span>
+            <div className="flex justify-between py-2 border-b border-neutral-200">
+              <span className="text-sm text-[#737373]">Account</span>
+              <span className="font-bold text-[#0a0a0a]">{expense.accounts?.name || "—"}</span>
             </div>
-            <div className="flex justify-between py-2 border-b border-slate-100">
-              <span className="text-sm text-[#6B7280]">Engagement</span>
-              <span className="font-bold text-[#111827]">{expense.engagements?.name || "—"}</span>
+            <div className="flex justify-between py-2 border-b border-neutral-200">
+              <span className="text-sm text-[#737373]">Engagement</span>
+              <span className="font-bold text-[#0a0a0a]">{expense.engagements?.name || "—"}</span>
             </div>
             <div className="flex justify-between py-2">
-              <span className="text-sm text-[#6B7280]">Contractor</span>
-              <span className="font-bold text-[#111827]">{expense.contractors?.full_name || "—"}</span>
+              <span className="text-sm text-[#737373]">Contractor</span>
+              <span className="font-bold text-[#0a0a0a]">{expense.contractors?.full_name || "—"}</span>
             </div>
           </CardContent>
         </Card>
         {expense.receipt_url && (
           <Card className="border-none shadow-sm">
-            <CardHeader><CardTitle className="text-lg font-bold text-[#111827]">Receipt</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-lg font-bold text-[#0a0a0a]">Receipt</CardTitle></CardHeader>
             <CardContent>
-              <a href={expense.receipt_url} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline flex items-center gap-1">
+              <a href={expense.receipt_url} target="_blank" rel="noopener noreferrer" className="text-sm text-neutral-900 hover:underline flex items-center gap-1">
                 <ExternalLink className="w-4 h-4" /> View receipt
               </a>
             </CardContent>

@@ -60,8 +60,8 @@ export default function ClientIntakeNewPage() {
       <div className="max-w-2xl mx-auto">
         <Card className="border-none shadow-sm">
           <CardContent className="p-6">
-            <h1 className="text-2xl font-bold text-[#111827]">Thanks for your interest</h1>
-            <p className="text-[#6B7280] mt-2">Your intake has been received. DataIsData will follow up with next steps.</p>
+            <h1 className="text-2xl font-bold text-[#0a0a0a]">Thanks for your interest</h1>
+            <p className="text-[#737373] mt-2">Your intake has been received. DataIsData will follow up with next steps.</p>
           </CardContent>
         </Card>
       </div>
@@ -100,7 +100,7 @@ export default function ClientIntakeNewPage() {
               </div>
             </div>
 
-            <Button type="submit" disabled={saving} className="bg-blue-600 hover:bg-blue-700">{saving ? "Submitting..." : "Submit Intake"}</Button>
+            <Button type="submit" disabled={saving} className="bg-neutral-900 hover:bg-neutral-800">{saving ? "Submitting..." : "Submit Intake"}</Button>
           </form>
         </CardContent>
       </Card>

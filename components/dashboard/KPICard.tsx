@@ -30,12 +30,12 @@ export function KPICard({
               <div className="flex items-center gap-1.5">
                 <div className={cn(
                   "p-1 rounded-full",
-                  changeType === "positive" && "bg-green-100",
+                  changeType === "positive" && "bg-neutral-200",
                   changeType === "negative" && "bg-red-100",
-                  changeType === "neutral" && "bg-slate-100"
+                  changeType === "neutral" && "bg-neutral-100"
                 )}>
                   {changeType === "positive" ? (
-                    <TrendingUp className="w-3 h-3 text-green-600" />
+                    <TrendingUp className="w-3 h-3 text-neutral-900" />
                   ) : changeType === "negative" ? (
                     <TrendingDown className="w-3 h-3 text-red-600" />
                   ) : null}
@@ -43,7 +43,7 @@ export function KPICard({
                 <span
                   className={cn(
                     "text-xs font-bold",
-                    changeType === "positive" && "text-green-600",
+                    changeType === "positive" && "text-neutral-900",
                     changeType === "negative" && "text-red-600",
                     changeType === "neutral" && "text-muted-foreground"
                   )}

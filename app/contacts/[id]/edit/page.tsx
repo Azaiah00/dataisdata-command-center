@@ -292,7 +292,7 @@ export default function EditContactPage({ params }: { params: Promise<{ id: stri
           <Card>
             <CardHeader>
               <CardTitle>Account Associations</CardTitle>
-              <p className="text-sm text-slate-500 mt-1">Manage which accounts this contact is associated with.</p>
+              <p className="text-sm text-neutral-500 mt-1">Manage which accounts this contact is associated with.</p>
             </CardHeader>
             <CardContent>
               <FormField
@@ -314,7 +314,7 @@ export default function EditContactPage({ params }: { params: Promise<{ id: stri
                               className="h-4 w-4 hover:bg-transparent"
                               onClick={() => field.onChange(field.value.filter(i => i !== accountId))}
                             >
-                              <Trash2 className="h-3 w-3 text-slate-400" />
+                              <Trash2 className="h-3 w-3 text-neutral-400" />
                             </Button>
                           </Badge>
                         );
@@ -349,7 +349,7 @@ export default function EditContactPage({ params }: { params: Promise<{ id: stri
             <Button variant="outline" type="button" onClick={() => router.back()} disabled={isSubmitting}>
               Cancel
             </Button>
-            <Button type="submit" className="bg-blue-600 hover:bg-blue-700" disabled={isSubmitting}>
+            <Button type="submit" className="bg-neutral-900 hover:bg-neutral-800" disabled={isSubmitting}>
               {isSubmitting ? "Saving..." : "Save Changes"}
             </Button>
           </div>
