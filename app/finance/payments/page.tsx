@@ -34,7 +34,7 @@ export default function PaymentsPage() {
           <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
             <Banknote className="w-4 h-4 text-primary" />
           </div>
-          <span className="font-bold text-[#0a0a0a] text-sm">{p.invoices?.invoice_number || "—"}</span>
+          <span className="font-bold text-[#111827] text-sm">{p.invoices?.invoice_number || "—"}</span>
         </div>
       ),
     },
@@ -42,35 +42,35 @@ export default function PaymentsPage() {
       header: "Account",
       accessorKey: "account",
       cell: (p: Payment) => (
-        <span className="text-sm text-[#737373]">{p.invoices?.accounts?.name || "—"}</span>
+        <span className="text-sm text-[#6B7280]">{p.invoices?.accounts?.name || "—"}</span>
       ),
     },
     {
       header: "Amount",
       accessorKey: "amount",
       cell: (p: Payment) => (
-        <span className="text-sm font-bold text-neutral-900">{formatCurrency(p.amount)}</span>
+        <span className="text-sm font-bold text-emerald-600">{formatCurrency(p.amount)}</span>
       ),
     },
     {
       header: "Method",
       accessorKey: "payment_method",
       cell: (p: Payment) => (
-        <span className="text-sm text-[#737373]">{p.payment_method}</span>
+        <span className="text-sm text-[#6B7280]">{p.payment_method}</span>
       ),
     },
     {
       header: "Date",
       accessorKey: "payment_date",
       cell: (p: Payment) => (
-        <span className="text-xs text-[#737373]">{formatDate(p.payment_date)}</span>
+        <span className="text-xs text-[#6B7280]">{formatDate(p.payment_date)}</span>
       ),
     },
     {
       header: "Reference",
       accessorKey: "reference_number",
       cell: (p: Payment) => (
-        <span className="text-xs text-[#737373]">{p.reference_number || "—"}</span>
+        <span className="text-xs text-[#6B7280]">{p.reference_number || "—"}</span>
       ),
     },
   ];
@@ -79,8 +79,8 @@ export default function PaymentsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#0a0a0a]">Payments</h1>
-          <p className="text-[#737373]">All payments received against invoices.</p>
+          <h1 className="text-2xl font-bold text-[#111827]">Payments</h1>
+          <p className="text-[#6B7280]">All payments received against invoices.</p>
         </div>
         <Link href="/finance/payments/new">
           <Button className="bg-primary hover:bg-primary/90 text-white">

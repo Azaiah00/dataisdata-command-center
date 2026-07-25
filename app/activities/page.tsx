@@ -50,8 +50,8 @@ export default function ActivitiesPage() {
             <MessageSquare className="w-4 h-4 text-primary" />
           </div>
           <div className="flex flex-col min-w-0">
-            <span className="font-bold text-[#0a0a0a] text-sm truncate">{activity.activity_type}</span>
-            <span className="text-xs text-[#737373]">{formatDate(activity.date_time)}</span>
+            <span className="font-bold text-[#111827] text-sm truncate">{activity.activity_type}</span>
+            <span className="text-xs text-[#6B7280]">{formatDate(activity.date_time)}</span>
           </div>
         </div>
       ),
@@ -61,12 +61,12 @@ export default function ActivitiesPage() {
       accessorKey: "account_id",
       cell: (activity: any) => (
         <div className="flex flex-col min-w-0">
-          <div className="flex items-center gap-1.5 text-[#0a0a0a] text-xs font-semibold">
-            <Building2 className="w-3.5 h-3.5 text-[#737373]" />
+          <div className="flex items-center gap-1.5 text-[#111827] text-xs font-semibold">
+            <Building2 className="w-3.5 h-3.5 text-[#6B7280]" />
             <span className="truncate">{activity.accounts?.name || "No Account"}</span>
           </div>
           {activity.engagements && (
-            <span className="text-[10px] text-[#737373] truncate mt-0.5 ml-5">
+            <span className="text-[10px] text-[#6B7280] truncate mt-0.5 ml-5">
               Project: {activity.engagements.name}
             </span>
           )}
@@ -77,7 +77,7 @@ export default function ActivitiesPage() {
       header: "Summary",
       accessorKey: "summary",
       cell: (activity: Activity) => (
-        <p className="text-xs text-[#737373] line-clamp-1 max-w-xs leading-relaxed">{activity.summary}</p>
+        <p className="text-xs text-[#6B7280] line-clamp-1 max-w-xs leading-relaxed">{activity.summary}</p>
       ),
     },
     {
@@ -103,7 +103,7 @@ export default function ActivitiesPage() {
             {activity.next_action || "None"}
           </span>
           {activity.next_action_due && (
-            <span className="text-[10px] text-[#737373] mt-0.5">
+            <span className="text-[10px] text-[#6B7280] mt-0.5">
               Due: {formatDate(activity.next_action_due)}
             </span>
           )}
@@ -116,7 +116,7 @@ export default function ActivitiesPage() {
       cell: (activity: Activity) => (
         <div className="flex justify-end">
           <Link href={`/activities/${activity.id}`}>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#737373] hover:text-white hover:bg-primary">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-white hover:bg-primary">
               <ArrowUpRight className="w-4 h-4" />
             </Button>
           </Link>
@@ -129,8 +129,8 @@ export default function ActivitiesPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#0a0a0a]">Activities</h1>
-          <p className="text-[#737373]">Timeline of meetings, calls, and communications.</p>
+          <h1 className="text-2xl font-bold text-[#111827]">Activities</h1>
+          <p className="text-[#6B7280]">Timeline of meetings, calls, and communications.</p>
         </div>
         <Link href="/activities/new">
           <Button className="bg-primary hover:bg-primary/90 text-white">

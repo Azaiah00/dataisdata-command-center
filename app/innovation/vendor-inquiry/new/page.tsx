@@ -52,8 +52,8 @@ export default function VendorInquiryFormPage() {
       <div className="max-w-2xl mx-auto">
         <Card className="border-none shadow-sm">
           <CardContent className="p-6">
-            <h1 className="text-2xl font-bold text-[#0a0a0a]">Thanks for your interest</h1>
-            <p className="text-[#737373] mt-2">Your inquiry was received. We will review and follow up if there is a fit.</p>
+            <h1 className="text-2xl font-bold text-[#111827]">Thanks for your interest</h1>
+            <p className="text-[#6B7280] mt-2">Your inquiry was received. We will review and follow up if there is a fit.</p>
           </CardContent>
         </Card>
       </div>
@@ -93,7 +93,7 @@ export default function VendorInquiryFormPage() {
               </div>
             </div>
 
-            <Button type="submit" disabled={saving} className="bg-neutral-900 hover:bg-neutral-800">
+            <Button type="submit" disabled={saving} className="bg-blue-600 hover:bg-blue-700">
               {saving ? "Submitting..." : "Submit Inquiry"}
             </Button>
           </form>

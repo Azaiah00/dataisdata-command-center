@@ -124,13 +124,13 @@ export default function VendorApplicationReviewPage() {
     loadApplication();
   }
 
-  if (!application) return <p className="text-sm text-[#737373]">Loading application...</p>;
+  if (!application) return <p className="text-sm text-[#6B7280]">Loading application...</p>;
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#0a0a0a]">Vendor Application Review</h1>
-        <p className="text-[#737373]">{application.vendor_inquiries?.company_name || "Unlinked application"}</p>
+        <h1 className="text-2xl font-bold text-[#111827]">Vendor Application Review</h1>
+        <p className="text-[#6B7280]">{application.vendor_inquiries?.company_name || "Unlinked application"}</p>
       </div>
 
       <Card className="border-none shadow-sm">
@@ -144,14 +144,14 @@ export default function VendorApplicationReviewPage() {
               </div>
             ))}
           </div>
-          <p className="text-xl font-bold text-[#0a0a0a]">Weighted Total: {weightedTotal}</p>
+          <p className="text-xl font-bold text-[#111827]">Weighted Total: {weightedTotal}</p>
         </CardContent>
       </Card>
 
       <Card className="border-none shadow-sm">
         <CardHeader><CardTitle>Approval Status</CardTitle></CardHeader>
         <CardContent className="space-y-3">
-          <select value={status} onChange={(e) => setStatus(e.target.value)} className="w-full rounded-md border border-neutral-200 bg-white p-2 text-sm">
+          <select value={status} onChange={(e) => setStatus(e.target.value)} className="w-full rounded-md border border-slate-200 bg-white p-2 text-sm">
             <option>Approved Innovation Partner</option>
             <option>Approved Event Participant</option>
             <option>Conditional</option>
@@ -164,7 +164,7 @@ export default function VendorApplicationReviewPage() {
           </div>
           <div className="flex flex-wrap gap-2">
             <Button onClick={saveReview} variant="outline">Save Review</Button>
-            <Button onClick={approveAndCreatePartner} className="bg-neutral-900 hover:bg-neutral-800">Approve and Create Partner</Button>
+            <Button onClick={approveAndCreatePartner} className="bg-blue-600 hover:bg-blue-700">Approve and Create Partner</Button>
           </div>
         </CardContent>
       </Card>

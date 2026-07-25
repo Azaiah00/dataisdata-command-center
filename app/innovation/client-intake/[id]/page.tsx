@@ -106,13 +106,13 @@ export default function ClientIntakeDetailPage() {
     loadData();
   }
 
-  if (!intake) return <p className="text-sm text-[#737373]">Loading intake...</p>;
+  if (!intake) return <p className="text-sm text-[#6B7280]">Loading intake...</p>;
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#0a0a0a]">{intake.organization_name}</h1>
-        <p className="text-[#737373]">Client intake review and conversion</p>
+        <h1 className="text-2xl font-bold text-[#111827]">{intake.organization_name}</h1>
+        <p className="text-[#6B7280]">Client intake review and conversion</p>
       </div>
 
       <Card className="border-none shadow-sm">
@@ -130,7 +130,7 @@ export default function ClientIntakeDetailPage() {
         <CardContent className="space-y-3">
           <div>
             <Label>Assigned Tier</Label>
-            <select value={tier} onChange={(e) => setTier(e.target.value)} className="mt-1 w-full rounded-md border border-neutral-200 bg-white p-2 text-sm">
+            <select value={tier} onChange={(e) => setTier(e.target.value)} className="mt-1 w-full rounded-md border border-slate-200 bg-white p-2 text-sm">
               <option>Dashboard Only</option>
               <option>Advisory</option>
               <option>Full IaaS</option>
@@ -140,7 +140,7 @@ export default function ClientIntakeDetailPage() {
           <div><Label>Readiness Score (0-100)</Label><Input value={readiness} onChange={(e) => setReadiness(e.target.value)} /></div>
           <div>
             <Label>Status</Label>
-            <select value={status} onChange={(e) => setStatus(e.target.value)} className="mt-1 w-full rounded-md border border-neutral-200 bg-white p-2 text-sm">
+            <select value={status} onChange={(e) => setStatus(e.target.value)} className="mt-1 w-full rounded-md border border-slate-200 bg-white p-2 text-sm">
               <option>New</option>
               <option>Reviewing</option>
               <option>Qualified</option>
@@ -149,7 +149,7 @@ export default function ClientIntakeDetailPage() {
           </div>
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" onClick={saveInternalReview}>Save Review</Button>
-            <Button onClick={convertToAccount} className="bg-neutral-900 hover:bg-neutral-800">Convert to Account</Button>
+            <Button onClick={convertToAccount} className="bg-blue-600 hover:bg-blue-700">Convert to Account</Button>
           </div>
         </CardContent>
       </Card>

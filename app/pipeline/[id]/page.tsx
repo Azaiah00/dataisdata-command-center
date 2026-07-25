@@ -88,8 +88,8 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
   if (!opportunity) {
     return (
       <div className="text-center py-20">
-        <h2 className="text-2xl font-bold text-neutral-900">Opportunity not found</h2>
-        <Link href="/pipeline" className="text-neutral-900 hover:underline mt-4 inline-block">
+        <h2 className="text-2xl font-bold text-slate-900">Opportunity not found</h2>
+        <Link href="/pipeline" className="text-blue-600 hover:underline mt-4 inline-block">
           Return to Pipeline
         </Link>
       </div>
@@ -99,16 +99,16 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-xs font-medium text-[#737373] uppercase tracking-wider">
+      <div className="flex items-center gap-2 text-xs font-medium text-[#6B7280] uppercase tracking-wider">
         <Link href="/pipeline" className="hover:text-primary transition-colors">
           Pipeline
         </Link>
         <span>/</span>
-        <span className="text-[#0a0a0a] truncate">{opportunity.name}</span>
+        <span className="text-[#111827] truncate">{opportunity.name}</span>
       </div>
 
       {/* Header */}
-      <div className="bg-white rounded-2xl p-6 border border-neutral-200 shadow-sm">
+      <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-start gap-4">
             <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
@@ -116,7 +116,7 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
             </div>
             <div>
               <div className="flex items-center gap-3 flex-wrap">
-                <h1 className="text-2xl font-bold text-[#0a0a0a]">{opportunity.name}</h1>
+                <h1 className="text-2xl font-bold text-[#111827]">{opportunity.name}</h1>
                 <Badge
                   className={cn(
                     "font-medium border-none text-[10px] h-5 px-2",
@@ -126,7 +126,7 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
                   {opportunity.stage}
                 </Badge>
               </div>
-              <div className="flex items-center gap-4 mt-2 text-sm text-[#737373]">
+              <div className="flex items-center gap-4 mt-2 text-sm text-[#6B7280]">
                 <div className="flex items-center gap-1.5">
                   <Building2 className="w-4 h-4" />
                   <Link
@@ -137,8 +137,8 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
                   </Link>
                 </div>
                 {relatedAccounts.length > 0 && (
-                  <div className="flex items-center gap-1.5 text-xs text-[#737373]">
-                    <span className="text-neutral-300">•</span>
+                  <div className="flex items-center gap-1.5 text-xs text-[#6B7280]">
+                    <span className="text-slate-300">•</span>
                     <span>Also linked to</span>
                     <div className="flex flex-wrap gap-1">
                       {relatedAccounts.map((acc) => (
@@ -155,7 +155,7 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
                 )}
                 {opportunity.service_line && (
                   <>
-                    <span className="text-neutral-300">|</span>
+                    <span className="text-slate-300">|</span>
                     <span>{opportunity.service_line}</span>
                   </>
                 )}
@@ -164,7 +164,7 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
           </div>
           <div className="flex items-center gap-2">
             <Link href={`/pipeline/${id}/edit`}>
-              <Button variant="outline" size="sm" className="border-neutral-200">
+              <Button variant="outline" size="sm" className="border-slate-200">
                 <Pencil className="w-4 h-4 mr-2" /> Edit
               </Button>
             </Link>
@@ -199,28 +199,28 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-bold text-[#0a0a0a]">Value</CardTitle>
+            <CardTitle className="text-lg font-bold text-[#111827]">Value</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="flex justify-between py-2 border-b border-neutral-200">
-              <span className="text-sm text-[#737373]">Estimated value</span>
-              <span className="font-bold text-[#0a0a0a]">
+            <div className="flex justify-between py-2 border-b border-slate-100">
+              <span className="text-sm text-[#6B7280]">Estimated value</span>
+              <span className="font-bold text-[#111827]">
                 {opportunity.estimated_value != null
                   ? formatCurrency(opportunity.estimated_value)
                   : "—"}
               </span>
             </div>
-            <div className="flex justify-between py-2 border-b border-neutral-200">
-              <span className="text-sm text-[#737373]">Weighted value</span>
-              <span className="font-bold text-neutral-900">
+            <div className="flex justify-between py-2 border-b border-slate-100">
+              <span className="text-sm text-[#6B7280]">Weighted value</span>
+              <span className="font-bold text-emerald-600">
                 {opportunity.weighted_value != null
                   ? formatCurrency(opportunity.weighted_value)
                   : "—"}
               </span>
             </div>
             <div className="flex justify-between py-2">
-              <span className="text-sm text-[#737373]">Probability</span>
-              <span className="font-bold text-[#0a0a0a]">
+              <span className="text-sm text-[#6B7280]">Probability</span>
+              <span className="font-bold text-[#111827]">
                 {opportunity.probability_pct != null ? `${opportunity.probability_pct}%` : "—"}
               </span>
             </div>
@@ -229,24 +229,24 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
 
         <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-bold text-[#0a0a0a]">Dates & contact</CardTitle>
+            <CardTitle className="text-lg font-bold text-[#111827]">Dates & contact</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="flex justify-between py-2 border-b border-neutral-200">
-              <span className="text-sm text-[#737373]">Expected start</span>
-              <span className="font-bold text-[#0a0a0a]">
+            <div className="flex justify-between py-2 border-b border-slate-100">
+              <span className="text-sm text-[#6B7280]">Expected start</span>
+              <span className="font-bold text-[#111827]">
                 {opportunity.expected_start ? formatDate(opportunity.expected_start) : "TBD"}
               </span>
             </div>
-            <div className="flex justify-between py-2 border-b border-neutral-200">
-              <span className="text-sm text-[#737373]">Expected end</span>
-              <span className="font-bold text-[#0a0a0a]">
+            <div className="flex justify-between py-2 border-b border-slate-100">
+              <span className="text-sm text-[#6B7280]">Expected end</span>
+              <span className="font-bold text-[#111827]">
                 {opportunity.expected_end ? formatDate(opportunity.expected_end) : "TBD"}
               </span>
             </div>
-            <div className="flex justify-between py-2 border-b border-neutral-200">
-              <span className="text-sm text-[#737373]">Primary contact</span>
-              <span className="font-bold text-[#0a0a0a]">
+            <div className="flex justify-between py-2 border-b border-slate-100">
+              <span className="text-sm text-[#6B7280]">Primary contact</span>
+              <span className="font-bold text-[#111827]">
                 {opportunity.contacts?.full_name ? (
                   <Link href={`/contacts/${opportunity.primary_contact_id}`} className="hover:text-primary">
                     {opportunity.contacts.full_name}
@@ -257,8 +257,8 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
               </span>
             </div>
             <div className="flex justify-between py-2">
-              <span className="text-sm text-[#737373]">Funding source</span>
-              <span className="font-bold text-[#0a0a0a]">{opportunity.funding_source || "—"}</span>
+              <span className="text-sm text-[#6B7280]">Funding source</span>
+              <span className="font-bold text-[#111827]">{opportunity.funding_source || "—"}</span>
             </div>
           </CardContent>
         </Card>
@@ -268,14 +268,14 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
       {(opportunity.next_step || opportunity.next_step_due) && (
         <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-bold text-[#0a0a0a]">Next step</CardTitle>
+            <CardTitle className="text-lg font-bold text-[#111827]">Next step</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             {opportunity.next_step && (
-              <p className="text-sm text-[#525252]">{opportunity.next_step}</p>
+              <p className="text-sm text-[#4B5563]">{opportunity.next_step}</p>
             )}
             {opportunity.next_step_due && (
-              <p className="text-xs text-[#737373]">
+              <p className="text-xs text-[#6B7280]">
                 Due: {formatDate(opportunity.next_step_due)}
               </p>
             )}
@@ -287,10 +287,10 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
       {opportunity.notes && (
         <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-bold text-[#0a0a0a]">Notes</CardTitle>
+            <CardTitle className="text-lg font-bold text-[#111827]">Notes</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-[#525252] whitespace-pre-wrap">{opportunity.notes}</p>
+            <p className="text-sm text-[#4B5563] whitespace-pre-wrap">{opportunity.notes}</p>
           </CardContent>
         </Card>
       )}
@@ -299,7 +299,7 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
       {opportunity.attachments && opportunity.attachments.length > 0 && (
         <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-bold text-[#0a0a0a]">Attachments</CardTitle>
+            <CardTitle className="text-lg font-bold text-[#111827]">Attachments</CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">

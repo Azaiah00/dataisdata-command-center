@@ -40,7 +40,7 @@ export function ActivityFeed({ activities }: ActivityFeedProps) {
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-lg font-semibold text-[#0a0a0a]">Recent Activities</CardTitle>
+            <CardTitle className="text-lg font-semibold text-[#111827]">Recent Activities</CardTitle>
             <CardDescription>Latest interactions and updates</CardDescription>
           </div>
           <Link href="/activities">
@@ -55,18 +55,18 @@ export function ActivityFeed({ activities }: ActivityFeedProps) {
         <ScrollArea className="h-[300px] pr-4">
           <div className="space-y-4">
             {activities.length === 0 ? (
-              <div className="py-8 text-center text-[#737373]">No recent activities</div>
+              <div className="py-8 text-center text-[#6B7280]">No recent activities</div>
             ) : (
               activities.map((activity) => (
                 <div
                   key={activity.id}
-                  className="flex items-start gap-3 p-3 rounded-lg hover:bg-neutral-50 transition-colors cursor-pointer border border-transparent hover:border-neutral-200"
+                  className="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer border border-transparent hover:border-slate-100"
                 >
                   <div
                     className={cn(
                       "p-2 rounded-lg flex-shrink-0",
-                      activity.outcome === "Good" && "bg-neutral-200 text-neutral-900",
-                      activity.outcome === "Neutral" && "bg-neutral-100 text-neutral-600",
+                      activity.outcome === "Good" && "bg-green-100 text-green-600",
+                      activity.outcome === "Neutral" && "bg-slate-100 text-slate-600",
                       activity.outcome === "Bad" && "bg-red-100 text-red-600"
                     )}
                   >
@@ -74,18 +74,18 @@ export function ActivityFeed({ activities }: ActivityFeedProps) {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-[#0a0a0a] text-sm">
+                      <span className="font-semibold text-[#111827] text-sm">
                         {activity.activity_type}
                       </span>
-                      <span className="text-[#737373] text-xs">•</span>
-                      <span className="text-xs text-[#737373]">
+                      <span className="text-[#6B7280] text-xs">•</span>
+                      <span className="text-xs text-[#6B7280]">
                         {formatDateRelative(activity.date_time)}
                       </span>
                     </div>
-                    <p className="text-sm text-[#0a0a0a] font-medium truncate mt-0.5">
+                    <p className="text-sm text-[#111827] font-medium truncate mt-0.5">
                       {activity.accounts?.name || "No Account"}
                     </p>
-                    <p className="text-xs text-[#737373] line-clamp-2 mt-1 leading-relaxed">
+                    <p className="text-xs text-[#6B7280] line-clamp-2 mt-1 leading-relaxed">
                       {activity.summary}
                     </p>
                   </div>

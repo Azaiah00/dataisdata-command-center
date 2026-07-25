@@ -87,7 +87,7 @@ export default function EditContractorPage({ params }: { params: Promise<{ id: s
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neutral-900" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
       </div>
     );
   }
@@ -98,7 +98,7 @@ export default function EditContractorPage({ params }: { params: Promise<{ id: s
         <Link href={`/contractors/${id}`}>
           <Button variant="ghost" size="icon"><ChevronLeft className="w-5 h-5" /></Button>
         </Link>
-        <h1 className="text-3xl font-bold tracking-tight text-[#0a0a0a]">Edit Contractor</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-[#111827]">Edit Contractor</h1>
       </div>
 
       <Card className="border-none shadow-sm">
@@ -158,7 +158,7 @@ export default function EditContractorPage({ params }: { params: Promise<{ id: s
               )} />
               <div className="flex justify-end gap-4">
                 <Link href={`/contractors/${id}`}><Button variant="outline" type="button">Cancel</Button></Link>
-                <Button type="submit" className="bg-neutral-900 hover:bg-neutral-800" disabled={isSubmitting}>
+                <Button type="submit" className="bg-blue-600 hover:bg-blue-700" disabled={isSubmitting}>
                   {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                   {isSubmitting ? "Saving..." : "Save Changes"}
                 </Button>

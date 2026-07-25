@@ -40,10 +40,10 @@ export default function InvoicesPage() {
       accessorKey: "invoice_number",
       cell: (inv: Invoice) => (
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-neutral-100 flex items-center justify-center">
-            <Receipt className="w-4 h-4 text-neutral-900" />
+          <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
+            <Receipt className="w-4 h-4 text-emerald-600" />
           </div>
-          <span className="font-bold text-[#0a0a0a] text-sm">{inv.invoice_number}</span>
+          <span className="font-bold text-[#111827] text-sm">{inv.invoice_number}</span>
         </div>
       ),
     },
@@ -51,14 +51,14 @@ export default function InvoicesPage() {
       header: "Account",
       accessorKey: "account_id",
       cell: (inv: Invoice) => (
-        <span className="text-sm text-[#737373]">{inv.accounts?.name || "—"}</span>
+        <span className="text-sm text-[#6B7280]">{inv.accounts?.name || "—"}</span>
       ),
     },
     {
       header: "Total",
       accessorKey: "total",
       cell: (inv: Invoice) => (
-        <span className="text-sm font-bold text-[#0a0a0a]">{formatCurrency(inv.total)}</span>
+        <span className="text-sm font-bold text-[#111827]">{formatCurrency(inv.total)}</span>
       ),
     },
     {
@@ -74,14 +74,14 @@ export default function InvoicesPage() {
       header: "Issue Date",
       accessorKey: "issue_date",
       cell: (inv: Invoice) => (
-        <span className="text-xs text-[#737373]">{formatDate(inv.issue_date)}</span>
+        <span className="text-xs text-[#6B7280]">{formatDate(inv.issue_date)}</span>
       ),
     },
     {
       header: "Due Date",
       accessorKey: "due_date",
       cell: (inv: Invoice) => (
-        <span className="text-xs text-[#737373]">{inv.due_date ? formatDate(inv.due_date) : "—"}</span>
+        <span className="text-xs text-[#6B7280]">{inv.due_date ? formatDate(inv.due_date) : "—"}</span>
       ),
     },
   ];
@@ -90,8 +90,8 @@ export default function InvoicesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#0a0a0a]">Invoices</h1>
-          <p className="text-[#737373]">Manage invoices for your accounts and engagements.</p>
+          <h1 className="text-2xl font-bold text-[#111827]">Invoices</h1>
+          <p className="text-[#6B7280]">Manage invoices for your accounts and engagements.</p>
         </div>
         <Link href="/finance/invoices/new">
           <Button className="bg-primary hover:bg-primary/90 text-white">
@@ -100,10 +100,10 @@ export default function InvoicesPage() {
         </Link>
       </div>
       {errorMessage && (
-        <div className="rounded-lg border border-neutral-200 bg-neutral-100 p-4 text-sm text-neutral-900">
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
           <p className="font-medium">Could not load invoices</p>
-          <p className="mt-1 text-neutral-700">{errorMessage}</p>
-          <p className="mt-2 text-xs">Run the SQL in <code className="bg-neutral-200 px-1 rounded">supabase/finance-schema.sql</code> in your Supabase Dashboard → SQL Editor to create the finance tables.</p>
+          <p className="mt-1 text-amber-700">{errorMessage}</p>
+          <p className="mt-2 text-xs">Run the SQL in <code className="bg-amber-100 px-1 rounded">supabase/finance-schema.sql</code> in your Supabase Dashboard → SQL Editor to create the finance tables.</p>
         </div>
       )}
       {loading ? (

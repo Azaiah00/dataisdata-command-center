@@ -213,7 +213,7 @@ export default function EngagementDetailPage({
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neutral-900" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
       </div>
     );
   }
@@ -221,7 +221,7 @@ export default function EngagementDetailPage({
   if (!engagement) {
     return (
       <div className="space-y-4">
-        <p className="text-neutral-600">Engagement not found.</p>
+        <p className="text-slate-600">Engagement not found.</p>
         <Link href="/engagements">
           <Button variant="outline">Back to Engagements</Button>
         </Link>
@@ -231,23 +231,23 @@ export default function EngagementDetailPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2 text-xs font-medium text-[#737373] uppercase tracking-wider">
-        <Link href="/engagements" className="hover:text-neutral-900 transition-colors">
+      <div className="flex items-center gap-2 text-xs font-medium text-[#6B7280] uppercase tracking-wider">
+        <Link href="/engagements" className="hover:text-blue-600 transition-colors">
           Engagements
         </Link>
         <span>/</span>
-        <span className="text-[#0a0a0a] truncate">{engagement.name}</span>
+        <span className="text-[#111827] truncate">{engagement.name}</span>
       </div>
 
-      <div className="bg-white rounded-2xl p-6 border border-neutral-200 shadow-sm">
+      <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-neutral-900 flex items-center justify-center text-white">
+            <div className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center text-white">
               <Briefcase className="w-7 h-7" />
             </div>
             <div>
               <div className="flex items-center gap-3 flex-wrap">
-                <h1 className="text-2xl font-bold text-[#0a0a0a]">{engagement.name}</h1>
+                <h1 className="text-2xl font-bold text-[#111827]">{engagement.name}</h1>
                 <span
                   className={cn(
                     "font-medium border-none text-xs px-2 py-1 rounded-md",
@@ -257,19 +257,19 @@ export default function EngagementDetailPage({
                   {engagement.status}
                 </span>
               </div>
-              <div className="flex items-center gap-4 mt-2 text-[#737373] text-sm">
+              <div className="flex items-center gap-4 mt-2 text-[#6B7280] text-sm">
                 <div className="flex items-center gap-1.5">
                   <Building2 className="w-4 h-4" />
                   <Link
                     href={`/accounts/${engagement.account_id}`}
-                    className="hover:text-neutral-900 font-medium"
+                    className="hover:text-blue-600 font-medium"
                   >
                     {engagement.accounts?.name ?? "Unknown account"}
                   </Link>
                 </div>
                 {engagement.engagement_type && (
                   <>
-                    <span className="text-neutral-400">•</span>
+                    <span className="text-slate-400">•</span>
                     <span>{engagement.engagement_type}</span>
                   </>
                 )}
@@ -280,7 +280,7 @@ export default function EngagementDetailPage({
               <Button
                 variant="outline"
                 size="sm"
-                className="border-neutral-200"
+                className="border-slate-200"
                 onClick={() => setIsEditing(!isEditing)}
               >
                 <Pencil className="w-4 h-4 mr-2" />
@@ -321,7 +321,7 @@ export default function EngagementDetailPage({
       {isEditing && (
         <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-bold text-[#0a0a0a]">Edit project</CardTitle>
+            <CardTitle className="text-lg font-bold text-[#111827]">Edit project</CardTitle>
             <CardDescription>Update engagement details and save.</CardDescription>
           </CardHeader>
           <CardContent>
@@ -489,7 +489,7 @@ export default function EngagementDetailPage({
                       {selectedContractorIds.map((cId) => {
                         const c = allContractors.find((ac) => ac.id === cId);
                         return (
-                          <Badge key={cId} variant="secondary" className="gap-1 px-2 py-1 bg-neutral-100 text-neutral-900 border-none">
+                          <Badge key={cId} variant="secondary" className="gap-1 px-2 py-1 bg-amber-50 text-amber-800 border-none">
                             <HardHat className="w-3 h-3" />
                             {c?.full_name || "Unknown"}
                             <button
@@ -525,11 +525,11 @@ export default function EngagementDetailPage({
                         ))}
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-[#737373]">Select multiple contractors to assign to this engagement.</p>
+                  <p className="text-xs text-[#6B7280]">Select multiple contractors to assign to this engagement.</p>
                 </div>
 
                 <div className="flex gap-2">
-                  <Button type="submit" disabled={saving} className="bg-neutral-900 hover:bg-neutral-800">
+                  <Button type="submit" disabled={saving} className="bg-blue-600 hover:bg-blue-700">
                     {saving ? "Saving..." : "Save changes"}
                   </Button>
                   <Button
@@ -551,27 +551,27 @@ export default function EngagementDetailPage({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card className="border-none shadow-sm">
             <CardHeader>
-              <CardTitle className="text-lg font-bold text-[#0a0a0a]">Financials</CardTitle>
+              <CardTitle className="text-lg font-bold text-[#111827]">Financials</CardTitle>
               <CardDescription>Budget and contract value</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex justify-between items-center py-2 border-b border-neutral-200">
-                <span className="text-sm text-[#737373]">Contract value</span>
-                <span className="font-bold text-[#0a0a0a]">
+              <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                <span className="text-sm text-[#6B7280]">Contract value</span>
+                <span className="font-bold text-[#111827]">
                   {engagement.contract_value != null
                     ? formatCurrency(engagement.contract_value)
                     : "—"}
                 </span>
               </div>
-              <div className="flex justify-between items-center py-2 border-b border-neutral-200">
-                <span className="text-sm text-[#737373]">Budget</span>
-                <span className="font-bold text-[#0a0a0a]">
+              <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                <span className="text-sm text-[#6B7280]">Budget</span>
+                <span className="font-bold text-[#111827]">
                   {engagement.budget != null ? formatCurrency(engagement.budget) : "—"}
                 </span>
               </div>
               <div className="flex justify-between items-center py-2">
-                <span className="text-sm text-[#737373]">Margin</span>
-                <span className="font-bold text-[#0a0a0a]">
+                <span className="text-sm text-[#6B7280]">Margin</span>
+                <span className="font-bold text-[#111827]">
                   {engagement.margin_pct != null ? `${engagement.margin_pct}%` : "—"}
                 </span>
               </div>
@@ -579,19 +579,19 @@ export default function EngagementDetailPage({
           </Card>
           <Card className="border-none shadow-sm">
             <CardHeader>
-              <CardTitle className="text-lg font-bold text-[#0a0a0a]">Timeline</CardTitle>
+              <CardTitle className="text-lg font-bold text-[#111827]">Timeline</CardTitle>
               <CardDescription>Start and end dates</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex justify-between items-center py-2 border-b border-neutral-200">
-                <span className="text-sm text-[#737373]">Start</span>
-                <span className="font-bold text-[#0a0a0a]">
+              <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                <span className="text-sm text-[#6B7280]">Start</span>
+                <span className="font-bold text-[#111827]">
                   {engagement.start_date ? formatDate(engagement.start_date) : "—"}
                 </span>
               </div>
               <div className="flex justify-between items-center py-2">
-                <span className="text-sm text-[#737373]">End</span>
-                <span className="font-bold text-[#0a0a0a]">
+                <span className="text-sm text-[#6B7280]">End</span>
+                <span className="font-bold text-[#111827]">
                   {engagement.end_date ? formatDate(engagement.end_date) : "—"}
                 </span>
               </div>
@@ -603,10 +603,10 @@ export default function EngagementDetailPage({
       {!isEditing && engagement.scope_summary && (
         <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-bold text-[#0a0a0a]">Scope</CardTitle>
+            <CardTitle className="text-lg font-bold text-[#111827]">Scope</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-[#525252] whitespace-pre-wrap">{engagement.scope_summary}</p>
+            <p className="text-sm text-[#4B5563] whitespace-pre-wrap">{engagement.scope_summary}</p>
           </CardContent>
         </Card>
       )}
@@ -614,7 +614,7 @@ export default function EngagementDetailPage({
       {!isEditing && engagement.attachments && engagement.attachments.length > 0 && (
         <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-bold text-[#0a0a0a]">Attachments</CardTitle>
+            <CardTitle className="text-lg font-bold text-[#111827]">Attachments</CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">
@@ -624,7 +624,7 @@ export default function EngagementDetailPage({
                     href={url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-neutral-900 hover:underline"
+                    className="text-sm text-blue-600 hover:underline"
                   >
                     {decodeURIComponent(url.split("/").pop() || "file")}
                   </a>
@@ -638,7 +638,7 @@ export default function EngagementDetailPage({
       {!isEditing && linkedContractors.length > 0 && (
         <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-bold text-[#0a0a0a]">
+            <CardTitle className="text-lg font-bold text-[#111827]">
               Assigned Contractors ({linkedContractors.length})
             </CardTitle>
           </CardHeader>
@@ -646,14 +646,14 @@ export default function EngagementDetailPage({
             <div className="space-y-3">
               {linkedContractors.map((c) => (
                 <Link key={c.id} href={`/contractors/${c.id}`}>
-                  <div className="flex items-center justify-between p-3 rounded-lg hover:bg-neutral-50 border border-neutral-200 cursor-pointer">
+                  <div className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 border border-slate-100 cursor-pointer">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-neutral-200 flex items-center justify-center">
-                        <HardHat className="w-4 h-4 text-neutral-700" />
+                      <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
+                        <HardHat className="w-4 h-4 text-amber-700" />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-[#0a0a0a]">{c.full_name}</p>
-                        <p className="text-xs text-[#737373]">{c.title_role || "Contractor"}</p>
+                        <p className="text-sm font-bold text-[#111827]">{c.full_name}</p>
+                        <p className="text-xs text-[#6B7280]">{c.title_role || "Contractor"}</p>
                       </div>
                     </div>
                   </div>

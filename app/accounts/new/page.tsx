@@ -340,7 +340,7 @@ export default function NewAccountPage() {
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Stakeholders</CardTitle>
-                <p className="text-sm text-neutral-500 mt-1">Link existing contacts or create new ones for this account.</p>
+                <p className="text-sm text-slate-500 mt-1">Link existing contacts or create new ones for this account.</p>
               </div>
               <Button 
                 type="button" 
@@ -371,7 +371,7 @@ export default function NewAccountPage() {
                               className="h-4 w-4 hover:bg-transparent"
                               onClick={() => field.onChange(field.value.filter(i => i !== id))}
                             >
-                              <Trash2 className="h-3 w-3 text-neutral-400" />
+                              <Trash2 className="h-3 w-3 text-slate-400" />
                             </Button>
                           </Badge>
                         );
@@ -403,7 +403,7 @@ export default function NewAccountPage() {
                 <div className="space-y-4 pt-4 border-t">
                   <h4 className="text-sm font-semibold">New Contacts to Create</h4>
                   {fields.map((field, index) => (
-                    <div key={field.id} className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border rounded-lg bg-neutral-50 relative group">
+                    <div key={field.id} className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border rounded-lg bg-slate-50 relative group">
                       <Button
                         type="button"
                         variant="ghost"
@@ -411,7 +411,7 @@ export default function NewAccountPage() {
                         className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-white border shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
                         onClick={() => remove(index)}
                       >
-                        <Trash2 className="h-3 w-3 text-red-600" />
+                        <Trash2 className="h-3 w-3 text-red-500" />
                       </Button>
                       
                       <FormField
@@ -419,7 +419,7 @@ export default function NewAccountPage() {
                         name={`inline_contacts.${index}.full_name`}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-[10px] uppercase font-bold text-neutral-500">Full Name</FormLabel>
+                            <FormLabel className="text-[10px] uppercase font-bold text-slate-500">Full Name</FormLabel>
                             <FormControl>
                               <Input placeholder="Name" {...field} className="h-8 text-sm" />
                             </FormControl>
@@ -432,7 +432,7 @@ export default function NewAccountPage() {
                         name={`inline_contacts.${index}.title_role`}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-[10px] uppercase font-bold text-neutral-500">Title</FormLabel>
+                            <FormLabel className="text-[10px] uppercase font-bold text-slate-500">Title</FormLabel>
                             <FormControl>
                               <Input placeholder="Title" {...field} className="h-8 text-sm" />
                             </FormControl>
@@ -445,7 +445,7 @@ export default function NewAccountPage() {
                         name={`inline_contacts.${index}.email`}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-[10px] uppercase font-bold text-neutral-500">Email</FormLabel>
+                            <FormLabel className="text-[10px] uppercase font-bold text-slate-500">Email</FormLabel>
                             <FormControl>
                               <Input placeholder="Email" {...field} className="h-8 text-sm" />
                             </FormControl>
@@ -458,7 +458,7 @@ export default function NewAccountPage() {
                         name={`inline_contacts.${index}.relationship_health`}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-[10px] uppercase font-bold text-neutral-500">Health</FormLabel>
+                            <FormLabel className="text-[10px] uppercase font-bold text-slate-500">Health</FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                                 <SelectTrigger className="h-8 text-sm">
@@ -486,7 +486,7 @@ export default function NewAccountPage() {
             <Button variant="outline" type="button" onClick={() => router.back()} disabled={isSubmitting}>
               Cancel
             </Button>
-            <Button type="submit" className="bg-neutral-900 hover:bg-neutral-800" disabled={isSubmitting}>
+            <Button type="submit" className="bg-blue-600 hover:bg-blue-700" disabled={isSubmitting}>
               {isSubmitting ? "Creating..." : "Create Account"}
             </Button>
           </div>

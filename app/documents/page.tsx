@@ -35,9 +35,9 @@ const sourceIcons = {
 
 const sourceColors = {
   Engagement: "bg-primary/10 text-primary",
-  Opportunity: "bg-neutral-200 text-neutral-700",
-  Partner: "bg-neutral-200 text-neutral-700",
-  Activity: "bg-neutral-200 text-neutral-900",
+  Opportunity: "bg-purple-100 text-purple-700",
+  Partner: "bg-amber-100 text-amber-700",
+  Activity: "bg-green-100 text-green-700",
 };
 
 const sourceLinks = {
@@ -158,11 +158,11 @@ export default function DocumentsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#0a0a0a]">Documents</h1>
-          <p className="text-[#737373]">All uploaded files across engagements, pipeline, partners, and activities.</p>
+          <h1 className="text-2xl font-bold text-[#111827]">Documents</h1>
+          <p className="text-[#6B7280]">All uploaded files across engagements, pipeline, partners, and activities.</p>
         </div>
         <div className="relative w-full sm:w-64">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <Input
             placeholder="Search files..."
             value={search}
@@ -175,7 +175,7 @@ export default function DocumentsPage() {
       {filtered.length > 0 ? (
         <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-bold text-[#0a0a0a]">
+            <CardTitle className="text-lg font-bold text-[#111827]">
               {filtered.length} Document{filtered.length !== 1 ? "s" : ""}
             </CardTitle>
           </CardHeader>
@@ -184,7 +184,7 @@ export default function DocumentsPage() {
               {filtered.map((doc, idx) => {
                 const Icon = sourceIcons[doc.sourceType];
                 return (
-                  <div key={`${doc.url}-${idx}`} className="flex items-center gap-4 p-3 rounded-lg hover:bg-neutral-50 border border-neutral-200">
+                  <div key={`${doc.url}-${idx}`} className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 border border-gray-100">
                     <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                       <FileText className="w-4 h-4 text-primary" />
                     </div>
@@ -198,10 +198,10 @@ export default function DocumentsPage() {
                         {doc.fileName}
                       </a>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <Icon className="w-3 h-3 text-neutral-400" />
+                        <Icon className="w-3 h-3 text-gray-400" />
                         <Link
                           href={`${sourceLinks[doc.sourceType]}/${doc.sourceId}`}
-                          className="text-xs text-[#737373] hover:text-primary truncate"
+                          className="text-xs text-[#6B7280] hover:text-primary truncate"
                         >
                           {doc.sourceName}
                         </Link>
@@ -210,8 +210,8 @@ export default function DocumentsPage() {
                     <Badge className={`text-[10px] h-5 px-2 border-none ${sourceColors[doc.sourceType]}`}>
                       {doc.sourceType}
                     </Badge>
-                    <span className="text-xs text-neutral-400 hidden sm:block">{formatDate(doc.sourceDate)}</span>
-                    <a href={doc.url} target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-primary">
+                    <span className="text-xs text-gray-400 hidden sm:block">{formatDate(doc.sourceDate)}</span>
+                    <a href={doc.url} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-primary">
                       <ExternalLink className="w-4 h-4" />
                     </a>
                   </div>
@@ -223,9 +223,9 @@ export default function DocumentsPage() {
       ) : (
         <Card className="border-none shadow-sm">
           <CardContent className="py-16 text-center">
-            <FileText className="w-12 h-12 text-neutral-300 mx-auto mb-4" />
-            <h3 className="text-lg font-bold text-[#0a0a0a]">No documents yet</h3>
-            <p className="text-sm text-[#737373] mt-1">
+            <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-lg font-bold text-[#111827]">No documents yet</h3>
+            <p className="text-sm text-[#6B7280] mt-1">
               Upload files when creating or editing engagements, pipeline items, partners, or activities.
             </p>
           </CardContent>

@@ -190,7 +190,7 @@ export default function NewPartnerPage() {
                     Cancel
                   </Button>
                 </Link>
-                <Button type="submit" className="bg-neutral-900 hover:bg-neutral-800">
+                <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
                   Create Partner
                 </Button>
               </div>

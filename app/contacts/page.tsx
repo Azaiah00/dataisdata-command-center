@@ -43,8 +43,8 @@ export default function ContactsPage() {
             {contact.full_name.charAt(0)}
           </div>
           <div className="flex flex-col min-w-0">
-            <span className="font-bold text-[#0a0a0a] text-sm truncate">{contact.full_name}</span>
-            <span className="text-xs text-[#737373]">{contact.title_role}</span>
+            <span className="font-bold text-[#111827] text-sm truncate">{contact.full_name}</span>
+            <span className="text-xs text-[#6B7280]">{contact.title_role}</span>
           </div>
         </div>
       ),
@@ -53,9 +53,9 @@ export default function ContactsPage() {
       header: "Account",
       accessorKey: "account_id",
       cell: (contact: any) => (
-        <div className="flex items-center gap-1.5 text-[#737373] text-xs">
+        <div className="flex items-center gap-1.5 text-[#6B7280] text-xs">
           <Building2 className="w-3.5 h-3.5" />
-          {contact.accounts?.name ?? <span className="italic text-neutral-400">No Account</span>}
+          {contact.accounts?.name ?? <span className="italic text-slate-400">No Account</span>}
         </div>
       ),
     },
@@ -63,7 +63,7 @@ export default function ContactsPage() {
       header: "Email",
       accessorKey: "email",
       cell: (contact: Contact) => (
-        <div className="flex items-center gap-1.5 text-[#737373] text-xs">
+        <div className="flex items-center gap-1.5 text-[#6B7280] text-xs">
           <Mail className="w-3.5 h-3.5" />
           {contact.email || "N/A"}
         </div>
@@ -93,7 +93,7 @@ export default function ContactsPage() {
               key={i}
               className={cn(
                 "w-1.5 h-1.5 rounded-full",
-                i < (contact.influence_level || 0) ? "bg-neutral-900" : "bg-neutral-200"
+                i < (contact.influence_level || 0) ? "bg-amber-500" : "bg-slate-200"
               )}
             />
           ))}
@@ -106,12 +106,12 @@ export default function ContactsPage() {
       cell: (contact: Contact) => (
         <div className="flex justify-end gap-2">
           <Link href={`/contacts/${contact.id}/edit`}>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#737373] hover:text-primary hover:bg-primary/10">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-primary hover:bg-primary/10">
               <Pencil className="w-3.5 h-3.5" />
             </Button>
           </Link>
           <Link href={`/contacts/${contact.id}`}>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#737373] hover:text-white hover:bg-primary">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-white hover:bg-primary">
               <ArrowUpRight className="w-4 h-4" />
             </Button>
           </Link>
@@ -124,8 +124,8 @@ export default function ContactsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#0a0a0a]">Contacts</h1>
-          <p className="text-[#737373]">Manage stakeholders and key decision makers.</p>
+          <h1 className="text-2xl font-bold text-[#111827]">Contacts</h1>
+          <p className="text-[#6B7280]">Manage stakeholders and key decision makers.</p>
         </div>
         <Link href="/contacts/new">
           <Button className="bg-primary hover:bg-primary/90 text-white">

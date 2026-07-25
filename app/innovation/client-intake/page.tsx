@@ -54,14 +54,14 @@ export default function ClientIntakeListPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-[#0a0a0a]">Client Intake</h1>
-          <p className="text-[#737373]">Assess city/agency interest and readiness.</p>
+          <h1 className="text-2xl font-bold text-[#111827]">Client Intake</h1>
+          <p className="text-[#6B7280]">Assess city/agency interest and readiness.</p>
         </div>
         <Link href="/innovation/client-intake/new">
           <Button className="bg-primary hover:bg-primary/90">Open Public Form</Button>
         </Link>
       </div>
-      {loading ? <p className="text-sm text-[#737373]">Loading...</p> : <DataTable columns={columns} data={data} />}
+      {loading ? <p className="text-sm text-[#6B7280]">Loading...</p> : <DataTable columns={columns} data={data} />}
     </div>
   );
 }

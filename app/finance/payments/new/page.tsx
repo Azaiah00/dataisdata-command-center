@@ -114,13 +114,13 @@ function NewPaymentPageContent() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <div className="flex items-center gap-2 text-xs font-medium text-[#737373] uppercase tracking-wider">
-        <Link href="/finance/payments" className="hover:text-neutral-900">Payments</Link>
+      <div className="flex items-center gap-2 text-xs font-medium text-[#6B7280] uppercase tracking-wider">
+        <Link href="/finance/payments" className="hover:text-blue-600">Payments</Link>
         <span>/</span>
-        <span className="text-[#0a0a0a]">Record Payment</span>
+        <span className="text-[#111827]">Record Payment</span>
       </div>
 
-      <h1 className="text-2xl font-bold text-[#0a0a0a]">Record Payment</h1>
+      <h1 className="text-2xl font-bold text-[#111827]">Record Payment</h1>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -196,7 +196,7 @@ function NewPaymentPageContent() {
           </Card>
 
           <div className="flex gap-3">
-            <Button type="submit" disabled={submitting} className="bg-neutral-900 hover:bg-neutral-800">
+            <Button type="submit" disabled={submitting} className="bg-blue-600 hover:bg-blue-700">
               {submitting ? "Recording..." : "Record Payment"}
             </Button>
             <Link href="/finance/payments"><Button type="button" variant="outline">Cancel</Button></Link>
@@ -212,7 +212,7 @@ export default function NewPaymentPage() {
     <Suspense
       fallback={
         <div className="flex items-center justify-center min-h-[400px]">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neutral-900" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
         </div>
       }
     >

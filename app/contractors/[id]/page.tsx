@@ -94,7 +94,7 @@ export default function ContractorDetailPage({ params }: { params: Promise<{ id:
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neutral-900" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
       </div>
     );
   }
@@ -102,8 +102,8 @@ export default function ContractorDetailPage({ params }: { params: Promise<{ id:
   if (!contractor) {
     return (
       <div className="text-center py-20">
-        <h2 className="text-2xl font-bold text-neutral-900">Contractor not found</h2>
-        <Link href="/contractors" className="text-neutral-900 hover:underline mt-4 inline-block">Return to Contractors</Link>
+        <h2 className="text-2xl font-bold text-slate-900">Contractor not found</h2>
+        <Link href="/contractors" className="text-blue-600 hover:underline mt-4 inline-block">Return to Contractors</Link>
       </div>
     );
   }
@@ -111,36 +111,36 @@ export default function ContractorDetailPage({ params }: { params: Promise<{ id:
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-xs font-medium text-[#737373] uppercase tracking-wider">
-        <Link href="/contractors" className="hover:text-neutral-900 transition-colors">Contractors</Link>
+      <div className="flex items-center gap-2 text-xs font-medium text-[#6B7280] uppercase tracking-wider">
+        <Link href="/contractors" className="hover:text-blue-600 transition-colors">Contractors</Link>
         <span>/</span>
-        <span className="text-[#0a0a0a]">{contractor.full_name}</span>
+        <span className="text-[#111827]">{contractor.full_name}</span>
       </div>
 
       {/* Header */}
-      <div className="bg-white rounded-2xl p-6 border border-neutral-200 shadow-sm">
+      <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex items-start gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-neutral-200 flex items-center justify-center">
-              <HardHat className="w-8 h-8 text-neutral-700" />
+            <div className="w-16 h-16 rounded-2xl bg-amber-100 flex items-center justify-center">
+              <HardHat className="w-8 h-8 text-amber-700" />
             </div>
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="text-2xl font-bold text-[#0a0a0a]">{contractor.full_name}</h1>
+                <h1 className="text-2xl font-bold text-[#111827]">{contractor.full_name}</h1>
                 <Badge className={cn("font-medium border-none text-[10px] h-5 px-2",
-                  contractor.status === "Active" ? "bg-neutral-200 text-neutral-900" : "bg-neutral-100 text-neutral-600"
+                  contractor.status === "Active" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"
                 )}>
                   {contractor.status}
                 </Badge>
               </div>
               {contractor.title_role && (
-                <p className="text-sm text-[#737373] mt-1">{contractor.title_role}</p>
+                <p className="text-sm text-[#6B7280] mt-1">{contractor.title_role}</p>
               )}
             </div>
           </div>
           <div className="flex items-center gap-2">
             <Link href={`/contractors/${id}/edit`}>
-              <Button variant="outline" size="sm" className="border-neutral-200 text-neutral-700 bg-white">
+              <Button variant="outline" size="sm" className="border-slate-200 text-slate-700 bg-white">
                 <Pencil className="w-4 h-4 mr-2" /> Edit
               </Button>
             </Link>
@@ -173,30 +173,30 @@ export default function ContractorDetailPage({ params }: { params: Promise<{ id:
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-bold text-[#0a0a0a]">Contact Info</CardTitle>
+            <CardTitle className="text-lg font-bold text-[#111827]">Contact Info</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center gap-3 text-neutral-600">
+            <div className="flex items-center gap-3 text-slate-600">
               <Mail className="w-4 h-4" />
               <span className="text-sm">{contractor.email || "No email"}</span>
             </div>
-            <div className="flex items-center gap-3 text-neutral-600">
+            <div className="flex items-center gap-3 text-slate-600">
               <Phone className="w-4 h-4" />
               <span className="text-sm">{contractor.phone || "No phone"}</span>
             </div>
-            <div className="flex justify-between items-center py-2 border-t border-neutral-200">
-              <span className="text-sm text-[#737373]">Created</span>
-              <span className="font-bold text-[#0a0a0a]">{formatDate(contractor.created_at)}</span>
+            <div className="flex justify-between items-center py-2 border-t border-slate-100">
+              <span className="text-sm text-[#6B7280]">Created</span>
+              <span className="font-bold text-[#111827]">{formatDate(contractor.created_at)}</span>
             </div>
           </CardContent>
         </Card>
 
         <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-bold text-[#0a0a0a]">Notes</CardTitle>
+            <CardTitle className="text-lg font-bold text-[#111827]">Notes</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-[#525252] whitespace-pre-wrap">
+            <p className="text-sm text-[#4B5563] whitespace-pre-wrap">
               {contractor.notes || "No notes for this contractor."}
             </p>
           </CardContent>
@@ -206,14 +206,14 @@ export default function ContractorDetailPage({ params }: { params: Promise<{ id:
       {/* Linked Engagements */}
       <Card className="border-none shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-lg font-bold text-[#0a0a0a]">
+          <CardTitle className="text-lg font-bold text-[#111827]">
             Linked Engagements ({managingEngagements ? selectedEngIds.length : engagements.length})
           </CardTitle>
           {!managingEngagements ? (
             <Button
               variant="outline"
               size="sm"
-              className="border-neutral-200"
+              className="border-slate-200"
               onClick={() => setManagingEngagements(true)}
             >
               <Settings2 className="w-4 h-4 mr-2" /> Manage
@@ -222,7 +222,7 @@ export default function ContractorDetailPage({ params }: { params: Promise<{ id:
             <div className="flex gap-2">
               <Button
                 size="sm"
-                className="bg-neutral-900 hover:bg-neutral-800"
+                className="bg-blue-600 hover:bg-blue-700"
                 disabled={savingEngagements}
                 onClick={async () => {
                   setSavingEngagements(true);
@@ -262,7 +262,7 @@ export default function ContractorDetailPage({ params }: { params: Promise<{ id:
                   {selectedEngIds.map((eid) => {
                     const eng = allEngagements.find((e) => e.id === eid);
                     return (
-                      <Badge key={eid} variant="secondary" className="gap-1 px-2 py-1 bg-neutral-100 text-neutral-900 border-none">
+                      <Badge key={eid} variant="secondary" className="gap-1 px-2 py-1 bg-blue-50 text-blue-800 border-none">
                         <Briefcase className="w-3 h-3" />
                         {eng?.name || "Unknown"}
                         <button
@@ -298,18 +298,18 @@ export default function ContractorDetailPage({ params }: { params: Promise<{ id:
                     ))}
                 </SelectContent>
               </Select>
-              <p className="text-xs text-[#737373]">Add or remove engagement assignments for this contractor.</p>
+              <p className="text-xs text-[#6B7280]">Add or remove engagement assignments for this contractor.</p>
             </div>
           ) : engagements.length > 0 ? (
             <div className="space-y-3">
               {engagements.map((eng) => (
                 <Link key={eng.id} href={`/engagements/${eng.id}`}>
-                  <div className="flex items-center justify-between p-3 rounded-lg hover:bg-neutral-50 border border-neutral-200 cursor-pointer">
+                  <div className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 border border-slate-100 cursor-pointer">
                     <div className="flex items-center gap-3">
-                      <Briefcase className="w-4 h-4 text-neutral-900" />
+                      <Briefcase className="w-4 h-4 text-blue-600" />
                       <div>
-                        <p className="text-sm font-bold text-[#0a0a0a]">{eng.name}</p>
-                        <p className="text-xs text-[#737373]">{eng.accounts?.name}</p>
+                        <p className="text-sm font-bold text-[#111827]">{eng.name}</p>
+                        <p className="text-xs text-[#6B7280]">{eng.accounts?.name}</p>
                       </div>
                     </div>
                     <Badge className={cn("text-[10px] h-5 px-2 border-none", getStatusColor(eng.status))}>
@@ -320,7 +320,7 @@ export default function ContractorDetailPage({ params }: { params: Promise<{ id:
               ))}
             </div>
           ) : (
-            <p className="text-sm text-neutral-400 italic text-center py-8">No linked engagements.</p>
+            <p className="text-sm text-slate-400 italic text-center py-8">No linked engagements.</p>
           )}
         </CardContent>
       </Card>

@@ -110,17 +110,17 @@ export default function MaturityPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#0a0a0a]">Innovation Maturity Index</h1>
-        <p className="text-[#737373]">Track baseline, improvement, and score history by account.</p>
+        <h1 className="text-2xl font-bold text-[#111827]">Innovation Maturity Index</h1>
+        <p className="text-[#6B7280]">Track baseline, improvement, and score history by account.</p>
       </div>
 
       <Card className="border-none shadow-sm">
         <CardContent className="p-4">
-          <Label className="text-xs text-[#737373]">Account</Label>
+          <Label className="text-xs text-[#6B7280]">Account</Label>
           <select
             value={selectedAccount}
             onChange={(e) => setSelectedAccount(e.target.value)}
-            className="mt-2 w-full rounded-md border border-neutral-200 bg-white p-2 text-sm"
+            className="mt-2 w-full rounded-md border border-slate-200 bg-white p-2 text-sm"
           >
             {accounts.map((account) => (
               <option key={account.id} value={account.id}>{account.name}</option>
@@ -132,7 +132,7 @@ export default function MaturityPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="border-none shadow-sm lg:col-span-2 overflow-hidden">
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-semibold text-[#0a0a0a]">Maturity Profile</CardTitle>
+            <CardTitle className="text-lg font-semibold text-[#111827]">Maturity Profile</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-[350px] w-full flex items-center justify-center">
@@ -226,7 +226,7 @@ export default function MaturityPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {MATURITY_CATEGORIES.map((category) => (
               <div key={category}>
-                <Label className="text-xs text-[#737373] capitalize">{category.replaceAll("_", " ")}</Label>
+                <Label className="text-xs text-[#6B7280] capitalize">{category.replaceAll("_", " ")}</Label>
                 <Input
                   type="number"
                   min={0}
@@ -246,9 +246,9 @@ export default function MaturityPage() {
       <Card className="border-none shadow-sm">
         <CardHeader><CardTitle>Snapshot History</CardTitle></CardHeader>
         <CardContent className="space-y-2">
-          {snapshots.length === 0 && <p className="text-sm text-[#737373]">No snapshots recorded yet.</p>}
+          {snapshots.length === 0 && <p className="text-sm text-[#6B7280]">No snapshots recorded yet.</p>}
           {snapshots.map((item) => (
-            <div key={item.id} className="flex items-center justify-between rounded-md border border-neutral-200 p-3 text-sm">
+            <div key={item.id} className="flex items-center justify-between rounded-md border border-slate-100 p-3 text-sm">
               <span>{new Date(item.as_of_date).toLocaleDateString()}</span>
               <span className="font-semibold">{item.overall_score ?? 0}</span>
             </div>

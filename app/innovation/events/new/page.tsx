@@ -58,7 +58,7 @@ export default function NewEventPage() {
             </div>
             <div><Label>Registration Link</Label><Input value={form.registration_link} onChange={(e) => setForm({ ...form, registration_link: e.target.value })} /></div>
             <div><Label>Notes</Label><Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></div>
-            <Button type="submit" disabled={saving} className="bg-neutral-900 hover:bg-neutral-800">{saving ? "Saving..." : "Create Event"}</Button>
+            <Button type="submit" disabled={saving} className="bg-blue-600 hover:bg-blue-700">{saving ? "Saving..." : "Create Event"}</Button>
           </form>
         </CardContent>
       </Card>

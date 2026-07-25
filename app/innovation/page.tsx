@@ -82,8 +82,8 @@ export default function InnovationPortfolioPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#0a0a0a]">Innovation Portfolio</h1>
-        <p className="text-[#737373]">Executive view of innovation, funding, and cost avoidance.</p>
+        <h1 className="text-2xl font-bold text-[#111827]">Innovation Portfolio</h1>
+        <p className="text-[#6B7280]">Executive view of innovation, funding, and cost avoidance.</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

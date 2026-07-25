@@ -63,14 +63,14 @@ export function FileAttachments({ value, onChange, disabled, label = "Attachment
         </Button>
       </div>
       {value.length > 0 && (
-        <ul className="space-y-1.5 rounded-lg border border-neutral-200 bg-neutral-50/50 p-2">
+        <ul className="space-y-1.5 rounded-lg border border-slate-200 bg-slate-50/50 p-2">
           {value.map((url) => (
             <li key={url} className="flex items-center justify-between gap-2 text-sm">
               <a
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="truncate text-neutral-900 hover:underline flex-1 min-w-0"
+                className="truncate text-blue-600 hover:underline flex-1 min-w-0"
               >
                 {decodeURIComponent(url.split("/").pop() || "file")}
               </a>

@@ -92,7 +92,7 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
     return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" /></div>;
   }
   if (!invoice) {
-    return <div className="text-center py-20"><h2 className="text-2xl font-bold text-neutral-900">Invoice not found</h2><Link href="/finance/invoices" className="text-neutral-900 hover:underline mt-4 inline-block">Back to Invoices</Link></div>;
+    return <div className="text-center py-20"><h2 className="text-2xl font-bold text-slate-900">Invoice not found</h2><Link href="/finance/invoices" className="text-blue-600 hover:underline mt-4 inline-block">Back to Invoices</Link></div>;
   }
 
   return (
@@ -101,48 +101,48 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
       <div className="hidden print:block mb-8 pb-6 border-b-2 border-primary">
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold text-[#0a0a0a]">DataIsData</h1>
-            <p className="text-sm text-[#737373]">Innovation as a Service</p>
+            <h1 className="text-3xl font-bold text-[#111827]">DataIsData</h1>
+            <p className="text-sm text-[#6B7280]">Innovation as a Service</p>
           </div>
           <div className="text-right">
-            <h2 className="text-2xl font-bold text-[#0a0a0a]">INVOICE</h2>
+            <h2 className="text-2xl font-bold text-[#111827]">INVOICE</h2>
             <p className="text-lg font-bold text-primary">{invoice.invoice_number}</p>
           </div>
         </div>
       </div>
 
       {/* Screen breadcrumb */}
-      <div className="flex items-center gap-2 text-xs font-medium text-[#737373] uppercase tracking-wider print:hidden">
-        <Link href="/finance/invoices" className="hover:text-neutral-900">Invoices</Link>
+      <div className="flex items-center gap-2 text-xs font-medium text-[#6B7280] uppercase tracking-wider print:hidden">
+        <Link href="/finance/invoices" className="hover:text-blue-600">Invoices</Link>
         <span>/</span>
-        <span className="text-[#0a0a0a]">{invoice.invoice_number}</span>
+        <span className="text-[#111827]">{invoice.invoice_number}</span>
       </div>
 
       {/* Header */}
-      <div className="bg-white rounded-2xl p-6 border border-neutral-200 shadow-sm print:border-none print:shadow-none print:p-0">
+      <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm print:border-none print:shadow-none print:p-0">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-neutral-200 flex items-center justify-center print:hidden">
-              <Receipt className="w-7 h-7 text-neutral-900" />
+            <div className="w-14 h-14 rounded-2xl bg-emerald-100 flex items-center justify-center print:hidden">
+              <Receipt className="w-7 h-7 text-emerald-700" />
             </div>
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="text-2xl font-bold text-[#0a0a0a]">{invoice.invoice_number}</h1>
+                <h1 className="text-2xl font-bold text-[#111827]">{invoice.invoice_number}</h1>
                 <Badge className={cn("font-medium border-none text-[10px] h-5 px-2", getStatusColor(invoice.status))}>
                   {invoice.status}
                 </Badge>
               </div>
-              <div className="flex items-center gap-4 mt-1 text-sm text-[#737373]">
+              <div className="flex items-center gap-4 mt-1 text-sm text-[#6B7280]">
                 <div className="flex items-center gap-1.5">
                   <Building2 className="w-4 h-4" />
-                  <Link href={`/accounts/${invoice.account_id}`} className="hover:text-neutral-900 font-medium">
+                  <Link href={`/accounts/${invoice.account_id}`} className="hover:text-blue-600 font-medium">
                     {invoice.accounts?.name}
                   </Link>
                 </div>
                 {invoice.engagements && (
                   <>
-                    <span className="text-neutral-300">|</span>
-                    <Link href={`/engagements/${invoice.engagement_id}`} className="hover:text-neutral-900">
+                    <span className="text-slate-300">|</span>
+                    <Link href={`/engagements/${invoice.engagement_id}`} className="hover:text-blue-600">
                       {invoice.engagements.name}
                     </Link>
                   </>
@@ -204,7 +204,7 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
               <Textarea value={editNotes} onChange={(e) => setEditNotes(e.target.value)} />
             </div>
             <div className="flex gap-2">
-              <Button onClick={onSave} disabled={saving} className="bg-neutral-900 hover:bg-neutral-800">{saving ? "Saving..." : "Save"}</Button>
+              <Button onClick={onSave} disabled={saving} className="bg-blue-600 hover:bg-blue-700">{saving ? "Saving..." : "Save"}</Button>
               <Button variant="outline" onClick={() => setIsEditing(false)}>Cancel</Button>
             </div>
           </CardContent>
@@ -214,46 +214,46 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
       {/* Financial summary + dates */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="border-none shadow-sm">
-          <CardHeader><CardTitle className="text-lg font-bold text-[#0a0a0a]">Summary</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-lg font-bold text-[#111827]">Summary</CardTitle></CardHeader>
           <CardContent className="space-y-3">
-            <div className="flex justify-between py-2 border-b border-neutral-200">
-              <span className="text-sm text-[#737373]">Subtotal</span>
-              <span className="font-bold text-[#0a0a0a]">{formatCurrency(invoice.subtotal)}</span>
+            <div className="flex justify-between py-2 border-b border-slate-100">
+              <span className="text-sm text-[#6B7280]">Subtotal</span>
+              <span className="font-bold text-[#111827]">{formatCurrency(invoice.subtotal)}</span>
             </div>
-            <div className="flex justify-between py-2 border-b border-neutral-200">
-              <span className="text-sm text-[#737373]">Tax</span>
-              <span className="font-bold text-[#0a0a0a]">{formatCurrency(invoice.tax_amount)}</span>
+            <div className="flex justify-between py-2 border-b border-slate-100">
+              <span className="text-sm text-[#6B7280]">Tax</span>
+              <span className="font-bold text-[#111827]">{formatCurrency(invoice.tax_amount)}</span>
             </div>
-            <div className="flex justify-between py-2 border-b border-neutral-200">
-              <span className="text-sm text-[#737373]">Total</span>
-              <span className="font-bold text-neutral-900 text-lg">{formatCurrency(invoice.total)}</span>
+            <div className="flex justify-between py-2 border-b border-slate-100">
+              <span className="text-sm text-[#6B7280]">Total</span>
+              <span className="font-bold text-emerald-600 text-lg">{formatCurrency(invoice.total)}</span>
             </div>
-            <div className="flex justify-between py-2 border-b border-neutral-200">
-              <span className="text-sm text-[#737373]">Paid</span>
-              <span className="font-bold text-neutral-900">{formatCurrency(totalPaid)}</span>
+            <div className="flex justify-between py-2 border-b border-slate-100">
+              <span className="text-sm text-[#6B7280]">Paid</span>
+              <span className="font-bold text-blue-600">{formatCurrency(totalPaid)}</span>
             </div>
             <div className="flex justify-between py-2">
-              <span className="text-sm font-bold text-[#0a0a0a]">Balance Due</span>
-              <span className={cn("font-bold text-lg", balanceDue > 0 ? "text-red-600" : "text-neutral-900")}>
+              <span className="text-sm font-bold text-[#111827]">Balance Due</span>
+              <span className={cn("font-bold text-lg", balanceDue > 0 ? "text-red-600" : "text-green-600")}>
                 {formatCurrency(balanceDue)}
               </span>
             </div>
           </CardContent>
         </Card>
         <Card className="border-none shadow-sm">
-          <CardHeader><CardTitle className="text-lg font-bold text-[#0a0a0a]">Dates</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-lg font-bold text-[#111827]">Dates</CardTitle></CardHeader>
           <CardContent className="space-y-3">
-            <div className="flex justify-between py-2 border-b border-neutral-200">
-              <span className="text-sm text-[#737373]">Issue Date</span>
-              <span className="font-bold text-[#0a0a0a]">{formatDate(invoice.issue_date)}</span>
+            <div className="flex justify-between py-2 border-b border-slate-100">
+              <span className="text-sm text-[#6B7280]">Issue Date</span>
+              <span className="font-bold text-[#111827]">{formatDate(invoice.issue_date)}</span>
             </div>
-            <div className="flex justify-between py-2 border-b border-neutral-200">
-              <span className="text-sm text-[#737373]">Due Date</span>
-              <span className="font-bold text-[#0a0a0a]">{invoice.due_date ? formatDate(invoice.due_date) : "—"}</span>
+            <div className="flex justify-between py-2 border-b border-slate-100">
+              <span className="text-sm text-[#6B7280]">Due Date</span>
+              <span className="font-bold text-[#111827]">{invoice.due_date ? formatDate(invoice.due_date) : "—"}</span>
             </div>
             <div className="flex justify-between py-2">
-              <span className="text-sm text-[#737373]">Created</span>
-              <span className="font-bold text-[#0a0a0a]">{formatDate(invoice.created_at)}</span>
+              <span className="text-sm text-[#6B7280]">Created</span>
+              <span className="font-bold text-[#111827]">{formatDate(invoice.created_at)}</span>
             </div>
           </CardContent>
         </Card>
@@ -261,24 +261,24 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
 
       {/* Line items */}
       <Card className="border-none shadow-sm">
-        <CardHeader><CardTitle className="text-lg font-bold text-[#0a0a0a]">Line Items ({lineItems.length})</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-lg font-bold text-[#111827]">Line Items ({lineItems.length})</CardTitle></CardHeader>
         <CardContent>
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-neutral-200">
-                <th className="text-left py-2 text-xs font-bold text-[#737373] uppercase">Description</th>
-                <th className="text-right py-2 text-xs font-bold text-[#737373] uppercase">Qty</th>
-                <th className="text-right py-2 text-xs font-bold text-[#737373] uppercase">Unit Price</th>
-                <th className="text-right py-2 text-xs font-bold text-[#737373] uppercase">Amount</th>
+              <tr className="border-b border-slate-200">
+                <th className="text-left py-2 text-xs font-bold text-[#6B7280] uppercase">Description</th>
+                <th className="text-right py-2 text-xs font-bold text-[#6B7280] uppercase">Qty</th>
+                <th className="text-right py-2 text-xs font-bold text-[#6B7280] uppercase">Unit Price</th>
+                <th className="text-right py-2 text-xs font-bold text-[#6B7280] uppercase">Amount</th>
               </tr>
             </thead>
             <tbody>
               {lineItems.map((li) => (
-                <tr key={li.id} className="border-b border-neutral-200">
-                  <td className="py-3 text-[#0a0a0a]">{li.description}</td>
-                  <td className="py-3 text-right text-[#737373]">{li.quantity}</td>
-                  <td className="py-3 text-right text-[#737373]">{formatCurrency(li.unit_price)}</td>
-                  <td className="py-3 text-right font-bold text-[#0a0a0a]">{formatCurrency(li.amount)}</td>
+                <tr key={li.id} className="border-b border-slate-50">
+                  <td className="py-3 text-[#111827]">{li.description}</td>
+                  <td className="py-3 text-right text-[#6B7280]">{li.quantity}</td>
+                  <td className="py-3 text-right text-[#6B7280]">{formatCurrency(li.unit_price)}</td>
+                  <td className="py-3 text-right font-bold text-[#111827]">{formatCurrency(li.amount)}</td>
                 </tr>
               ))}
             </tbody>
@@ -289,16 +289,16 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
       {/* Payment history */}
       {payments.length > 0 && (
         <Card className="border-none shadow-sm">
-          <CardHeader><CardTitle className="text-lg font-bold text-[#0a0a0a]">Payment History ({payments.length})</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-lg font-bold text-[#111827]">Payment History ({payments.length})</CardTitle></CardHeader>
           <CardContent>
             <div className="space-y-3">
               {payments.map((p) => (
-                <div key={p.id} className="flex items-center justify-between p-3 rounded-lg border border-neutral-200">
+                <div key={p.id} className="flex items-center justify-between p-3 rounded-lg border border-slate-100">
                   <div>
-                    <p className="text-sm font-bold text-[#0a0a0a]">{formatCurrency(p.amount)}</p>
-                    <p className="text-xs text-[#737373]">{p.payment_method} {p.reference_number ? `• ${p.reference_number}` : ""}</p>
+                    <p className="text-sm font-bold text-[#111827]">{formatCurrency(p.amount)}</p>
+                    <p className="text-xs text-[#6B7280]">{p.payment_method} {p.reference_number ? `• ${p.reference_number}` : ""}</p>
                   </div>
-                  <span className="text-xs text-[#737373]">{formatDate(p.payment_date)}</span>
+                  <span className="text-xs text-[#6B7280]">{formatDate(p.payment_date)}</span>
                 </div>
               ))}
             </div>
@@ -309,14 +309,14 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
       {/* Notes */}
       {!isEditing && invoice.notes && (
         <Card className="border-none shadow-sm">
-          <CardHeader><CardTitle className="text-lg font-bold text-[#0a0a0a]">Notes</CardTitle></CardHeader>
-          <CardContent><p className="text-sm text-[#525252] whitespace-pre-wrap">{invoice.notes}</p></CardContent>
+          <CardHeader><CardTitle className="text-lg font-bold text-[#111827]">Notes</CardTitle></CardHeader>
+          <CardContent><p className="text-sm text-[#4B5563] whitespace-pre-wrap">{invoice.notes}</p></CardContent>
         </Card>
       )}
 
       {/* Print footer */}
       <div className="hidden print:block mt-12 pt-6 border-t-2 border-primary">
-        <p className="text-sm text-[#737373]">DataIsData Command Center | Generated {new Date().toLocaleDateString()}</p>
+        <p className="text-sm text-[#6B7280]">DataIsData Command Center | Generated {new Date().toLocaleDateString()}</p>
       </div>
     </div>
   );

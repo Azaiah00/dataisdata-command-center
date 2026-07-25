@@ -38,120 +38,87 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-
-  /* Brand ramp — achromatic ink scale */
-  --color-brand-green-dark: var(--brand-green-dark);
-  --color-brand-green-muted: var(--brand-green-muted);
-  --color-brand-green-bright: var(--brand-green-bright);
-
-  /* Radius scale — cards 24px, controls 18px, nested 10px, small 6px */
-  --radius-sm: calc(var(--radius) - 12px);
-  --radius-md: calc(var(--radius) - 8px);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
-  --radius-xl: var(--radius);
-  --radius-2xl: calc(var(--radius) + 6px);
-  --radius-3xl: calc(var(--radius) + 6px);
-  --radius-4xl: calc(var(--radius) + 6px);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
 }
 
-/*
- * Monochromatic "clinical blueprint on frosted paper" system.
- * Ink #0a0a0a · Ink Soft #171717 · Mid Gray #737373
- * Hairline #e5e5e5 · Canvas #f5f5f5 · Surface Alt #fafafa · Paper #ffffff
- * Ember #e7000b is reserved exclusively for destructive/error states.
- */
 :root {
-  --radius: 1.125rem;
-
-  --background: #fafafa;
-  --foreground: #0a0a0a;
-  --card: #ffffff;
-  --card-foreground: #0a0a0a;
-  --popover: #ffffff;
-  --popover-foreground: #0a0a0a;
-  --primary: #0a0a0a;
-  --primary-foreground: #fafafa;
-  --secondary: #f5f5f5;
-  --secondary-foreground: #171717;
-  --muted: #f5f5f5;
-  --muted-foreground: #737373;
-  --accent: #f5f5f5;
-  --accent-foreground: #171717;
-  --destructive: #e7000b;
-  --border: #e5e5e5;
-  --input: #e5e5e5;
-  --ring: #a3a3a3;
-
-  /* Monochrome data ramp — encodes magnitude by tone, not hue */
-  --chart-1: #0a0a0a;
-  --chart-2: #404040;
-  --chart-3: #737373;
-  --chart-4: #a3a3a3;
-  --chart-5: #d4d4d4;
-
-  --sidebar: #fafafa;
-  --sidebar-foreground: #0a0a0a;
-  --sidebar-primary: #0a0a0a;
-  --sidebar-primary-foreground: #fafafa;
-  --sidebar-accent: #f5f5f5;
-  --sidebar-accent-foreground: #171717;
-  --sidebar-border: #e5e5e5;
-  --sidebar-ring: #a3a3a3;
-
-  --brand-green-dark: #0a0a0a;
-  --brand-green-muted: #404040;
-  --brand-green-bright: #171717;
-
-  /* Barely-perceptible elevation: hairline ring + two soft drops */
-  --shadow-card:
-    0 0 0 1px rgba(23, 23, 23, 0.05),
-    0 1px 3px rgba(0, 0, 0, 0.1),
-    0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --radius: 1.25rem;
+  --background: oklch(0.99 0.005 150);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.35 0.08 150);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.95 0.03 150);
+  --secondary-foreground: oklch(0.205 0.05 150);
+  --muted: oklch(0.97 0.01 150);
+  --muted-foreground: oklch(0.556 0.02 150);
+  --accent: oklch(0.92 0.06 150);
+  --accent-foreground: oklch(0.205 0.05 150);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0.01 150);
+  --input: oklch(0.922 0.01 150);
+  --ring: oklch(0.35 0.08 150);
+  --chart-1: oklch(0.35 0.08 150);
+  --chart-2: oklch(0.45 0.12 150);
+  --chart-3: oklch(0.55 0.15 150);
+  --chart-4: oklch(0.65 0.18 150);
+  --chart-5: oklch(0.75 0.21 150);
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.35 0.08 150);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.95 0.03 150);
+  --sidebar-accent-foreground: oklch(0.205 0.05 150);
+  --sidebar-border: oklch(0.922 0.01 150);
+  --sidebar-ring: oklch(0.35 0.08 150);
+  
+  /* Custom colors for the redesign */
+  --brand-green-dark: oklch(0.32 0.06 150);
+  --brand-green-muted: oklch(0.38 0.05 150);
+  --brand-green-bright: oklch(0.55 0.15 150);
 }
 
 .dark {
-  --background: #0a0a0a;
-  --foreground: #fafafa;
-  --card: #171717;
-  --card-foreground: #fafafa;
-  --popover: #171717;
-  --popover-foreground: #fafafa;
-  --primary: #fafafa;
-  --primary-foreground: #0a0a0a;
-  --secondary: #262626;
-  --secondary-foreground: #fafafa;
-  --muted: #262626;
-  --muted-foreground: #a3a3a3;
-  --accent: #262626;
-  --accent-foreground: #fafafa;
-  --destructive: #ff6467;
-  --border: rgba(255, 255, 255, 0.1);
-  --input: rgba(255, 255, 255, 0.15);
-  --ring: #737373;
-
-  --chart-1: #fafafa;
-  --chart-2: #d4d4d4;
-  --chart-3: #a3a3a3;
-  --chart-4: #737373;
-  --chart-5: #525252;
-
-  --sidebar: #171717;
-  --sidebar-foreground: #fafafa;
-  --sidebar-primary: #fafafa;
-  --sidebar-primary-foreground: #0a0a0a;
-  --sidebar-accent: #262626;
-  --sidebar-accent-foreground: #fafafa;
-  --sidebar-border: rgba(255, 255, 255, 0.1);
-  --sidebar-ring: #737373;
-
-  --brand-green-dark: #fafafa;
-  --brand-green-muted: #d4d4d4;
-  --brand-green-bright: #e5e5e5;
-
-  --shadow-card:
-    0 0 0 1px rgba(255, 255, 255, 0.06),
-    0 1px 3px rgba(0, 0, 0, 0.4),
-    0 1px 2px -1px rgba(0, 0, 0, 0.4);
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
 }
 
 @layer base {
@@ -160,38 +127,7 @@
   }
   body {
     @apply bg-background text-foreground;
-    letter-spacing: -0.011em;
   }
-
-  /* Type scale tracking — tightens as size grows */
-  h1 {
-    letter-spacing: -0.025em;
-  }
-  h2,
-  h3 {
-    letter-spacing: -0.02em;
-  }
-}
-
-/*
- * Card treatment, applied by slot so every card shares the same
- * hairline + barely-perceptible elevation regardless of local utilities.
- */
-[data-slot="card"] {
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-card);
-  transition: box-shadow 150ms ease;
-}
-
-[data-slot="card"]:hover {
-  box-shadow: var(--shadow-card);
-}
-
-/* Filled controls rely on tonal contrast, not elevation */
-[data-slot="button"][data-variant="default"],
-[data-slot="button"][data-variant="destructive"],
-[data-slot="button"][data-variant="brand"] {
-  box-shadow: none;
 }
 
 /* Print styles for branded reports */
@@ -225,11 +161,10 @@
   }
 
   /* Cards print cleanly */
-  [data-slot="card"],
   .shadow-sm,
   .shadow-md {
     box-shadow: none !important;
-    border: 1px solid #e5e5e5 !important;
+    border: 1px solid #e5e7eb !important;
   }
 
   /* Avoid page breaks inside cards */
@@ -237,11 +172,14 @@
     break-inside: avoid;
   }
 
-  /* Progress bars and tone ramps print with their fill */
-  [class*="bg-neutral-"],
+  /* Progress bars print with color */
+  [class*="bg-slate-500"],
   [class*="bg-primary"],
-  [class*="bg-brand-green-"],
-  [class*="bg-red-"] {
+  [class*="bg-brand-green-bright"],
+  [class*="bg-indigo-500"],
+  [class*="bg-purple-500"],
+  [class*="bg-green-500"],
+  [class*="bg-red-500"] {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
