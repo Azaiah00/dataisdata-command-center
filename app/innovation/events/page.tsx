@@ -1,5 +1,6 @@
 "use client";
 
+import { Can } from "@/components/auth/AccessProvider";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
@@ -65,9 +66,11 @@ export default function EventsPage() {
           <h1 className="text-2xl font-bold text-[#111827]">Vendor Showcase Events</h1>
           <p className="text-[#6B7280]">Track event strategy, sponsors, and outcomes.</p>
         </div>
-        <Link href="/innovation/events/new">
-          <Button className="bg-primary hover:bg-primary/90">New Event</Button>
-        </Link>
+        <Can module="events" action="create">
+          <Link href="/innovation/events/new">
+            <Button className="bg-primary hover:bg-primary/90">New Event</Button>
+          </Link>
+        </Can>
       </div>
       {loading ? <p className="text-sm text-[#6B7280]">Loading...</p> : <DataTable columns={columns} data={events} />}
     </div>

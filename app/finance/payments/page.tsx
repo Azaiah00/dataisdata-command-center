@@ -1,15 +1,22 @@
 "use client";
 
+import { Can } from "@/components/auth/AccessProvider";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { PdfButton } from "@/components/ui/PdfButton";
+import { exportListPdf } from "@/lib/pdf/reports";
+import { useAccess } from "@/components/auth/AccessProvider";
 import { supabase } from "@/lib/supabase";
 import { Payment } from "@/lib/types";
 import { DataTable } from "@/components/data-table/DataTable";
 import { Button } from "@/components/ui/button";
 import { Plus, Banknote } from "lucide-react";
 import Link from "next/link";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, num } from "@/lib/utils";
 
 export default function PaymentsPage() {
+  const router = useRouter();
+  const { realUser } = useAccess();
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -34,7 +41,7 @@ export default function PaymentsPage() {
           <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
             <Banknote className="w-4 h-4 text-primary" />
           </div>
-          <span className="font-bold text-[#111827] text-sm">{p.invoices?.invoice_number || "—"}</span>
+          <span className="font-bold text-foreground text-sm">{p.invoices?.invoice_number || "—"}</span>
         </div>
       ),
     },
@@ -42,7 +49,7 @@ export default function PaymentsPage() {
       header: "Account",
       accessorKey: "account",
       cell: (p: Payment) => (
-        <span className="text-sm text-[#6B7280]">{p.invoices?.accounts?.name || "—"}</span>
+        <span className="text-sm text-muted-foreground">{p.invoices?.accounts?.name || "—"}</span>
       ),
     },
     {
@@ -56,21 +63,21 @@ export default function PaymentsPage() {
       header: "Method",
       accessorKey: "payment_method",
       cell: (p: Payment) => (
-        <span className="text-sm text-[#6B7280]">{p.payment_method}</span>
+        <span className="text-sm text-muted-foreground">{p.payment_method}</span>
       ),
     },
     {
       header: "Date",
       accessorKey: "payment_date",
       cell: (p: Payment) => (
-        <span className="text-xs text-[#6B7280]">{formatDate(p.payment_date)}</span>
+        <span className="text-xs text-muted-foreground">{formatDate(p.payment_date)}</span>
       ),
     },
     {
       header: "Reference",
       accessorKey: "reference_number",
       cell: (p: Payment) => (
-        <span className="text-xs text-[#6B7280]">{p.reference_number || "—"}</span>
+        <span className="text-xs text-muted-foreground">{p.reference_number || "—"}</span>
       ),
     },
   ];
@@ -79,19 +86,40 @@ export default function PaymentsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#111827]">Payments</h1>
-          <p className="text-[#6B7280]">All payments received against invoices.</p>
+          <h1 className="text-2xl font-bold text-foreground">Payments</h1>
+          <p className="text-muted-foreground">All payments received against invoices.</p>
         </div>
+        <div className="flex gap-2">
+        <PdfButton
+          onExport={() =>
+            exportListPdf({
+              title: "Payments Received",
+              preparedBy: realUser?.full_name,
+              kpis: [
+                { label: "Payments", value: String(payments.length) },
+                { label: "Total received", value: formatCurrency(payments.reduce((t, p) => t + num(p.amount), 0)), tone: "good" },
+              ],
+              columns: ["Date", "Invoice", "Account", "Method", "Reference", "Amount"],
+              rows: payments.map((p) => [formatDate(p.payment_date), p.invoices?.invoice_number || "—", p.invoices?.accounts?.name || "—", p.payment_method, p.reference_number || "—", formatCurrency(p.amount)]),
+              foot: [["Total", "", "", "", "", formatCurrency(payments.reduce((t, p) => t + num(p.amount), 0))]],
+              alignRight: [5],
+              filename: "DataIsData-Payments",
+            })
+          }
+        />
+        <Can module="payments" action="create">
         <Link href="/finance/payments/new">
-          <Button className="bg-primary hover:bg-primary/90 text-white">
-            <Plus className="w-4 h-4 mr-2" /> Record Payment
-          </Button>
-        </Link>
+            <Button className="bg-primary hover:bg-primary/90 text-white">
+              <Plus className="w-4 h-4 mr-2" /> Record Payment
+            </Button>
+          </Link>
+        </Can>
+        </div>
       </div>
       {loading ? (
         <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" /></div>
       ) : (
-        <DataTable columns={columns} data={payments} onRowClick={(p) => { window.location.href = `/finance/invoices/${p.invoice_id}`; }} />
+        <DataTable columns={columns} data={payments} onRowClick={(p) => router.push(`/finance/invoices/${p.invoice_id}`)} />
       )}
     </div>
   );

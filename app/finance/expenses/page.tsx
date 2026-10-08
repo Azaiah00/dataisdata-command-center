@@ -1,6 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Can } from "@/components/auth/AccessProvider";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { PdfButton } from "@/components/ui/PdfButton";
+import { exportListPdf } from "@/lib/pdf/reports";
+import { useAccess } from "@/components/auth/AccessProvider";
 import { supabase } from "@/lib/supabase";
 import { Expense } from "@/lib/types";
 import { DataTable } from "@/components/data-table/DataTable";
@@ -8,11 +13,18 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus, CreditCard } from "lucide-react";
 import Link from "next/link";
-import { cn, formatCurrency, formatDate, getStatusColor } from "@/lib/utils";
+import { cn, formatCurrency, formatDate, getStatusColor, num } from "@/lib/utils";
+import { EXPENSE_CATEGORIES } from "@/lib/constants";
 
 export default function ExpensesPage() {
+  const router = useRouter();
+  const { realUser } = useAccess();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
+  const [category, setCategory] = useState("all");
+  const categories = useMemo(() => Array.from(new Set([...EXPENSE_CATEGORIES, ...expenses.map((e) => e.category)])), [expenses]);
+  const shown = useMemo(() => (category === "all" ? expenses : expenses.filter((e) => e.category === category)), [expenses, category]);
+  const total = shown.reduce((t, e) => t + num(e.amount), 0);
 
   useEffect(() => {
     async function fetch() {
@@ -36,8 +48,8 @@ export default function ExpensesPage() {
             <CreditCard className="w-4 h-4 text-orange-600" />
           </div>
           <div>
-            <span className="font-bold text-[#111827] text-sm block">{e.description}</span>
-            {e.engagements?.name && <span className="text-[10px] text-[#6B7280]">{e.engagements.name}</span>}
+            <span className="font-bold text-foreground text-sm block">{e.description}</span>
+            {e.engagements?.name && <span className="text-[10px] text-muted-foreground">{e.engagements.name}</span>}
           </div>
         </div>
       ),
@@ -45,7 +57,7 @@ export default function ExpensesPage() {
     {
       header: "Category",
       accessorKey: "category",
-      cell: (e: Expense) => <span className="text-sm text-[#6B7280]">{e.category}</span>,
+      cell: (e: Expense) => <span className="text-sm text-muted-foreground">{e.category}</span>,
     },
     {
       header: "Amount",
@@ -55,12 +67,12 @@ export default function ExpensesPage() {
     {
       header: "Contractor",
       accessorKey: "contractor_id",
-      cell: (e: Expense) => <span className="text-sm text-[#6B7280]">{e.contractors?.full_name || "—"}</span>,
+      cell: (e: Expense) => <span className="text-sm text-muted-foreground">{e.contractors?.full_name || "—"}</span>,
     },
     {
       header: "Date",
       accessorKey: "expense_date",
-      cell: (e: Expense) => <span className="text-xs text-[#6B7280]">{formatDate(e.expense_date)}</span>,
+      cell: (e: Expense) => <span className="text-xs text-muted-foreground">{formatDate(e.expense_date)}</span>,
     },
     {
       header: "Status",
@@ -77,19 +89,52 @@ export default function ExpensesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#111827]">Expenses</h1>
-          <p className="text-[#6B7280]">Track project costs, contractor payments, and overhead.</p>
+          <h1 className="text-2xl font-bold text-foreground">Expenses</h1>
+          <p className="text-muted-foreground">Track project costs, contractor payments, and overhead.</p>
         </div>
+        <div className="flex gap-2">
+        <PdfButton
+          onExport={() =>
+            exportListPdf({
+              title: "Expense Register",
+              subtitle: category === "all" ? "All expenses" : `${category} expenses`,
+              preparedBy: realUser?.full_name,
+              kpis: [
+                { label: "Expenses", value: String(shown.length) },
+                { label: "Total", value: formatCurrency(total) },
+                { label: "Pending approval", value: formatCurrency(shown.filter((e) => e.status === "Pending").reduce((t, e) => t + num(e.amount), 0)) },
+              ],
+              columns: ["Date", "Description", "Category", "Engagement", "Contractor", "Status", "Receipt", "Amount"],
+              rows: shown.map((e) => [formatDate(e.expense_date), e.description, e.category, e.engagements?.name || "—", e.contractors?.full_name || "—", e.status, e.receipt_url ? "Yes" : "No", formatCurrency(e.amount)]),
+              foot: [["Total", "", "", "", "", "", "", formatCurrency(total)]],
+              alignRight: [7],
+              filename: "DataIsData-Expenses",
+            })
+          }
+        />
+        <Can module="expenses" action="create">
         <Link href="/finance/expenses/new">
-          <Button className="bg-primary hover:bg-primary/90 text-white">
-            <Plus className="w-4 h-4 mr-2" /> New Expense
-          </Button>
-        </Link>
+            <Button className="bg-primary hover:bg-primary/90 text-white">
+              <Plus className="w-4 h-4 mr-2" /> New Expense
+            </Button>
+          </Link>
+        </Can>
+        </div>
       </div>
       {loading ? (
         <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" /></div>
       ) : (
-        <DataTable columns={columns} data={expenses} onRowClick={(e) => { window.location.href = `/finance/expenses/${e.id}`; }} />
+        <>
+          <div className="flex flex-wrap gap-2">
+            {["all", ...categories].map((c) => (
+              <button key={c} type="button" onClick={() => setCategory(c)} className={cn("rounded-full border px-3 py-1 text-xs font-semibold", category === c ? "border-primary bg-primary text-white" : "border-border bg-white text-muted-foreground hover:border-primary/40")}>
+                {c === "all" ? "All" : c}
+              </button>
+            ))}
+            <span className="ml-auto text-sm font-semibold text-foreground">{formatCurrency(total)}</span>
+          </div>
+          <DataTable columns={columns} data={shown} onRowClick={(e) => router.push(`/finance/expenses/${e.id}`)} />
+        </>
       )}
     </div>
   );

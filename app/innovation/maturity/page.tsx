@@ -1,5 +1,6 @@
 "use client";
 
+import { Can } from "@/components/auth/AccessProvider";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -237,9 +238,11 @@ export default function MaturityPage() {
               </div>
             ))}
           </div>
-          <Button onClick={saveSnapshot} disabled={saving} className="bg-primary hover:bg-primary/90">
-            {saving ? "Saving..." : "Record New Snapshot"}
-          </Button>
+          <Can module="innovation_maturity" action="create">
+            <Button onClick={saveSnapshot} disabled={saving} className="bg-primary hover:bg-primary/90">
+              {saving ? "Saving..." : "Record New Snapshot"}
+            </Button>
+          </Can>
         </CardContent>
       </Card>
 

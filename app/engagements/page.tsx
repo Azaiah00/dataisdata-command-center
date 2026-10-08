@@ -1,5 +1,6 @@
 "use client";
 
+import { Can } from "@/components/auth/AccessProvider";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Engagement } from "@/lib/types";
@@ -118,12 +119,14 @@ export default function EngagementsPage() {
           <h1 className="text-2xl font-bold text-[#111827]">Engagements</h1>
           <p className="text-[#6B7280]">Track active projects and service delivery.</p>
         </div>
-        <Link href="/engagements/new">
-          <Button className="bg-primary hover:bg-primary/90 text-white">
-            <Plus className="w-4 h-4 mr-2" />
-            New Engagement
-          </Button>
-        </Link>
+        <Can module="engagements" action="create">
+          <Link href="/engagements/new">
+            <Button className="bg-primary hover:bg-primary/90 text-white">
+              <Plus className="w-4 h-4 mr-2" />
+              New Engagement
+            </Button>
+          </Link>
+        </Can>
       </div>
 
       {loading ? (

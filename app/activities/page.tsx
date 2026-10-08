@@ -1,5 +1,6 @@
 "use client";
 
+import { Can } from "@/components/auth/AccessProvider";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Activity } from "@/lib/types";
@@ -132,12 +133,14 @@ export default function ActivitiesPage() {
           <h1 className="text-2xl font-bold text-[#111827]">Activities</h1>
           <p className="text-[#6B7280]">Timeline of meetings, calls, and communications.</p>
         </div>
-        <Link href="/activities/new">
-          <Button className="bg-primary hover:bg-primary/90 text-white">
-            <Plus className="w-4 h-4 mr-2" />
-            Log Activity
-          </Button>
-        </Link>
+        <Can module="activities" action="create">
+          <Link href="/activities/new">
+            <Button className="bg-primary hover:bg-primary/90 text-white">
+              <Plus className="w-4 h-4 mr-2" />
+              Log Activity
+            </Button>
+          </Link>
+        </Can>
       </div>
 
       {loading ? (

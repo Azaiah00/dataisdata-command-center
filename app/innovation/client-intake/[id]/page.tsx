@@ -1,5 +1,6 @@
 "use client";
 
+import { Can } from "@/components/auth/AccessProvider";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
@@ -148,8 +149,12 @@ export default function ClientIntakeDetailPage() {
             </select>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" onClick={saveInternalReview}>Save Review</Button>
-            <Button onClick={convertToAccount} className="bg-blue-600 hover:bg-blue-700">Convert to Account</Button>
+            <Can module="client_intake" action="edit">
+              <Button variant="outline" onClick={saveInternalReview}>Save Review</Button>
+            </Can>
+            <Can module="accounts" action="create">
+              <Button onClick={convertToAccount} className="bg-blue-600 hover:bg-blue-700">Convert to Account</Button>
+            </Can>
           </div>
         </CardContent>
       </Card>

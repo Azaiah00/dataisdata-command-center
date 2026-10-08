@@ -1,5 +1,7 @@
 "use client";
 
+import { Can, useAccess } from "@/components/auth/AccessProvider";
+import { EntityFinancePanel } from "@/components/finance/EntityFinancePanel";
 import { useEffect, useState, use } from "react";
 import { supabase } from "@/lib/supabase";
 import { Account, Contact, Engagement, Opportunity, Activity, Contractor, Partner } from "@/lib/types";
@@ -32,6 +34,8 @@ import { ActivityFeed } from "@/components/dashboard/ActivityFeed";
 
 export default function AccountDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const { can } = useAccess();
+  const showFinance = can("invoices") || can("expenses") || can("finance_tracker");
   const [account, setAccount] = useState<Account | null>(null);
   const [parentAccount, setParentAccount] = useState<Account | null>(null);
   const [childAccounts, setChildAccounts] = useState<Account[]>([]);
@@ -215,67 +219,97 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Link href={`/accounts/${id}/edit`}>
-              <Button variant="outline" className="border-slate-200 text-slate-700 bg-white">
-                Edit Account
-              </Button>
-            </Link>
-            <Link href={`/activities/new?account_id=${id}`}>
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                Add Interaction
-              </Button>
-            </Link>
+            <Can module="accounts" action="edit">
+              <Link href={`/accounts/${id}/edit`}>
+                <Button variant="outline" className="border-slate-200 text-slate-700 bg-white">
+                  Edit Account
+                </Button>
+              </Link>
+            </Can>
+            <Can module="activities" action="create">
+              <Link href={`/activities/new?account_id=${id}`}>
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                  Add Interaction
+                </Button>
+              </Link>
+            </Can>
           </div>
         </div>
       </div>
 
       <Tabs defaultValue="overview" className="space-y-6">
-        <div className="border-b border-slate-200">
-          <TabsList className="bg-transparent h-12 p-0 gap-8 border-none">
+        <div className="border-b border-slate-200 overflow-x-auto">
+          <TabsList className="bg-transparent h-12 p-0 gap-8 border-none w-max">
             <TabsTrigger 
               value="overview" 
               className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#6B7280] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
             >
               Overview
             </TabsTrigger>
-            <TabsTrigger 
-              value="engagements" 
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#6B7280] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
-            >
-              Engagements ({engagements.length})
-            </TabsTrigger>
-            <TabsTrigger 
-              value="pipeline" 
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#6B7280] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
-            >
-              Pipeline ({opportunities.length})
-            </TabsTrigger>
-            <TabsTrigger 
-              value="contacts" 
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#6B7280] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
-            >
-              Stakeholders ({contacts.length})
-            </TabsTrigger>
-            <TabsTrigger 
-              value="contractors" 
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#6B7280] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
-            >
-              Contractors ({contractors.length})
-            </TabsTrigger>
-            <TabsTrigger 
-              value="partners" 
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#6B7280] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
-            >
-              Partners ({partners.length})
-            </TabsTrigger>
-            <TabsTrigger 
-              value="activities" 
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#6B7280] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
-            >
-              Activity History
-            </TabsTrigger>
+            <Can module="engagements" action="view">
+              <TabsTrigger 
+                value="engagements" 
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#6B7280] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
+              >
+                Engagements ({engagements.length})
+              </TabsTrigger>
+            </Can>
+            <Can module="pipeline" action="view">
+              <TabsTrigger 
+                value="pipeline" 
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#6B7280] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
+              >
+                Pipeline ({opportunities.length})
+              </TabsTrigger>
+            </Can>
+            <Can module="contacts" action="view">
+              <TabsTrigger 
+                value="contacts" 
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#6B7280] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
+              >
+                Stakeholders ({contacts.length})
+              </TabsTrigger>
+            </Can>
+            <Can module="contractors" action="view">
+              <TabsTrigger 
+                value="contractors" 
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#6B7280] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
+              >
+                Contractors ({contractors.length})
+              </TabsTrigger>
+            </Can>
+            <Can module="partners" action="view">
+              <TabsTrigger 
+                value="partners" 
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#6B7280] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
+              >
+                Partners ({partners.length})
+              </TabsTrigger>
+            </Can>
+            {showFinance && (
+              <TabsTrigger
+                value="finance"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#6B7280] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
+              >
+                Finance
+              </TabsTrigger>
+            )}
+            <Can module="activities" action="view">
+              <TabsTrigger 
+                value="activities" 
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#6B7280] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
+              >
+                Activity History
+              </TabsTrigger>
+            </Can>
           </TabsList>
         </div>
+
+        {showFinance && (
+          <TabsContent value="finance" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
+            <EntityFinancePanel scope={{ accountId: id }} title="Account financials" />
+          </TabsContent>
+        )}
 
         <TabsContent value="overview" className="space-y-6 focus-visible:outline-none focus-visible:ring-0">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -343,12 +377,14 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
                   <span className="text-sm text-[#6B7280]">Active Projects</span>
                   <span className="font-bold text-[#111827]">{engagements.filter(e => e.status === 'In Progress').length}</span>
                 </div>
+                <Can module="pipeline">
                 <div className="flex justify-between items-center py-2 border-b border-slate-50">
                   <span className="text-sm text-[#6B7280]">Pipeline Value</span>
                   <span className="font-bold text-green-600">
                     {formatCurrency(opportunities.reduce((sum, op) => sum + (op.estimated_value || 0), 0))}
                   </span>
                 </div>
+                </Can>
                 <div className="flex justify-between items-center py-2 border-b border-slate-50">
                   <span className="text-sm text-[#6B7280]">Stakeholders</span>
                   <span className="font-bold text-[#111827]">{contacts.length}</span>
@@ -366,323 +402,349 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
           </div>
         </TabsContent>
 
-        <TabsContent value="contacts" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-bold text-[#111827]">Stakeholders</h3>
-            <Link href={`/contacts/new?account_id=${account.id}`}>
-              <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
-                <Plus className="w-4 h-4 mr-2" />
-                Add Contact
-              </Button>
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {contacts.map((contact) => (
-              <Card 
-                key={contact.id} 
-                className="hover:shadow-md transition-all cursor-pointer border-slate-100 group" 
-                onClick={() => window.location.href = `/contacts/${contact.id}`}
-              >
-                <CardContent className="p-5 flex gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm">
-                    {contact.full_name.charAt(0)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-[#111827] group-hover:text-blue-600 transition-colors truncate">{contact.full_name}</h4>
-                    <p className="text-xs text-[#6B7280] truncate">{contact.title_role}</p>
-                    <div className="mt-4 space-y-2">
-                      {contact.email && (
-                        <div className="flex items-center gap-2 text-xs text-[#6B7280]">
-                          <Mail className="w-3.5 h-3.5" /> <span className="truncate">{contact.email}</span>
+        <Can module="contacts" action="view">
+          <TabsContent value="contacts" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-bold text-[#111827]">Stakeholders</h3>
+              <Can module="contacts" action="create">
+                <Link href={`/contacts/new?account_id=${account.id}`}>
+                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Contact
+                  </Button>
+                </Link>
+              </Can>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {contacts.map((contact) => (
+                <Card 
+                  key={contact.id} 
+                  className="hover:shadow-md transition-all cursor-pointer border-slate-100 group" 
+                  onClick={() => window.location.href = `/contacts/${contact.id}`}
+                >
+                  <CardContent className="p-5 flex gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm">
+                      {contact.full_name.charAt(0)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-[#111827] group-hover:text-blue-600 transition-colors truncate">{contact.full_name}</h4>
+                      <p className="text-xs text-[#6B7280] truncate">{contact.title_role}</p>
+                      <div className="mt-4 space-y-2">
+                        {contact.email && (
+                          <div className="flex items-center gap-2 text-xs text-[#6B7280]">
+                            <Mail className="w-3.5 h-3.5" /> <span className="truncate">{contact.email}</span>
+                          </div>
+                        )}
+                        <div className="flex items-center gap-2 mt-1">
+                           <div className="flex items-center gap-0.5">
+                              {[...Array(5)].map((_, i) => (
+                                <div
+                                  key={i}
+                                  className={cn(
+                                    "w-1.5 h-1.5 rounded-full",
+                                    i < (contact.influence_level || 0) ? "bg-amber-500" : "bg-slate-200"
+                                  )}
+                                />
+                              ))}
+                           </div>
+                           <Badge className={cn("text-[9px] h-4 px-1 border-none ml-auto", getStatusColor(contact.relationship_health))}>
+                             {contact.relationship_health}
+                           </Badge>
                         </div>
-                      )}
-                      <div className="flex items-center gap-2 mt-1">
-                         <div className="flex items-center gap-0.5">
-                            {[...Array(5)].map((_, i) => (
-                              <div
-                                key={i}
-                                className={cn(
-                                  "w-1.5 h-1.5 rounded-full",
-                                  i < (contact.influence_level || 0) ? "bg-amber-500" : "bg-slate-200"
-                                )}
-                              />
-                            ))}
-                         </div>
-                         <Badge className={cn("text-[9px] h-4 px-1 border-none ml-auto", getStatusColor(contact.relationship_health))}>
-                           {contact.relationship_health}
-                         </Badge>
                       </div>
                     </div>
+                  </CardContent>
+                </Card>
+              ))}
+              {contacts.length === 0 && (
+                <div className="col-span-full py-16 text-center bg-white rounded-2xl border-2 border-dashed border-slate-100">
+                  <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <User className="w-6 h-6 text-slate-300" />
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-            {contacts.length === 0 && (
-              <div className="col-span-full py-16 text-center bg-white rounded-2xl border-2 border-dashed border-slate-100">
-                <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <User className="w-6 h-6 text-slate-300" />
+                  <p className="text-[#6B7280] text-sm font-medium">No stakeholders found</p>
+                  <Can module="contacts" action="create">
+                    <Link href={`/contacts/new?account_id=${account.id}`} className="text-blue-600 text-xs font-bold hover:underline mt-2 inline-block">
+                      Add your first contact
+                    </Link>
+                  </Can>
                 </div>
-                <p className="text-[#6B7280] text-sm font-medium">No stakeholders found</p>
-                <Link href={`/contacts/new?account_id=${account.id}`} className="text-blue-600 text-xs font-bold hover:underline mt-2 inline-block">
-                  Add your first contact
-                </Link>
-              </div>
-            )}
-          </div>
-        </TabsContent>
+              )}
+            </div>
+          </TabsContent>
+        </Can>
 
-        <TabsContent value="engagements" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-bold text-[#111827]">Active Engagements</h3>
-            <Link href={`/engagements/new?account_id=${account.id}`}>
-              <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
-                <Plus className="w-4 h-4 mr-2" />
-                New Engagement
-              </Button>
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {engagements.map((eng) => (
-              <Card 
-                key={eng.id} 
-                className="hover:shadow-md transition-all cursor-pointer border-slate-100 group" 
-                onClick={() => window.location.href = `/engagements/${eng.id}`}
-              >
-                <CardContent className="p-5">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
-                        <Briefcase className="w-5 h-5 text-blue-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-[#111827] group-hover:text-blue-600 transition-colors leading-tight">
-                          {eng.name}
-                        </h4>
-                        <p className="text-xs text-[#6B7280]">{eng.engagement_type}</p>
-                      </div>
-                    </div>
-                    <Badge className={cn("text-[10px] h-5 px-2 border-none font-medium", getStatusColor(eng.status))}>
-                      {eng.status}
-                    </Badge>
-                  </div>
-                  {/* Assigned contractors */}
-                  {engContractorMap[eng.id] && engContractorMap[eng.id].length > 0 && (
-                    <div className="flex flex-wrap gap-1 mb-3">
-                      {engContractorMap[eng.id].map((name) => (
-                        <Badge key={name} variant="secondary" className="text-[9px] h-4 px-1.5 bg-amber-50 text-amber-700 border-none">
-                          <HardHat className="w-2.5 h-2.5 mr-0.5" />
-                          {name}
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-                  <div className="flex items-center justify-between pt-4 border-t border-slate-50">
-                    <div className="flex flex-col">
-                      <span className="text-xs text-[#6B7280]">Value</span>
-                      <span className="text-sm font-bold text-[#111827]">{formatCurrency(eng.contract_value)}</span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-xs text-[#6B7280]">Timeline</span>
-                      <span className="text-sm font-bold text-[#111827] block">
-                        {eng.start_date ? new Date(eng.start_date).toLocaleDateString() : "TBD"}
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-            {engagements.length === 0 && (
-              <div className="col-span-full py-16 text-center bg-white rounded-2xl border-2 border-dashed border-slate-100">
-                <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Briefcase className="w-6 h-6 text-slate-300" />
-                </div>
-                <p className="text-[#6B7280] text-sm font-medium">No active engagements</p>
-                <Link href={`/engagements/new?account_id=${account.id}`} className="text-blue-600 text-xs font-bold hover:underline mt-2 inline-block">
-                  Create an engagement
+        <Can module="engagements" action="view">
+          <TabsContent value="engagements" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-bold text-[#111827]">Active Engagements</h3>
+              <Can module="engagements" action="create">
+                <Link href={`/engagements/new?account_id=${account.id}`}>
+                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                    <Plus className="w-4 h-4 mr-2" />
+                    New Engagement
+                  </Button>
                 </Link>
-              </div>
-            )}
-          </div>
-        </TabsContent>
+              </Can>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {engagements.map((eng) => (
+                <Card 
+                  key={eng.id} 
+                  className="hover:shadow-md transition-all cursor-pointer border-slate-100 group" 
+                  onClick={() => window.location.href = `/engagements/${eng.id}`}
+                >
+                  <CardContent className="p-5">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+                          <Briefcase className="w-5 h-5 text-blue-600" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-[#111827] group-hover:text-blue-600 transition-colors leading-tight">
+                            {eng.name}
+                          </h4>
+                          <p className="text-xs text-[#6B7280]">{eng.engagement_type}</p>
+                        </div>
+                      </div>
+                      <Badge className={cn("text-[10px] h-5 px-2 border-none font-medium", getStatusColor(eng.status))}>
+                        {eng.status}
+                      </Badge>
+                    </div>
+                    {/* Assigned contractors */}
+                    {engContractorMap[eng.id] && engContractorMap[eng.id].length > 0 && (
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        {engContractorMap[eng.id].map((name) => (
+                          <Badge key={name} variant="secondary" className="text-[9px] h-4 px-1.5 bg-amber-50 text-amber-700 border-none">
+                            <HardHat className="w-2.5 h-2.5 mr-0.5" />
+                            {name}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between pt-4 border-t border-slate-50">
+                      <div className="flex flex-col">
+                        <span className="text-xs text-[#6B7280]">Value</span>
+                        <span className="text-sm font-bold text-[#111827]">{formatCurrency(eng.contract_value)}</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-xs text-[#6B7280]">Timeline</span>
+                        <span className="text-sm font-bold text-[#111827] block">
+                          {eng.start_date ? new Date(eng.start_date).toLocaleDateString() : "TBD"}
+                        </span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+              {engagements.length === 0 && (
+                <div className="col-span-full py-16 text-center bg-white rounded-2xl border-2 border-dashed border-slate-100">
+                  <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Briefcase className="w-6 h-6 text-slate-300" />
+                  </div>
+                  <p className="text-[#6B7280] text-sm font-medium">No active engagements</p>
+                  <Can module="engagements" action="create">
+                    <Link href={`/engagements/new?account_id=${account.id}`} className="text-blue-600 text-xs font-bold hover:underline mt-2 inline-block">
+                      Create an engagement
+                    </Link>
+                  </Can>
+                </div>
+              )}
+            </div>
+          </TabsContent>
+        </Can>
         
-        <TabsContent value="pipeline" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-bold text-[#111827]">Pipeline Opportunities</h3>
-            <Link href={`/pipeline/new?account_id=${account.id}`}>
-              <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
-                <Plus className="w-4 h-4 mr-2" />
-                New Opportunity
-              </Button>
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {opportunities.map((opp) => (
-              <Card 
-                key={opp.id} 
-                className="hover:shadow-md transition-all cursor-pointer border-slate-100 group" 
-                onClick={() => window.location.href = `/pipeline/${opp.id}`}
-              >
-                <CardContent className="p-5">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
-                        <GitBranch className="w-5 h-5 text-blue-600" />
+        <Can module="pipeline" action="view">
+          <TabsContent value="pipeline" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-bold text-[#111827]">Pipeline Opportunities</h3>
+              <Can module="pipeline" action="create">
+                <Link href={`/pipeline/new?account_id=${account.id}`}>
+                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                    <Plus className="w-4 h-4 mr-2" />
+                    New Opportunity
+                  </Button>
+                </Link>
+              </Can>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {opportunities.map((opp) => (
+                <Card 
+                  key={opp.id} 
+                  className="hover:shadow-md transition-all cursor-pointer border-slate-100 group" 
+                  onClick={() => window.location.href = `/pipeline/${opp.id}`}
+                >
+                  <CardContent className="p-5">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+                          <GitBranch className="w-5 h-5 text-blue-600" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-[#111827] group-hover:text-blue-600 transition-colors leading-tight">
+                            {opp.name}
+                          </h4>
+                          <p className="text-xs text-[#6B7280]">{opp.service_line}</p>
+                        </div>
+                      </div>
+                      <Badge className={cn("text-[10px] h-5 px-2 border-none font-medium", getStatusColor(opp.stage))}>
+                        {opp.stage}
+                      </Badge>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-50">
+                      <div>
+                        <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block mb-1">Value</span>
+                        <span className="text-sm font-bold text-[#111827]">{formatCurrency(opp.estimated_value)}</span>
                       </div>
                       <div>
-                        <h4 className="font-bold text-[#111827] group-hover:text-blue-600 transition-colors leading-tight">
-                          {opp.name}
-                        </h4>
-                        <p className="text-xs text-[#6B7280]">{opp.service_line}</p>
+                        <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block mb-1">Weighted</span>
+                        <span className="text-sm font-bold text-green-600">{formatCurrency(opp.weighted_value)}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block mb-1">Probability</span>
+                        <span className="text-sm font-bold text-[#111827]">{opp.probability_pct}%</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block mb-1">Expected Start</span>
+                        <span className="text-sm font-bold text-[#111827]">{opp.expected_start ? formatDate(opp.expected_start) : "TBD"}</span>
                       </div>
                     </div>
-                    <Badge className={cn("text-[10px] h-5 px-2 border-none font-medium", getStatusColor(opp.stage))}>
-                      {opp.stage}
-                    </Badge>
+                  </CardContent>
+                </Card>
+              ))}
+              {opportunities.length === 0 && (
+                <div className="col-span-full py-16 text-center bg-white rounded-2xl border-2 border-dashed border-slate-100">
+                  <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <GitBranch className="w-6 h-6 text-slate-300" />
                   </div>
-                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-50">
-                    <div>
-                      <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block mb-1">Value</span>
-                      <span className="text-sm font-bold text-[#111827]">{formatCurrency(opp.estimated_value)}</span>
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block mb-1">Weighted</span>
-                      <span className="text-sm font-bold text-green-600">{formatCurrency(opp.weighted_value)}</span>
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block mb-1">Probability</span>
-                      <span className="text-sm font-bold text-[#111827]">{opp.probability_pct}%</span>
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block mb-1">Expected Start</span>
-                      <span className="text-sm font-bold text-[#111827]">{opp.expected_start ? formatDate(opp.expected_start) : "TBD"}</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-            {opportunities.length === 0 && (
-              <div className="col-span-full py-16 text-center bg-white rounded-2xl border-2 border-dashed border-slate-100">
-                <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <GitBranch className="w-6 h-6 text-slate-300" />
+                  <p className="text-[#6B7280] text-sm font-medium">No opportunities in pipeline</p>
+                  <Can module="pipeline" action="create">
+                    <Link href={`/pipeline/new?account_id=${account.id}`} className="text-blue-600 text-xs font-bold hover:underline mt-2 inline-block">
+                      Add an opportunity
+                    </Link>
+                  </Can>
                 </div>
-                <p className="text-[#6B7280] text-sm font-medium">No opportunities in pipeline</p>
-                <Link href={`/pipeline/new?account_id=${account.id}`} className="text-blue-600 text-xs font-bold hover:underline mt-2 inline-block">
-                  Add an opportunity
-                </Link>
-              </div>
-            )}
-          </div>
-        </TabsContent>
+              )}
+            </div>
+          </TabsContent>
+        </Can>
 
         {/* Contractors Tab */}
-        <TabsContent value="contractors" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-bold text-[#111827]">Contractors</h3>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {contractors.map((c) => (
-              <Card
-                key={c.id}
-                className="hover:shadow-md transition-all cursor-pointer border-slate-100 group"
-                onClick={() => window.location.href = `/contractors/${c.id}`}
-              >
-                <CardContent className="p-5 flex gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center">
-                    <HardHat className="w-5 h-5" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-[#111827] group-hover:text-blue-600 transition-colors truncate">
-                      {c.full_name}
-                    </h4>
-                    <p className="text-xs text-[#6B7280] truncate">{c.title_role || "Contractor"}</p>
-                    {c.engagement_name && (
-                      <p className="text-[10px] text-[#9CA3AF] mt-1 truncate">
-                        On: {c.engagement_name}
-                      </p>
-                    )}
-                    <div className="mt-2 flex items-center gap-2">
-                      {c.email && (
-                        <span className="text-[10px] text-[#6B7280] flex items-center gap-1">
-                          <Mail className="w-3 h-3" /> {c.email}
-                        </span>
-                      )}
+        <Can module="contractors" action="view">
+          <TabsContent value="contractors" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-bold text-[#111827]">Contractors</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {contractors.map((c) => (
+                <Card
+                  key={c.id}
+                  className="hover:shadow-md transition-all cursor-pointer border-slate-100 group"
+                  onClick={() => window.location.href = `/contractors/${c.id}`}
+                >
+                  <CardContent className="p-5 flex gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center">
+                      <HardHat className="w-5 h-5" />
                     </div>
-                    <Badge className={cn("text-[9px] h-4 px-1 border-none mt-2", getStatusColor(c.status))}>
-                      {c.status}
-                    </Badge>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-[#111827] group-hover:text-blue-600 transition-colors truncate">
+                        {c.full_name}
+                      </h4>
+                      <p className="text-xs text-[#6B7280] truncate">{c.title_role || "Contractor"}</p>
+                      {c.engagement_name && (
+                        <p className="text-[10px] text-[#9CA3AF] mt-1 truncate">
+                          On: {c.engagement_name}
+                        </p>
+                      )}
+                      <div className="mt-2 flex items-center gap-2">
+                        {c.email && (
+                          <span className="text-[10px] text-[#6B7280] flex items-center gap-1">
+                            <Mail className="w-3 h-3" /> {c.email}
+                          </span>
+                        )}
+                      </div>
+                      <Badge className={cn("text-[9px] h-4 px-1 border-none mt-2", getStatusColor(c.status))}>
+                        {c.status}
+                      </Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+              {contractors.length === 0 && (
+                <div className="col-span-full py-16 text-center bg-white rounded-2xl border-2 border-dashed border-slate-100">
+                  <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <HardHat className="w-6 h-6 text-slate-300" />
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-            {contractors.length === 0 && (
-              <div className="col-span-full py-16 text-center bg-white rounded-2xl border-2 border-dashed border-slate-100">
-                <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <HardHat className="w-6 h-6 text-slate-300" />
+                  <p className="text-[#6B7280] text-sm font-medium">No contractors linked to this account&apos;s engagements</p>
                 </div>
-                <p className="text-[#6B7280] text-sm font-medium">No contractors linked to this account&apos;s engagements</p>
-              </div>
-            )}
-          </div>
-        </TabsContent>
+              )}
+            </div>
+          </TabsContent>
+        </Can>
 
         {/* Partners Tab */}
-        <TabsContent value="partners" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-bold text-[#111827]">Partners</h3>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {partners.map((p) => (
-              <Card
-                key={p.id}
-                className="hover:shadow-md transition-all cursor-pointer border-slate-100 group"
-                onClick={() => window.location.href = `/partners/${p.id}`}
-              >
-                <CardContent className="p-5 flex gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center">
-                    <Handshake className="w-5 h-5" />
+        <Can module="partners" action="view">
+          <TabsContent value="partners" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-bold text-[#111827]">Partners</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {partners.map((p) => (
+                <Card
+                  key={p.id}
+                  className="hover:shadow-md transition-all cursor-pointer border-slate-100 group"
+                  onClick={() => window.location.href = `/partners/${p.id}`}
+                >
+                  <CardContent className="p-5 flex gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center">
+                      <Handshake className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-[#111827] group-hover:text-blue-600 transition-colors truncate">
+                        {p.name}
+                      </h4>
+                      <p className="text-xs text-[#6B7280] truncate">{p.partner_type || "Partner"}</p>
+                      {p.engagement_name && (
+                        <p className="text-[10px] text-[#9CA3AF] mt-1 truncate">
+                          On: {p.engagement_name}
+                        </p>
+                      )}
+                      {p.capabilities && (
+                        <p className="text-[10px] text-[#6B7280] mt-2 truncate">{p.capabilities}</p>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+              {partners.length === 0 && (
+                <div className="col-span-full py-16 text-center bg-white rounded-2xl border-2 border-dashed border-slate-100">
+                  <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Handshake className="w-6 h-6 text-slate-300" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-[#111827] group-hover:text-blue-600 transition-colors truncate">
-                      {p.name}
-                    </h4>
-                    <p className="text-xs text-[#6B7280] truncate">{p.partner_type || "Partner"}</p>
-                    {p.engagement_name && (
-                      <p className="text-[10px] text-[#9CA3AF] mt-1 truncate">
-                        On: {p.engagement_name}
-                      </p>
-                    )}
-                    {p.capabilities && (
-                      <p className="text-[10px] text-[#6B7280] mt-2 truncate">{p.capabilities}</p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-            {partners.length === 0 && (
-              <div className="col-span-full py-16 text-center bg-white rounded-2xl border-2 border-dashed border-slate-100">
-                <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Handshake className="w-6 h-6 text-slate-300" />
+                  <p className="text-[#6B7280] text-sm font-medium">No partners linked to this account&apos;s engagements</p>
                 </div>
-                <p className="text-[#6B7280] text-sm font-medium">No partners linked to this account&apos;s engagements</p>
-              </div>
-            )}
-          </div>
-        </TabsContent>
+              )}
+            </div>
+          </TabsContent>
+        </Can>
 
-        <TabsContent value="activities" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-bold text-[#111827]">Interaction Timeline</h3>
-            <Link href={`/activities/new?account_id=${account.id}`}>
-              <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
-                <Plus className="w-4 h-4 mr-2" />
-                Log Interaction
-              </Button>
-            </Link>
-          </div>
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-            <ActivityFeed activities={activities} />
-          </div>
-        </TabsContent>
+        <Can module="activities" action="view">
+          <TabsContent value="activities" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-bold text-[#111827]">Interaction Timeline</h3>
+              <Can module="activities" action="create">
+                <Link href={`/activities/new?account_id=${account.id}`}>
+                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Log Interaction
+                  </Button>
+                </Link>
+              </Can>
+            </div>
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+              <ActivityFeed activities={activities} />
+            </div>
+          </TabsContent>
+        </Can>
       </Tabs>
     </div>
   );

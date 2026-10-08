@@ -1,5 +1,6 @@
 "use client";
 
+import { Can } from "@/components/auth/AccessProvider";
 import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -143,32 +144,36 @@ export default function PartnerDetailPage({ params }: { params: Promise<{ id: st
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Link href={`/partners/${id}/edit`}>
-              <Button variant="outline" size="sm" className="border-slate-200 text-slate-700 bg-white">
-                <Pencil className="w-4 h-4 mr-2" /> Edit
-              </Button>
-            </Link>
-            <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="border-red-200 text-red-600 hover:bg-red-50">
-                  <Trash2 className="w-4 h-4 mr-2" /> Delete
+            <Can module="partners" action="edit">
+              <Link href={`/partners/${id}/edit`}>
+                <Button variant="outline" size="sm" className="border-slate-200 text-slate-700 bg-white">
+                  <Pencil className="w-4 h-4 mr-2" /> Edit
                 </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Delete Partner</DialogTitle>
-                  <DialogDescription>
-                    Are you sure you want to delete &quot;{partner.name}&quot;? This cannot be undone.
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} disabled={deleting}>Cancel</Button>
-                  <Button variant="destructive" onClick={onDelete} disabled={deleting}>
-                    {deleting ? "Deleting..." : "Delete"}
+              </Link>
+            </Can>
+            <Can module="partners" action="delete">
+              <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="border-red-200 text-red-600 hover:bg-red-50">
+                    <Trash2 className="w-4 h-4 mr-2" /> Delete
                   </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Delete Partner</DialogTitle>
+                    <DialogDescription>
+                      Are you sure you want to delete &quot;{partner.name}&quot;? This cannot be undone.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} disabled={deleting}>Cancel</Button>
+                    <Button variant="destructive" onClick={onDelete} disabled={deleting}>
+                      {deleting ? "Deleting..." : "Delete"}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </Can>
           </div>
         </div>
       </div>
@@ -212,73 +217,77 @@ export default function PartnerDetailPage({ params }: { params: Promise<{ id: st
       </div>
 
       {/* Linked Engagements */}
-      <Card className="border-none shadow-sm">
-        <CardHeader>
-          <CardTitle className="text-lg font-bold text-[#111827]">
-            Linked Engagements ({engagements.length})
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {engagements.length > 0 ? (
-            <div className="space-y-3">
-              {engagements.map((eng) => (
-                <Link key={eng.id} href={`/engagements/${eng.id}`}>
-                  <div className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 border border-slate-100 cursor-pointer">
-                    <div className="flex items-center gap-3">
-                      <Briefcase className="w-4 h-4 text-blue-600" />
-                      <div>
-                        <p className="text-sm font-bold text-[#111827]">{eng.name}</p>
-                        <p className="text-xs text-[#6B7280]">{eng.accounts?.name}</p>
+      <Can module="engagements" action="view">
+        <Card className="border-none shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-lg font-bold text-[#111827]">
+              Linked Engagements ({engagements.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {engagements.length > 0 ? (
+              <div className="space-y-3">
+                {engagements.map((eng) => (
+                  <Link key={eng.id} href={`/engagements/${eng.id}`}>
+                    <div className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 border border-slate-100 cursor-pointer">
+                      <div className="flex items-center gap-3">
+                        <Briefcase className="w-4 h-4 text-blue-600" />
+                        <div>
+                          <p className="text-sm font-bold text-[#111827]">{eng.name}</p>
+                          <p className="text-xs text-[#6B7280]">{eng.accounts?.name}</p>
+                        </div>
                       </div>
-                    </div>
-                    <Badge className={cn("text-[10px] h-5 px-2 border-none", getStatusColor(eng.status))}>
-                      {eng.status}
-                    </Badge>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-slate-400 italic text-center py-8">No linked engagements.</p>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Linked Opportunities */}
-      <Card className="border-none shadow-sm">
-        <CardHeader>
-          <CardTitle className="text-lg font-bold text-[#111827]">
-            Linked Opportunities ({opportunities.length})
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {opportunities.length > 0 ? (
-            <div className="space-y-3">
-              {opportunities.map((opp) => (
-                <Link key={opp.id} href={`/pipeline/${opp.id}`}>
-                  <div className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 border border-slate-100 cursor-pointer">
-                    <div className="flex items-center gap-3">
-                      <TrendingUp className="w-4 h-4 text-blue-600" />
-                      <div>
-                        <p className="text-sm font-bold text-[#111827]">{opp.name}</p>
-                        <p className="text-xs text-[#6B7280]">{opp.accounts?.name}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-green-600">{formatCurrency(opp.estimated_value)}</span>
-                      <Badge className={cn("text-[10px] h-5 px-2 border-none", getStatusColor(opp.stage))}>
-                        {opp.stage}
+                      <Badge className={cn("text-[10px] h-5 px-2 border-none", getStatusColor(eng.status))}>
+                        {eng.status}
                       </Badge>
                     </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-slate-400 italic text-center py-8">No linked opportunities.</p>
-          )}
-        </CardContent>
-      </Card>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-slate-400 italic text-center py-8">No linked engagements.</p>
+            )}
+          </CardContent>
+        </Card>
+      </Can>
+
+      {/* Linked Opportunities */}
+      <Can module="pipeline" action="view">
+        <Card className="border-none shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-lg font-bold text-[#111827]">
+              Linked Opportunities ({opportunities.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {opportunities.length > 0 ? (
+              <div className="space-y-3">
+                {opportunities.map((opp) => (
+                  <Link key={opp.id} href={`/pipeline/${opp.id}`}>
+                    <div className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 border border-slate-100 cursor-pointer">
+                      <div className="flex items-center gap-3">
+                        <TrendingUp className="w-4 h-4 text-blue-600" />
+                        <div>
+                          <p className="text-sm font-bold text-[#111827]">{opp.name}</p>
+                          <p className="text-xs text-[#6B7280]">{opp.accounts?.name}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-green-600">{formatCurrency(opp.estimated_value)}</span>
+                        <Badge className={cn("text-[10px] h-5 px-2 border-none", getStatusColor(opp.stage))}>
+                          {opp.stage}
+                        </Badge>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-slate-400 italic text-center py-8">No linked opportunities.</p>
+            )}
+          </CardContent>
+        </Card>
+      </Can>
 
       {/* Attachments */}
       {partner.attachments && partner.attachments.length > 0 && (

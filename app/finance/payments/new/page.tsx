@@ -15,7 +15,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
 import Link from "next/link";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, num } from "@/lib/utils";
+import { recomputeInvoiceStatus } from "@/lib/finance/data";
+import { todayISO } from "@/lib/finance/dates";
 
 const formSchema = z.object({
   invoice_id: z.string().uuid("Select an invoice"),
@@ -48,7 +50,7 @@ function NewPaymentPageContent() {
     defaultValues: {
       invoice_id: preselectedInvoice,
       amount: "",
-      payment_date: new Date().toISOString().split("T")[0],
+      payment_date: todayISO(),
       payment_method: "Check",
       reference_number: "",
       notes: "",
@@ -70,13 +72,16 @@ function NewPaymentPageContent() {
       const { data: pays } = await supabase.from("payments").select("invoice_id, amount");
       const paidMap: Record<string, number> = {};
       (pays || []).forEach((p: any) => {
-        paidMap[p.invoice_id] = (paidMap[p.invoice_id] || 0) + (p.amount || 0);
+        paidMap[p.invoice_id] = (paidMap[p.invoice_id] || 0) + num(p.amount);
       });
 
-      const withBalance = invs.map((inv: any) => ({
-        ...inv,
-        balance: inv.total - (paidMap[inv.id] || 0),
-      }));
+      const withBalance = invs
+        .map((inv: any) => ({
+          ...inv,
+          accounts: Array.isArray(inv.accounts) ? inv.accounts[0] ?? null : inv.accounts,
+          balance: Math.round((num(inv.total) - (paidMap[inv.id] || 0)) * 100) / 100,
+        }))
+        .filter((inv: InvoiceOption) => (inv.balance || 0) > 0 || inv.id === preselectedInvoice);
       setInvoices(withBalance);
     }
     fetchInvoices();
@@ -85,7 +90,33 @@ function NewPaymentPageContent() {
   const selectedInvoice = invoices.find((i) => i.id === form.watch("invoice_id"));
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    const amount = num(values.amount);
+    if (amount <= 0) {
+      toast.error("Amount must be greater than zero");
+      return;
+    }
     setSubmitting(true);
+    // Always check against the live balance (not cached state) so an invoice can never be over-paid.
+    const [{ data: inv }, { data: pays }] = await Promise.all([
+      supabase.from("invoices").select("total, status").eq("id", values.invoice_id).maybeSingle(),
+      supabase.from("payments").select("amount").eq("invoice_id", values.invoice_id),
+    ]);
+    if (!inv) {
+      setSubmitting(false);
+      toast.error("Invoice not found");
+      return;
+    }
+    const liveBalance = Math.round((num(inv.total) - (pays || []).reduce((t: number, p: { amount: number }) => t + num(p.amount), 0)) * 100) / 100;
+    if (inv.status === "Cancelled") {
+      setSubmitting(false);
+      toast.error("This invoice is cancelled.");
+      return;
+    }
+    if (amount > liveBalance + 0.005) {
+      setSubmitting(false);
+      toast.error(`That is more than the ${formatCurrency(Math.max(0, liveBalance))} balance due.`);
+      return;
+    }
     try {
       const { error } = await supabase.from("payments").insert({
         invoice_id: values.invoice_id,
@@ -97,10 +128,10 @@ function NewPaymentPageContent() {
       });
       if (error) throw error;
 
-      // Check if invoice is fully paid and auto-update status
-      const amt = parseFloat(values.amount) || 0;
-      if (selectedInvoice && amt >= (selectedInvoice.balance || 0)) {
-        await supabase.from("invoices").update({ status: "Paid", updated_at: new Date().toISOString() }).eq("id", values.invoice_id);
+      // Recalculate status from all payments (Paid when fully covered; a Draft that receives money is clearly Sent).
+      const next = await recomputeInvoiceStatus(values.invoice_id);
+      if (next === "Draft") {
+        await supabase.from("invoices").update({ status: "Sent", updated_at: new Date().toISOString() }).eq("id", values.invoice_id);
       }
 
       toast.success("Payment recorded");
@@ -115,7 +146,7 @@ function NewPaymentPageContent() {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="flex items-center gap-2 text-xs font-medium text-[#6B7280] uppercase tracking-wider">
-        <Link href="/finance/payments" className="hover:text-blue-600">Payments</Link>
+        <Link href="/finance/payments" className="hover:text-primary">Payments</Link>
         <span>/</span>
         <span className="text-[#111827]">Record Payment</span>
       </div>
@@ -196,7 +227,7 @@ function NewPaymentPageContent() {
           </Card>
 
           <div className="flex gap-3">
-            <Button type="submit" disabled={submitting} className="bg-blue-600 hover:bg-blue-700">
+            <Button type="submit" disabled={submitting} >
               {submitting ? "Recording..." : "Record Payment"}
             </Button>
             <Link href="/finance/payments"><Button type="button" variant="outline">Cancel</Button></Link>
@@ -212,7 +243,7 @@ export default function NewPaymentPage() {
     <Suspense
       fallback={
         <div className="flex items-center justify-center min-h-[400px]">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
         </div>
       }
     >

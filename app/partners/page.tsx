@@ -1,5 +1,6 @@
 "use client";
 
+import { Can } from "@/components/auth/AccessProvider";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Partner } from "@/lib/types";
@@ -84,11 +85,13 @@ export default function PartnersPage() {
       accessorKey: "actions",
       cell: (partner: Partner) => (
         <div className="flex justify-end gap-2">
-          <Link href={`/partners/${partner.id}/edit`}>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-primary hover:bg-primary/10">
-              <Pencil className="w-3.5 h-3.5" />
-            </Button>
-          </Link>
+          <Can module="partners" action="edit">
+            <Link href={`/partners/${partner.id}/edit`}>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-primary hover:bg-primary/10">
+                <Pencil className="w-3.5 h-3.5" />
+              </Button>
+            </Link>
+          </Can>
           <Link href={`/partners/${partner.id}`}>
             <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-white hover:bg-primary">
               <ArrowUpRight className="w-4 h-4" />
@@ -106,12 +109,14 @@ export default function PartnersPage() {
           <h1 className="text-2xl font-bold text-[#111827]">Partners</h1>
           <p className="text-[#6B7280]">Manage vendor, prime, sub, and university ecosystem.</p>
         </div>
-        <Link href="/partners/new">
-          <Button className="bg-primary hover:bg-primary/90 text-white">
-            <Plus className="w-4 h-4 mr-2" />
-            New Partner
-          </Button>
-        </Link>
+        <Can module="partners" action="create">
+          <Link href="/partners/new">
+            <Button className="bg-primary hover:bg-primary/90 text-white">
+              <Plus className="w-4 h-4 mr-2" />
+              New Partner
+            </Button>
+          </Link>
+        </Can>
       </div>
 
       {loading ? (

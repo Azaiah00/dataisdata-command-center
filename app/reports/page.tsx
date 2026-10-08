@@ -1,5 +1,8 @@
 "use client";
 
+import { Can, useAccess } from "@/components/auth/AccessProvider";
+import { PdfButton } from "@/components/ui/PdfButton";
+import { BrandedPdf, pdfDateStamp } from "@/lib/pdf/branded";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { formatCurrency, formatCompactCurrency, cn, getStatusColor } from "@/lib/utils";
@@ -16,7 +19,6 @@ import {
   Target,
   BarChart3,
   Printer,
-  Download,
 } from "lucide-react";
 
 interface PipelineByStage {
@@ -39,6 +41,7 @@ interface TopAccount {
 }
 
 export default function ReportsPage() {
+  const { can, realUser } = useAccess();
   const [loading, setLoading] = useState(true);
   const reportRef = useRef<HTMLDivElement>(null);
 
@@ -59,7 +62,8 @@ export default function ReportsPage() {
   useEffect(() => {
     async function fetchReports() {
       // Fetch all opportunities for pipeline breakdown
-      const { data: opps } = await supabase.from("opportunities").select("stage, estimated_value, weighted_value");
+      const none = { data: null as null };
+      const { data: opps } = can("pipeline") ? await supabase.from("opportunities").select("stage, estimated_value, weighted_value") : none;
       if (opps) {
         const totalEst = opps.reduce((sum, o) => sum + (o.estimated_value || 0), 0);
         const totalW = opps.reduce((sum, o) => sum + (o.weighted_value || 0), 0);
@@ -79,7 +83,7 @@ export default function ReportsPage() {
       }
 
       // Fetch engagements for breakdown
-      const { data: engs } = await supabase.from("engagements").select("status, contract_value, budget");
+      const { data: engs } = can("engagements") ? await supabase.from("engagements").select("status, contract_value, budget") : none;
       if (engs) {
         const totalCV = engs.reduce((sum, e) => sum + (e.contract_value || 0), 0);
         setTotalEngagementValue(totalCV);
@@ -95,8 +99,8 @@ export default function ReportsPage() {
       }
 
       // Fetch accounts with engagement counts
-      const { data: accs } = await supabase.from("accounts").select("id, name");
-      const { data: engLinks } = await supabase.from("engagements").select("account_id, contract_value");
+      const { data: accs } = can("accounts") ? await supabase.from("accounts").select("id, name") : none;
+      const { data: engLinks } = can("accounts") ? await supabase.from("engagements").select("account_id, contract_value") : none;
       if (accs && engLinks) {
         const accMap: Record<string, { name: string; count: number; total: number }> = {};
         accs.forEach((a) => (accMap[a.id] = { name: a.name, count: 0, total: 0 }));
@@ -114,8 +118,8 @@ export default function ReportsPage() {
       }
 
       // Entity counts
-      const tables = ["accounts", "contacts", "partners", "activities"] as const;
-      const countResults: Record<string, number> = {};
+      const tables = (["accounts", "contacts", "partners", "activities"] as const).filter((t) => can(t));
+      const countResults: Record<string, number> = { accounts: 0, contacts: 0, partners: 0, activities: 0 };
       await Promise.all(
         tables.map(async (t) => {
           const { count } = await supabase.from(t).select("id", { count: "exact", head: true });
@@ -128,7 +132,7 @@ export default function ReportsPage() {
     }
 
     fetchReports();
-  }, []);
+  }, [can]);
 
   if (loading) {
     return (
@@ -138,8 +142,27 @@ export default function ReportsPage() {
     );
   }
 
-  function handlePrint() {
-    window.print();
+  async function exportPdf() {
+    const pdf = await BrandedPdf.create({ title: "Performance Report", subtitle: reportDate, preparedBy: realUser?.full_name });
+    const kpis = [];
+    if (can("pipeline")) kpis.push({ label: "Total pipeline", value: formatCompactCurrency(totalPipeline), sub: `Weighted ${formatCompactCurrency(totalWeighted)}` });
+    if (can("engagements")) kpis.push({ label: "Engagement value", value: formatCompactCurrency(totalEngagementValue), sub: `${activeEngagements} active` });
+    if (can("accounts")) kpis.push({ label: "Accounts", value: String(counts.accounts), sub: `${counts.contacts} contacts` });
+    if (can("partners")) kpis.push({ label: "Partners", value: String(counts.partners), sub: `${counts.activities} activities` });
+    if (kpis.length) pdf.kpis(kpis);
+    if (can("pipeline")) {
+      pdf.heading("Pipeline by stage");
+      pdf.table({ head: ["Stage", "Opportunities", "Value"], body: pipelineByStage.map((p) => [p.stage, String(p.count), formatCurrency(p.total_value)]), alignRight: [1, 2] });
+    }
+    if (can("engagements")) {
+      pdf.heading("Engagements by status");
+      pdf.table({ head: ["Status", "Engagements", "Contract value"], body: engagementsByStatus.map((e) => [e.status, String(e.count), formatCurrency(e.total_budget)]), alignRight: [1, 2] });
+    }
+    if (can("accounts")) {
+      pdf.heading("Top accounts by contract value");
+      pdf.table({ head: ["Account", "Engagements", "Contract value"], body: topAccounts.map((a) => [a.name, String(a.engagement_count), formatCurrency(a.total_value)]), alignRight: [1, 2] });
+    }
+    pdf.save(`DataIsData-Performance-Report-${pdfDateStamp()}`);
   }
 
   const stageColors: Record<string, string> = {
@@ -183,176 +206,187 @@ export default function ReportsPage() {
           <p className="text-[#6B7280]">Overview of your CRM performance and metrics.</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={handlePrint} className="border-gray-200">
+          <Button variant="outline" onClick={() => window.print()} className="border-gray-200">
             <Printer className="w-4 h-4 mr-2" />
-            Print Report
+            Print
           </Button>
-          <Button onClick={handlePrint} className="bg-primary hover:bg-primary/90">
-            <Download className="w-4 h-4 mr-2" />
-            Download PDF
-          </Button>
+          <PdfButton variant="default" size="default" onExport={exportPdf} />
         </div>
       </div>
 
       {/* KPI Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Can module="pipeline" action="view">
+          <Card className="border-none shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm font-medium text-[#6B7280]">Total Pipeline</p>
+                  <p className="text-2xl font-bold text-[#111827]">{formatCompactCurrency(totalPipeline)}</p>
+                  <p className="text-xs text-[#6B7280] mt-1">Weighted: {formatCompactCurrency(totalWeighted)}</p>
+                </div>
+                <div className="p-3 rounded-xl bg-primary/10">
+                  <TrendingUp className="w-5 h-5 text-primary" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </Can>
+
         <Card className="border-none shadow-sm hover:shadow-md transition-shadow">
-          <CardContent className="p-6">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-sm font-medium text-[#6B7280]">Total Pipeline</p>
-                <p className="text-2xl font-bold text-[#111827]">{formatCompactCurrency(totalPipeline)}</p>
-                <p className="text-xs text-[#6B7280] mt-1">Weighted: {formatCompactCurrency(totalWeighted)}</p>
+          <Can module="engagements" action="view">
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm font-medium text-[#6B7280]">Engagement Revenue</p>
+                  <p className="text-2xl font-bold text-[#111827]">{formatCompactCurrency(totalEngagementValue)}</p>
+                  <p className="text-xs text-[#6B7280] mt-1">{activeEngagements} active engagements</p>
+                </div>
+                <div className="p-3 rounded-xl bg-green-50">
+                  <DollarSign className="w-5 h-5 text-green-600" />
+                </div>
               </div>
-              <div className="p-3 rounded-xl bg-primary/10">
-                <TrendingUp className="w-5 h-5 text-primary" />
-              </div>
-            </div>
-          </CardContent>
+            </CardContent>
+          </Can>
         </Card>
 
         <Card className="border-none shadow-sm hover:shadow-md transition-shadow">
-          <CardContent className="p-6">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-sm font-medium text-[#6B7280]">Engagement Revenue</p>
-                <p className="text-2xl font-bold text-[#111827]">{formatCompactCurrency(totalEngagementValue)}</p>
-                <p className="text-xs text-[#6B7280] mt-1">{activeEngagements} active engagements</p>
+          <Can module="accounts" action="view">
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm font-medium text-[#6B7280]">Accounts</p>
+                  <p className="text-2xl font-bold text-[#111827]">{counts.accounts}</p>
+                  <p className="text-xs text-[#6B7280] mt-1">{counts.contacts} contacts</p>
+                </div>
+                <div className="p-3 rounded-xl bg-purple-50">
+                  <Building2 className="w-5 h-5 text-purple-600" />
+                </div>
               </div>
-              <div className="p-3 rounded-xl bg-green-50">
-                <DollarSign className="w-5 h-5 text-green-600" />
-              </div>
-            </div>
-          </CardContent>
+            </CardContent>
+          </Can>
         </Card>
 
         <Card className="border-none shadow-sm hover:shadow-md transition-shadow">
-          <CardContent className="p-6">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-sm font-medium text-[#6B7280]">Accounts</p>
-                <p className="text-2xl font-bold text-[#111827]">{counts.accounts}</p>
-                <p className="text-xs text-[#6B7280] mt-1">{counts.contacts} contacts</p>
+          <Can module="partners" action="view">
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm font-medium text-[#6B7280]">Partners</p>
+                  <p className="text-2xl font-bold text-[#111827]">{counts.partners}</p>
+                  <p className="text-xs text-[#6B7280] mt-1">{counts.activities} activities logged</p>
+                </div>
+                <div className="p-3 rounded-xl bg-amber-50">
+                  <Handshake className="w-5 h-5 text-amber-600" />
+                </div>
               </div>
-              <div className="p-3 rounded-xl bg-purple-50">
-                <Building2 className="w-5 h-5 text-purple-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-none shadow-sm hover:shadow-md transition-shadow">
-          <CardContent className="p-6">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-sm font-medium text-[#6B7280]">Partners</p>
-                <p className="text-2xl font-bold text-[#111827]">{counts.partners}</p>
-                <p className="text-xs text-[#6B7280] mt-1">{counts.activities} activities logged</p>
-              </div>
-              <div className="p-3 rounded-xl bg-amber-50">
-                <Handshake className="w-5 h-5 text-amber-600" />
-              </div>
-            </div>
-          </CardContent>
+            </CardContent>
+          </Can>
         </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Pipeline by Stage */}
-        <Card className="border-none shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-lg font-bold text-[#111827] flex items-center gap-2">
-              <Target className="w-5 h-5 text-primary" />
-              Pipeline by Stage
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {pipelineByStage.map((item) => (
-              <div key={item.stage} className="space-y-1.5">
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-2">
-                    <div className={cn("w-2.5 h-2.5 rounded-full", stageColors[item.stage] || "bg-gray-400")} />
-                    <span className="font-medium text-[#111827]">{item.stage}</span>
-                    <Badge variant="secondary" className="text-[10px] h-4 px-1.5 bg-gray-100 text-gray-500">
-                      {item.count}
-                    </Badge>
+        <Can module="pipeline" action="view">
+          <Card className="border-none shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-lg font-bold text-[#111827] flex items-center gap-2">
+                <Target className="w-5 h-5 text-primary" />
+                Pipeline by Stage
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {pipelineByStage.map((item) => (
+                <div key={item.stage} className="space-y-1.5">
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2">
+                      <div className={cn("w-2.5 h-2.5 rounded-full", stageColors[item.stage] || "bg-gray-400")} />
+                      <span className="font-medium text-[#111827]">{item.stage}</span>
+                      <Badge variant="secondary" className="text-[10px] h-4 px-1.5 bg-gray-100 text-gray-500">
+                        {item.count}
+                      </Badge>
+                    </div>
+                    <span className="font-bold text-[#111827]">{formatCurrency(item.total_value)}</span>
                   </div>
-                  <span className="font-bold text-[#111827]">{formatCurrency(item.total_value)}</span>
+                  <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className={cn("h-full rounded-full transition-all duration-500", stageColors[item.stage] || "bg-gray-400")}
+                      style={{ width: `${Math.max((item.total_value / maxPipelineValue) * 100, 2)}%` }}
+                    />
+                  </div>
                 </div>
-                <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                  <div
-                    className={cn("h-full rounded-full transition-all duration-500", stageColors[item.stage] || "bg-gray-400")}
-                    style={{ width: `${Math.max((item.total_value / maxPipelineValue) * 100, 2)}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-            {pipelineByStage.every((s) => s.count === 0) && (
-              <p className="text-sm text-gray-400 italic text-center py-4">No pipeline data yet.</p>
-            )}
-          </CardContent>
-        </Card>
+              ))}
+              {pipelineByStage.every((s) => s.count === 0) && (
+                <p className="text-sm text-gray-400 italic text-center py-4">No pipeline data yet.</p>
+              )}
+            </CardContent>
+          </Card>
+        </Can>
 
         {/* Engagements by Status */}
-        <Card className="border-none shadow-sm">
+        <Can module="engagements" action="view">
+          <Card className="border-none shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-lg font-bold text-[#111827] flex items-center gap-2">
+                <Briefcase className="w-5 h-5 text-primary" />
+                Engagements by Status
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {engagementsByStatus.length > 0 ? (
+                <div className="space-y-3">
+                  {engagementsByStatus.map((item) => (
+                    <div key={item.status} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 border border-gray-100">
+                      <div className="flex items-center gap-3">
+                        <Badge className={cn("text-[10px] h-5 px-2 border-none", getStatusColor(item.status))}>
+                          {item.status}
+                        </Badge>
+                        <span className="text-sm text-[#6B7280]">{item.count} engagement{item.count !== 1 ? "s" : ""}</span>
+                      </div>
+                      <span className="font-bold text-[#111827]">{formatCurrency(item.total_budget)}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-gray-400 italic text-center py-4">No engagements yet.</p>
+              )}
+            </CardContent>
+          </Card>
+        </Can>
+      </div>
+
+      {/* Top Accounts by Revenue */}
+      <Can module="accounts" action="view">
+        <Card className="border-none shadow-sm print:shadow-none print:border print:border-gray-200">
           <CardHeader>
             <CardTitle className="text-lg font-bold text-[#111827] flex items-center gap-2">
-              <Briefcase className="w-5 h-5 text-primary" />
-              Engagements by Status
+              <BarChart3 className="w-5 h-5 text-primary" />
+              Top Accounts by Engagement Value
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {engagementsByStatus.length > 0 ? (
+            {topAccounts.length > 0 ? (
               <div className="space-y-3">
-                {engagementsByStatus.map((item) => (
-                  <div key={item.status} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 border border-gray-100">
-                    <div className="flex items-center gap-3">
-                      <Badge className={cn("text-[10px] h-5 px-2 border-none", getStatusColor(item.status))}>
-                        {item.status}
-                      </Badge>
-                      <span className="text-sm text-[#6B7280]">{item.count} engagement{item.count !== 1 ? "s" : ""}</span>
+                {topAccounts.map((acc, idx) => (
+                  <div key={acc.id} className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 border border-gray-100">
+                    <span className="text-lg font-bold text-gray-300 w-6 text-center">{idx + 1}</span>
+                    <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <Building2 className="w-4 h-4 text-primary" />
                     </div>
-                    <span className="font-bold text-[#111827]">{formatCurrency(item.total_budget)}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-[#111827] text-sm truncate">{acc.name}</p>
+                      <p className="text-xs text-[#6B7280]">{acc.engagement_count} engagement{acc.engagement_count !== 1 ? "s" : ""}</p>
+                    </div>
+                    <span className="font-bold text-green-600 text-sm">{formatCurrency(acc.total_value)}</span>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-gray-400 italic text-center py-4">No engagements yet.</p>
+              <p className="text-sm text-gray-400 italic text-center py-8">No account data yet.</p>
             )}
           </CardContent>
         </Card>
-      </div>
-
-      {/* Top Accounts by Revenue */}
-      <Card className="border-none shadow-sm print:shadow-none print:border print:border-gray-200">
-        <CardHeader>
-          <CardTitle className="text-lg font-bold text-[#111827] flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-primary" />
-            Top Accounts by Engagement Value
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {topAccounts.length > 0 ? (
-            <div className="space-y-3">
-              {topAccounts.map((acc, idx) => (
-                <div key={acc.id} className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 border border-gray-100">
-                  <span className="text-lg font-bold text-gray-300 w-6 text-center">{idx + 1}</span>
-                  <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <Building2 className="w-4 h-4 text-primary" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-[#111827] text-sm truncate">{acc.name}</p>
-                    <p className="text-xs text-[#6B7280]">{acc.engagement_count} engagement{acc.engagement_count !== 1 ? "s" : ""}</p>
-                  </div>
-                  <span className="font-bold text-green-600 text-sm">{formatCurrency(acc.total_value)}</span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-gray-400 italic text-center py-8">No account data yet.</p>
-          )}
-        </CardContent>
-      </Card>
+      </Can>
 
       {/* Print-only branded footer */}
       <div className="hidden print:block mt-12 pt-6 border-t-2 border-primary">

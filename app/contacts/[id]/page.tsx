@@ -1,5 +1,6 @@
 "use client";
 
+import { Can } from "@/components/auth/AccessProvider";
 import { useEffect, useState, use } from "react";
 import { supabase } from "@/lib/supabase";
 import { Contact, Account, Activity } from "@/lib/types";
@@ -93,12 +94,16 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
           <p className="text-slate-500 mt-1">{contact.title_role} at {contact.accounts?.name}</p>
         </div>
         <div className="flex gap-2">
-          <Link href={`/contacts/${id}/edit`}>
-            <Button variant="outline">Edit Contact</Button>
-          </Link>
-          <Link href={`/activities/new?account_id=${contact?.account_id || ""}`}>
-            <Button className="bg-blue-600 hover:bg-blue-700">Log Activity</Button>
-          </Link>
+          <Can module="contacts" action="edit">
+            <Link href={`/contacts/${id}/edit`}>
+              <Button variant="outline">Edit Contact</Button>
+            </Link>
+          </Can>
+          <Can module="activities" action="create">
+            <Link href={`/activities/new?account_id=${contact?.account_id || ""}`}>
+              <Button className="bg-blue-600 hover:bg-blue-700">Log Activity</Button>
+            </Link>
+          </Can>
         </div>
       </div>
 
@@ -163,45 +168,47 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
         </div>
 
         <div className="md:col-span-2 space-y-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg font-semibold text-slate-800">Recent Activity</CardTitle>
-              <CalendarDays className="w-5 h-5 text-slate-400" />
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                {activities.length > 0 ? (
-                  activities.map((activity, idx) => (
-                    <div key={activity.id} className="relative pl-6 pb-6 last:pb-0">
-                      {idx !== activities.length - 1 && (
-                        <div className="absolute left-[11px] top-6 bottom-0 w-[2px] bg-slate-100" />
-                      )}
-                      <div className="absolute left-0 top-1 w-[24px] h-[24px] rounded-full bg-white border-2 border-blue-500 flex items-center justify-center z-10">
-                        <MessageSquare className="w-3 h-3 text-blue-500" />
-                      </div>
-                      <div className="flex flex-col">
-                        <div className="flex justify-between items-center">
-                          <span className="font-semibold text-slate-900">{activity.activity_type}</span>
-                          <span className="text-xs text-slate-500">{formatDate(activity.date_time)}</span>
-                        </div>
-                        <p className="text-sm text-slate-600 mt-1">{activity.summary}</p>
-                        {activity.next_action && (
-                          <div className="mt-2 p-2 bg-slate-50 rounded text-xs border border-slate-100">
-                            <span className="font-bold text-blue-600 mr-2">NEXT:</span>
-                            {activity.next_action}
-                          </div>
+          <Can module="activities" action="view">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="text-lg font-semibold text-slate-800">Recent Activity</CardTitle>
+                <CalendarDays className="w-5 h-5 text-slate-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  {activities.length > 0 ? (
+                    activities.map((activity, idx) => (
+                      <div key={activity.id} className="relative pl-6 pb-6 last:pb-0">
+                        {idx !== activities.length - 1 && (
+                          <div className="absolute left-[11px] top-6 bottom-0 w-[2px] bg-slate-100" />
                         )}
+                        <div className="absolute left-0 top-1 w-[24px] h-[24px] rounded-full bg-white border-2 border-blue-500 flex items-center justify-center z-10">
+                          <MessageSquare className="w-3 h-3 text-blue-500" />
+                        </div>
+                        <div className="flex flex-col">
+                          <div className="flex justify-between items-center">
+                            <span className="font-semibold text-slate-900">{activity.activity_type}</span>
+                            <span className="text-xs text-slate-500">{formatDate(activity.date_time)}</span>
+                          </div>
+                          <p className="text-sm text-slate-600 mt-1">{activity.summary}</p>
+                          {activity.next_action && (
+                            <div className="mt-2 p-2 bg-slate-50 rounded text-xs border border-slate-100">
+                              <span className="font-bold text-blue-600 mr-2">NEXT:</span>
+                              {activity.next_action}
+                            </div>
+                          )}
+                        </div>
                       </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-12 text-slate-500 italic border border-dashed rounded-lg">
+                      No recent activities recorded.
                     </div>
-                  ))
-                ) : (
-                  <div className="text-center py-12 text-slate-500 italic border border-dashed rounded-lg">
-                    No recent activities recorded.
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </Can>
         </div>
       </div>
     </div>

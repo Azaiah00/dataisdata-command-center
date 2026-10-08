@@ -1,5 +1,6 @@
 "use client";
 
+import { Can, useAccess } from "@/components/auth/AccessProvider";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { PIPELINE_STAGES, STAGE_COLORS } from "@/lib/constants";
@@ -113,6 +114,8 @@ function SortableOpportunityCard({ op, onClick }: { op: any; onClick: () => void
 // --- Main Page ---
 
 export default function PipelinePage() {
+  const { can } = useAccess();
+  const canMove = can("pipeline", "edit");
   const [opportunities, setOpportunities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeOp, setActiveOp] = useState<any | null>(null);
@@ -156,6 +159,11 @@ export default function PipelinePage() {
   }, [fetchOpportunities]);
 
   const updateOpportunityStage = async (id: string, newStage: string) => {
+    if (!canMove) {
+      toast.error("You don't have permission to change pipeline stages.");
+      fetchOpportunities();
+      return;
+    }
     // Optimistic update
     setOpportunities((prev) =>
       prev.map((op) => (op.id === id ? { ...op, stage: newStage } : op))
@@ -271,12 +279,14 @@ export default function PipelinePage() {
           <h1 className="text-2xl font-bold text-[#111827]">Pipeline</h1>
           <p className="text-[#6B7280]">Track potential work and weighted revenue forecasts.</p>
         </div>
-        <Link href="/pipeline/new">
-          <Button className="bg-primary hover:bg-primary/90 text-white">
-            <Plus className="w-4 h-4 mr-2" />
-            New Opportunity
-          </Button>
-        </Link>
+        <Can module="pipeline" action="create">
+          <Link href="/pipeline/new">
+            <Button className="bg-primary hover:bg-primary/90 text-white">
+              <Plus className="w-4 h-4 mr-2" />
+              New Opportunity
+            </Button>
+          </Link>
+        </Can>
       </div>
 
       {loading ? (
@@ -285,7 +295,7 @@ export default function PipelinePage() {
         </div>
       ) : (
         <DndContext
-          sensors={sensors}
+          sensors={canMove ? sensors : []}
           collisionDetection={closestCorners}
           onDragStart={onDragStart}
           onDragOver={onDragOver}

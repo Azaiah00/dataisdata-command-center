@@ -4,11 +4,13 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Lock } from "lucide-react";
+import { BrandMark } from "@/components/brand/BrandMark";
+import { AUTH_MODE } from "./AccessProvider";
 
 /** Session storage key. Once set, user stays "verified" until the tab/browser is closed. */
 const PIN_VERIFIED_KEY = "did-pin-verified";
 
-/** Correct 4-digit PIN (temporary until real auth is in place). */
+/** Correct 4-digit PIN (outer gate during the demo-login phase). */
 const CORRECT_PIN = "2345";
 
 interface PinGateProps {
@@ -16,8 +18,8 @@ interface PinGateProps {
 }
 
 /**
- * Shows a 4-digit PIN screen on first visit in a session.
- * After correct PIN, sets sessionStorage so no prompt on refresh until session ends.
+ * Outer gate for the demo-login phase: a 4-digit PIN, then the seat picker.
+ * Automatically disabled when NEXT_PUBLIC_AUTH_MODE=google (real sign-in replaces it).
  */
 export function PinGate({ children }: PinGateProps) {
   const [mounted, setMounted] = useState(false);
@@ -25,9 +27,12 @@ export function PinGate({ children }: PinGateProps) {
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
 
-  // On mount (client-only), check if this session is already verified.
   useEffect(() => {
     setMounted(true);
+    if (AUTH_MODE === "google") {
+      setUnlocked(true);
+      return;
+    }
     if (typeof window !== "undefined" && sessionStorage.getItem(PIN_VERIFIED_KEY) === "true") {
       setUnlocked(true);
     }
@@ -45,7 +50,6 @@ export function PinGate({ children }: PinGateProps) {
     }
   }
 
-  // Avoid hydration mismatch: render nothing until we've read sessionStorage.
   if (!mounted) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -56,17 +60,18 @@ export function PinGate({ children }: PinGateProps) {
 
   if (!unlocked) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="w-full max-w-sm space-y-6">
+      <div className="min-h-screen bg-gradient-to-br from-brand-green-dark via-primary to-brand-green-muted flex items-center justify-center p-4 relative overflow-hidden">
+        <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-white/10 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-32 -right-24 w-[28rem] h-[28rem] rounded-full bg-brand-green-bright/30 blur-3xl pointer-events-none" />
+        <div className="w-full max-w-sm space-y-6 relative rounded-3xl bg-white p-8 shadow-2xl">
           <div className="flex flex-col items-center gap-3">
-            <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
-              <Lock className="w-7 h-7 text-primary" />
-            </div>
+            <BrandMark size={64} rounded="rounded-2xl" />
             <div className="text-center space-y-1">
-              <h1 className="text-xl font-bold text-foreground">Enter PIN</h1>
-              <p className="text-sm text-muted-foreground">
-                Enter your 4-digit PIN to access the Command Center.
-              </p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">DataIsData Command Center</p>
+              <h1 className="text-xl font-bold text-foreground flex items-center justify-center gap-2">
+                <Lock className="w-4 h-4 text-primary" /> Enter PIN
+              </h1>
+              <p className="text-sm text-muted-foreground">Enter the 4-digit team PIN to continue to sign-in.</p>
             </div>
           </div>
 
@@ -88,9 +93,7 @@ export function PinGate({ children }: PinGateProps) {
               autoComplete="off"
               aria-label="4-digit PIN"
             />
-            {error && (
-              <p className="text-sm text-destructive text-center font-medium">{error}</p>
-            )}
+            {error && <p className="text-sm text-destructive text-center font-medium">{error}</p>}
             <Button type="submit" className="w-full h-12" disabled={pin.length !== 4}>
               Unlock
             </Button>

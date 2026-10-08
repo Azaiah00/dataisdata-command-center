@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useAccess } from "@/components/auth/AccessProvider";
 import { formatDate } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -48,6 +49,7 @@ const sourceLinks = {
 };
 
 export default function DocumentsPage() {
+  const { can } = useAccess();
   const [docs, setDocs] = useState<DocEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -57,10 +59,10 @@ export default function DocumentsPage() {
       const allDocs: DocEntry[] = [];
 
       // Engagements
-      const { data: engs } = await supabase
+      const { data: engs } = await (can("engagements") ? supabase
         .from("engagements")
         .select("id, name, attachments, created_at")
-        .not("attachments", "is", null);
+        .not("attachments", "is", null) : Promise.resolve({ data: [] as never[] }));
       (engs || []).forEach((e) =>
         (e.attachments || []).forEach((url: string) =>
           allDocs.push({
@@ -75,10 +77,10 @@ export default function DocumentsPage() {
       );
 
       // Opportunities
-      const { data: opps } = await supabase
+      const { data: opps } = await (can("pipeline") ? supabase
         .from("opportunities")
         .select("id, name, attachments, created_at")
-        .not("attachments", "is", null);
+        .not("attachments", "is", null) : Promise.resolve({ data: [] as never[] }));
       (opps || []).forEach((o) =>
         (o.attachments || []).forEach((url: string) =>
           allDocs.push({
@@ -93,10 +95,10 @@ export default function DocumentsPage() {
       );
 
       // Partners
-      const { data: parts } = await supabase
+      const { data: parts } = await (can("partners") ? supabase
         .from("partners")
         .select("id, name, attachments, created_at")
-        .not("attachments", "is", null);
+        .not("attachments", "is", null) : Promise.resolve({ data: [] as never[] }));
       (parts || []).forEach((p) =>
         (p.attachments || []).forEach((url: string) =>
           allDocs.push({
@@ -111,10 +113,10 @@ export default function DocumentsPage() {
       );
 
       // Activities
-      const { data: acts } = await supabase
+      const { data: acts } = await (can("activities") ? supabase
         .from("activities")
         .select("id, activity_type, summary, attachments, created_at")
-        .not("attachments", "is", null);
+        .not("attachments", "is", null) : Promise.resolve({ data: [] as never[] }));
       (acts || []).forEach((a) =>
         (a.attachments || []).forEach((url: string) =>
           allDocs.push({
@@ -135,7 +137,7 @@ export default function DocumentsPage() {
     }
 
     fetchDocuments();
-  }, []);
+  }, [can]);
 
   const filtered = search
     ? docs.filter(

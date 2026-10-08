@@ -1,5 +1,6 @@
 "use client";
 
+import { Can } from "@/components/auth/AccessProvider";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Contact } from "@/lib/types";
@@ -105,11 +106,13 @@ export default function ContactsPage() {
       accessorKey: "actions",
       cell: (contact: Contact) => (
         <div className="flex justify-end gap-2">
-          <Link href={`/contacts/${contact.id}/edit`}>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-primary hover:bg-primary/10">
-              <Pencil className="w-3.5 h-3.5" />
-            </Button>
-          </Link>
+          <Can module="contacts" action="edit">
+            <Link href={`/contacts/${contact.id}/edit`}>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-primary hover:bg-primary/10">
+                <Pencil className="w-3.5 h-3.5" />
+              </Button>
+            </Link>
+          </Can>
           <Link href={`/contacts/${contact.id}`}>
             <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-white hover:bg-primary">
               <ArrowUpRight className="w-4 h-4" />
@@ -127,12 +130,14 @@ export default function ContactsPage() {
           <h1 className="text-2xl font-bold text-[#111827]">Contacts</h1>
           <p className="text-[#6B7280]">Manage stakeholders and key decision makers.</p>
         </div>
-        <Link href="/contacts/new">
-          <Button className="bg-primary hover:bg-primary/90 text-white">
-            <Plus className="w-4 h-4 mr-2" />
-            New Contact
-          </Button>
-        </Link>
+        <Can module="contacts" action="create">
+          <Link href="/contacts/new">
+            <Button className="bg-primary hover:bg-primary/90 text-white">
+              <Plus className="w-4 h-4 mr-2" />
+              New Contact
+            </Button>
+          </Link>
+        </Can>
       </div>
 
       {loading ? (

@@ -111,7 +111,7 @@ export default function NewAccountPage() {
           status: values.status,
           owner: values.owner,
           notes: values.notes,
-          parent_account_id: values.parent_account_id || null,
+          parent_account_id: values.parent_account_id && values.parent_account_id !== "none" ? values.parent_account_id : null,
         }])
         .select()
         .single();

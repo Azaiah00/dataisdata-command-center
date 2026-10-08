@@ -1,5 +1,7 @@
 "use client";
 
+import { Can } from "@/components/auth/AccessProvider";
+import { EntityFinancePanel } from "@/components/finance/EntityFinancePanel";
 import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -139,32 +141,36 @@ export default function ContractorDetailPage({ params }: { params: Promise<{ id:
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Link href={`/contractors/${id}/edit`}>
-              <Button variant="outline" size="sm" className="border-slate-200 text-slate-700 bg-white">
-                <Pencil className="w-4 h-4 mr-2" /> Edit
-              </Button>
-            </Link>
-            <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="border-red-200 text-red-600 hover:bg-red-50">
-                  <Trash2 className="w-4 h-4 mr-2" /> Delete
+            <Can module="contractors" action="edit">
+              <Link href={`/contractors/${id}/edit`}>
+                <Button variant="outline" size="sm" className="border-slate-200 text-slate-700 bg-white">
+                  <Pencil className="w-4 h-4 mr-2" /> Edit
                 </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Delete Contractor</DialogTitle>
-                  <DialogDescription>
-                    Are you sure you want to delete &quot;{contractor.full_name}&quot;? This cannot be undone.
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} disabled={deleting}>Cancel</Button>
-                  <Button variant="destructive" onClick={onDelete} disabled={deleting}>
-                    {deleting ? "Deleting..." : "Delete"}
+              </Link>
+            </Can>
+            <Can module="contractors" action="delete">
+              <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="border-red-200 text-red-600 hover:bg-red-50">
+                    <Trash2 className="w-4 h-4 mr-2" /> Delete
                   </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Delete Contractor</DialogTitle>
+                    <DialogDescription>
+                      Are you sure you want to delete &quot;{contractor.full_name}&quot;? This cannot be undone.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} disabled={deleting}>Cancel</Button>
+                    <Button variant="destructive" onClick={onDelete} disabled={deleting}>
+                      {deleting ? "Deleting..." : "Delete"}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </Can>
           </div>
         </div>
       </div>
@@ -203,127 +209,133 @@ export default function ContractorDetailPage({ params }: { params: Promise<{ id:
         </Card>
       </div>
 
+      <EntityFinancePanel scope={{ contractorId: id }} title="Placements & pay" />
+
       {/* Linked Engagements */}
-      <Card className="border-none shadow-sm">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-lg font-bold text-[#111827]">
-            Linked Engagements ({managingEngagements ? selectedEngIds.length : engagements.length})
-          </CardTitle>
-          {!managingEngagements ? (
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-slate-200"
-              onClick={() => setManagingEngagements(true)}
-            >
-              <Settings2 className="w-4 h-4 mr-2" /> Manage
-            </Button>
-          ) : (
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                className="bg-blue-600 hover:bg-blue-700"
-                disabled={savingEngagements}
-                onClick={async () => {
-                  setSavingEngagements(true);
-                  // Delete existing links, re-insert selected
-                  await supabase.from("engagement_contractors").delete().eq("contractor_id", id);
-                  if (selectedEngIds.length > 0) {
-                    const rows = selectedEngIds.map((eid) => ({ engagement_id: eid, contractor_id: id }));
-                    await supabase.from("engagement_contractors").insert(rows);
-                  }
-                  setSavingEngagements(false);
-                  setManagingEngagements(false);
-                  toast.success("Engagements updated");
-                  await fetchData();
-                }}
-              >
-                {savingEngagements ? "Saving..." : "Save"}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setSelectedEngIds(engagements.map((e) => e.id));
-                  setManagingEngagements(false);
-                }}
-              >
-                Cancel
-              </Button>
-            </div>
-          )}
-        </CardHeader>
-        <CardContent>
-          {managingEngagements ? (
-            <div className="space-y-4">
-              {/* Currently selected as removable badges */}
-              {selectedEngIds.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {selectedEngIds.map((eid) => {
-                    const eng = allEngagements.find((e) => e.id === eid);
-                    return (
-                      <Badge key={eid} variant="secondary" className="gap-1 px-2 py-1 bg-blue-50 text-blue-800 border-none">
-                        <Briefcase className="w-3 h-3" />
-                        {eng?.name || "Unknown"}
-                        <button
-                          type="button"
-                          className="ml-1 hover:text-red-600"
-                          onClick={() => setSelectedEngIds((prev) => prev.filter((x) => x !== eid))}
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </Badge>
-                    );
-                  })}
-                </div>
-              )}
-              <Select
-                onValueChange={(val) => {
-                  if (!selectedEngIds.includes(val)) {
-                    setSelectedEngIds((prev) => [...prev, val]);
-                  }
-                }}
-                value=""
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Add an engagement..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {allEngagements
-                    .filter((e) => !selectedEngIds.includes(e.id))
-                    .map((e) => (
-                      <SelectItem key={e.id} value={e.id}>
-                        {e.name} ({e.status})
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-[#6B7280]">Add or remove engagement assignments for this contractor.</p>
-            </div>
-          ) : engagements.length > 0 ? (
-            <div className="space-y-3">
-              {engagements.map((eng) => (
-                <Link key={eng.id} href={`/engagements/${eng.id}`}>
-                  <div className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 border border-slate-100 cursor-pointer">
-                    <div className="flex items-center gap-3">
-                      <Briefcase className="w-4 h-4 text-blue-600" />
-                      <div>
-                        <p className="text-sm font-bold text-[#111827]">{eng.name}</p>
-                        <p className="text-xs text-[#6B7280]">{eng.accounts?.name}</p>
-                      </div>
-                    </div>
-                    <Badge className={cn("text-[10px] h-5 px-2 border-none", getStatusColor(eng.status))}>
-                      {eng.status}
-                    </Badge>
+      <Can module="engagements" action="view">
+        <Card className="border-none shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-lg font-bold text-[#111827]">
+              Linked Engagements ({managingEngagements ? selectedEngIds.length : engagements.length})
+            </CardTitle>
+            {!managingEngagements ? (
+              <Can module="contractors" action="edit">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-slate-200"
+                  onClick={() => setManagingEngagements(true)}
+                >
+                  <Settings2 className="w-4 h-4 mr-2" /> Manage
+                </Button>
+              </Can>
+            ) : (
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700"
+                  disabled={savingEngagements}
+                  onClick={async () => {
+                    setSavingEngagements(true);
+                    // Delete existing links, re-insert selected
+                    await supabase.from("engagement_contractors").delete().eq("contractor_id", id);
+                    if (selectedEngIds.length > 0) {
+                      const rows = selectedEngIds.map((eid) => ({ engagement_id: eid, contractor_id: id }));
+                      await supabase.from("engagement_contractors").insert(rows);
+                    }
+                    setSavingEngagements(false);
+                    setManagingEngagements(false);
+                    toast.success("Engagements updated");
+                    await fetchData();
+                  }}
+                >
+                  {savingEngagements ? "Saving..." : "Save"}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setSelectedEngIds(engagements.map((e) => e.id));
+                    setManagingEngagements(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+            )}
+          </CardHeader>
+          <CardContent>
+            {managingEngagements ? (
+              <div className="space-y-4">
+                {/* Currently selected as removable badges */}
+                {selectedEngIds.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {selectedEngIds.map((eid) => {
+                      const eng = allEngagements.find((e) => e.id === eid);
+                      return (
+                        <Badge key={eid} variant="secondary" className="gap-1 px-2 py-1 bg-blue-50 text-blue-800 border-none">
+                          <Briefcase className="w-3 h-3" />
+                          {eng?.name || "Unknown"}
+                          <button
+                            type="button"
+                            className="ml-1 hover:text-red-600"
+                            onClick={() => setSelectedEngIds((prev) => prev.filter((x) => x !== eid))}
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </Badge>
+                      );
+                    })}
                   </div>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-slate-400 italic text-center py-8">No linked engagements.</p>
-          )}
-        </CardContent>
-      </Card>
+                )}
+                <Select
+                  onValueChange={(val) => {
+                    if (!selectedEngIds.includes(val)) {
+                      setSelectedEngIds((prev) => [...prev, val]);
+                    }
+                  }}
+                  value=""
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Add an engagement..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {allEngagements
+                      .filter((e) => !selectedEngIds.includes(e.id))
+                      .map((e) => (
+                        <SelectItem key={e.id} value={e.id}>
+                          {e.name} ({e.status})
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-[#6B7280]">Add or remove engagement assignments for this contractor.</p>
+              </div>
+            ) : engagements.length > 0 ? (
+              <div className="space-y-3">
+                {engagements.map((eng) => (
+                  <Link key={eng.id} href={`/engagements/${eng.id}`}>
+                    <div className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 border border-slate-100 cursor-pointer">
+                      <div className="flex items-center gap-3">
+                        <Briefcase className="w-4 h-4 text-blue-600" />
+                        <div>
+                          <p className="text-sm font-bold text-[#111827]">{eng.name}</p>
+                          <p className="text-xs text-[#6B7280]">{eng.accounts?.name}</p>
+                        </div>
+                      </div>
+                      <Badge className={cn("text-[10px] h-5 px-2 border-none", getStatusColor(eng.status))}>
+                        {eng.status}
+                      </Badge>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-slate-400 italic text-center py-8">No linked engagements.</p>
+            )}
+          </CardContent>
+        </Card>
+      </Can>
     </div>
   );
 }

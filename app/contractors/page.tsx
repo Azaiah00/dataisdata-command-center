@@ -1,5 +1,6 @@
 "use client";
 
+import { Can } from "@/components/auth/AccessProvider";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Contractor } from "@/lib/types";
@@ -75,11 +76,13 @@ export default function ContractorsPage() {
       accessorKey: "actions",
       cell: (c: Contractor) => (
         <div className="flex justify-end gap-2">
-          <Link href={`/contractors/${c.id}/edit`}>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-primary hover:bg-primary/10">
-              <Pencil className="w-3.5 h-3.5" />
-            </Button>
-          </Link>
+          <Can module="contractors" action="edit">
+            <Link href={`/contractors/${c.id}/edit`}>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-primary hover:bg-primary/10">
+                <Pencil className="w-3.5 h-3.5" />
+              </Button>
+            </Link>
+          </Can>
           <Link href={`/contractors/${c.id}`}>
             <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-white hover:bg-primary">
               <ArrowUpRight className="w-4 h-4" />
@@ -97,12 +100,14 @@ export default function ContractorsPage() {
           <h1 className="text-2xl font-bold text-[#111827]">Contractors</h1>
           <p className="text-[#6B7280]">Manage contractors placed at client accounts.</p>
         </div>
-        <Link href="/contractors/new">
-          <Button className="bg-primary hover:bg-primary/90 text-white">
-            <Plus className="w-4 h-4 mr-2" />
-            New Contractor
-          </Button>
-        </Link>
+        <Can module="contractors" action="create">
+          <Link href="/contractors/new">
+            <Button className="bg-primary hover:bg-primary/90 text-white">
+              <Plus className="w-4 h-4 mr-2" />
+              New Contractor
+            </Button>
+          </Link>
+        </Can>
       </div>
 
       {loading ? (

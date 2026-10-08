@@ -1,5 +1,6 @@
 "use client";
 
+import { Can } from "@/components/auth/AccessProvider";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
@@ -57,9 +58,11 @@ export default function ClientIntakeListPage() {
           <h1 className="text-2xl font-bold text-[#111827]">Client Intake</h1>
           <p className="text-[#6B7280]">Assess city/agency interest and readiness.</p>
         </div>
-        <Link href="/innovation/client-intake/new">
-          <Button className="bg-primary hover:bg-primary/90">Open Public Form</Button>
-        </Link>
+        <Can module="client_intake" action="create">
+          <Link href="/innovation/client-intake/new">
+            <Button className="bg-primary hover:bg-primary/90">Open Public Form</Button>
+          </Link>
+        </Can>
       </div>
       {loading ? <p className="text-sm text-[#6B7280]">Loading...</p> : <DataTable columns={columns} data={data} />}
     </div>

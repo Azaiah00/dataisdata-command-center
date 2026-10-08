@@ -1,5 +1,6 @@
 "use client";
 
+import { Can } from "@/components/auth/AccessProvider";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
@@ -163,8 +164,12 @@ export default function VendorApplicationReviewPage() {
             <Input value={reviewer} onChange={(e) => setReviewer(e.target.value)} />
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button onClick={saveReview} variant="outline">Save Review</Button>
-            <Button onClick={approveAndCreatePartner} className="bg-blue-600 hover:bg-blue-700">Approve and Create Partner</Button>
+            <Can module="vendor_applications" action="edit">
+              <Button onClick={saveReview} variant="outline">Save Review</Button>
+            </Can>
+            <Can module="partners" action="create">
+              <Button onClick={approveAndCreatePartner} className="bg-blue-600 hover:bg-blue-700">Approve and Create Partner</Button>
+            </Can>
           </div>
         </CardContent>
       </Card>

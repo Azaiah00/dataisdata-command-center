@@ -1,5 +1,6 @@
 "use client";
 
+import { Can } from "@/components/auth/AccessProvider";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -61,12 +62,16 @@ export default function VendorInquiryPage() {
       accessorKey: "actions",
       cell: (item: Inquiry) => (
         <div className="flex gap-2">
-          <Link href={`/innovation/vendor-application/new?inquiry_id=${item.id}`}>
-            <Button size="sm" variant="outline">View</Button>
-          </Link>
+          <Can module="vendor_applications" action="create">
+            <Link href={`/innovation/vendor-application/new?inquiry_id=${item.id}`}>
+              <Button size="sm" variant="outline">View</Button>
+            </Link>
+          </Can>
+          <Can module="vendor_inquiries" action="create">
           <Button size="sm" className="bg-primary hover:bg-primary/90" onClick={(e) => { e.stopPropagation(); inviteToApply(item); }}>
             Invite to Apply
           </Button>
+          </Can>
         </div>
       ),
     },
@@ -79,9 +84,11 @@ export default function VendorInquiryPage() {
           <h1 className="text-2xl font-bold text-[#111827]">Vendor Inquiries</h1>
           <p className="text-[#6B7280]">Stage 1 of partner enrollment.</p>
         </div>
-        <Link href="/innovation/vendor-inquiry/new">
-          <Button className="bg-primary hover:bg-primary/90">Open Public Form</Button>
-        </Link>
+        <Can module="vendor_inquiries" action="create">
+          <Link href="/innovation/vendor-inquiry/new">
+            <Button className="bg-primary hover:bg-primary/90">Open Public Form</Button>
+          </Link>
+        </Can>
       </div>
       {loading ? <p className="text-sm text-[#6B7280]">Loading...</p> : <DataTable columns={columns} data={data} />}
     </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { Can } from "@/components/auth/AccessProvider";
 import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -29,6 +30,8 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [linkedEngagement, setLinkedEngagement] = useState<{ id: string; name: string } | null>(null);
+  const [converting, setConverting] = useState(false);
 
   useEffect(() => {
     async function fetchOpportunity() {
@@ -42,6 +45,10 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
         setRelatedAccounts([]);
       } else {
         setOpportunity(data);
+        if (data.stage === "Awarded" && data.account_id) {
+          const { data: eng } = await supabase.from("engagements").select("id, name").eq("account_id", data.account_id).eq("name", data.name).limit(1);
+          setLinkedEngagement(eng && eng[0] ? eng[0] : null);
+        }
 
         if (data.related_account_ids && data.related_account_ids.length > 0) {
           const { data: related, error: relatedError } = await supabase
@@ -62,6 +69,33 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
     }
     fetchOpportunity();
   }, [id]);
+
+  /** Awarded work becomes an engagement so delivery, billing and finance pick it up. */
+  async function convertToEngagement() {
+    if (!opportunity) return;
+    setConverting(true);
+    const { data, error } = await supabase
+      .from("engagements")
+      .insert({
+        name: opportunity.name,
+        account_id: opportunity.account_id,
+        engagement_type: opportunity.service_line || "Advisory",
+        status: "Planned",
+        start_date: opportunity.expected_start || null,
+        end_date: opportunity.expected_end || null,
+        contract_value: opportunity.estimated_value ?? null,
+        scope_summary: [opportunity.notes, opportunity.funding_source ? `Funding: ${opportunity.funding_source}` : null].filter(Boolean).join("\n\n") || null,
+      })
+      .select("id, name")
+      .single();
+    setConverting(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Engagement created from the awarded opportunity");
+    router.push(`/engagements/${data.id}`);
+  }
 
   async function onDelete() {
     setDeleting(true);
@@ -162,35 +196,53 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Link href={`/pipeline/${id}/edit`}>
-              <Button variant="outline" size="sm" className="border-slate-200">
-                <Pencil className="w-4 h-4 mr-2" /> Edit
-              </Button>
-            </Link>
-            <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="border-red-200 text-red-600 hover:bg-red-50">
-                  <Trash2 className="w-4 h-4 mr-2" /> Delete
+          <div className="flex flex-wrap items-center gap-2">
+            {opportunity.stage === "Awarded" &&
+              (linkedEngagement ? (
+                <Link href={`/engagements/${linkedEngagement.id}`}>
+                  <Button variant="outline" size="sm">
+                    View engagement
+                  </Button>
+                </Link>
+              ) : (
+                <Can module="engagements" action="create">
+                  <Button size="sm" onClick={convertToEngagement} disabled={converting}>
+                    {converting ? "Creating…" : "Convert to engagement"}
+                  </Button>
+                </Can>
+              ))}
+            <Can module="pipeline" action="edit">
+              <Link href={`/pipeline/${id}/edit`}>
+                <Button variant="outline" size="sm" className="border-slate-200">
+                  <Pencil className="w-4 h-4 mr-2" /> Edit
                 </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Delete this opportunity?</DialogTitle>
-                  <DialogDescription>
-                    This will permanently delete &quot;{opportunity.name}&quot;. This cannot be undone.
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
-                    Cancel
+              </Link>
+            </Can>
+            <Can module="pipeline" action="delete">
+              <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="border-red-200 text-red-600 hover:bg-red-50">
+                    <Trash2 className="w-4 h-4 mr-2" /> Delete
                   </Button>
-                  <Button variant="destructive" disabled={deleting} onClick={onDelete}>
-                    {deleting ? "Deleting..." : "Delete"}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Delete this opportunity?</DialogTitle>
+                    <DialogDescription>
+                      This will permanently delete &quot;{opportunity.name}&quot;. This cannot be undone.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button variant="destructive" disabled={deleting} onClick={onDelete}>
+                      {deleting ? "Deleting..." : "Delete"}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </Can>
           </div>
         </div>
       </div>

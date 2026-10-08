@@ -105,8 +105,8 @@ function ActivityForm() {
     // Convert empty strings to null for UUID fields
     const payload = {
       ...values,
-      engagement_id: values.engagement_id || null,
-      opportunity_id: values.opportunity_id || null,
+      engagement_id: values.engagement_id && values.engagement_id !== "none" ? values.engagement_id : null,
+      opportunity_id: values.opportunity_id && values.opportunity_id !== "none" ? values.opportunity_id : null,
       next_action_due: values.next_action_due || null,
       attachments: values.attachments?.length ? values.attachments : null,
     };

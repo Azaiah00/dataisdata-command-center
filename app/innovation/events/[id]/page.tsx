@@ -1,5 +1,6 @@
 "use client";
 
+import { Can } from "@/components/auth/AccessProvider";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
@@ -115,7 +116,9 @@ export default function EventDetailPage() {
               <option>Strategic Partner</option>
             </select>
             <Input placeholder="Fee" value={fee} onChange={(e) => setFee(e.target.value)} />
-            <Button onClick={addVendor} className="bg-blue-600 hover:bg-blue-700">Add Vendor</Button>
+            <Can module="events" action="edit">
+              <Button onClick={addVendor} className="bg-blue-600 hover:bg-blue-700">Add Vendor</Button>
+            </Can>
           </div>
           <div className="space-y-2">
             {eventVendors.length === 0 && <p className="text-sm text-[#6B7280]">No vendors added yet.</p>}
@@ -134,7 +137,11 @@ export default function EventDetailPage() {
         <CardContent className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div><Label>Leads Generated</Label><Input value={leads} onChange={(e) => setLeads(e.target.value)} /></div>
           <div><Label>Revenue Generated</Label><Input value={revenue} onChange={(e) => setRevenue(e.target.value)} /></div>
-          <div className="pt-6"><Button onClick={updateMetrics} className="w-full bg-blue-600 hover:bg-blue-700">Save Metrics</Button></div>
+          <div className="pt-6">
+            <Can module="events" action="edit">
+              <Button onClick={updateMetrics} className="w-full bg-blue-600 hover:bg-blue-700">Save Metrics</Button>
+            </Can>
+          </div>
         </CardContent>
       </Card>
     </div>

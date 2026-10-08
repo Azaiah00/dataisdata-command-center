@@ -1,5 +1,7 @@
 "use client";
 
+import { Can } from "@/components/auth/AccessProvider";
+import { EntityFinancePanel } from "@/components/finance/EntityFinancePanel";
 import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -277,43 +279,47 @@ export default function EngagementDetailPage({
             </div>
           </div>
           <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-slate-200"
-                onClick={() => setIsEditing(!isEditing)}
-              >
-                <Pencil className="w-4 h-4 mr-2" />
-                {isEditing ? "Cancel" : "Edit"}
-              </Button>
-              <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="border-red-200 text-red-600 hover:bg-red-50">
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Delete
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Delete this project?</DialogTitle>
-                    <DialogDescription>
-                      This will permanently delete &quot;{engagement.name}&quot;. Related activities will be unlinked. This cannot be undone.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <DialogFooter>
-                    <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
-                      Cancel
+              <Can module="engagements" action="edit">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-slate-200"
+                  onClick={() => setIsEditing(!isEditing)}
+                >
+                  <Pencil className="w-4 h-4 mr-2" />
+                  {isEditing ? "Cancel" : "Edit"}
+                </Button>
+              </Can>
+              <Can module="engagements" action="delete">
+                <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm" className="border-red-200 text-red-600 hover:bg-red-50">
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Delete
                     </Button>
-                    <Button
-                      variant="destructive"
-                      disabled={deleting}
-                      onClick={onDelete}
-                    >
-                      {deleting ? "Deleting..." : "Delete project"}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Delete this project?</DialogTitle>
+                      <DialogDescription>
+                        This will permanently delete &quot;{engagement.name}&quot;. Related activities will be unlinked. This cannot be undone.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        disabled={deleting}
+                        onClick={onDelete}
+                      >
+                        {deleting ? "Deleting..." : "Delete project"}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </Can>
           </div>
         </div>
       </div>
@@ -551,8 +557,8 @@ export default function EngagementDetailPage({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card className="border-none shadow-sm">
             <CardHeader>
-              <CardTitle className="text-lg font-bold text-[#111827]">Financials</CardTitle>
-              <CardDescription>Budget and contract value</CardDescription>
+              <CardTitle className="text-lg font-bold text-[#111827]">Contract</CardTitle>
+              <CardDescription>Contract value, budget and planned margin</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center py-2 border-b border-slate-100">
@@ -600,6 +606,8 @@ export default function EngagementDetailPage({
         </div>
       )}
 
+      {!isEditing && <EntityFinancePanel scope={{ engagementId: engagement.id, contractValue: engagement.contract_value }} title="Billing, costs & placements" />}
+
       {!isEditing && engagement.scope_summary && (
         <Card className="border-none shadow-sm">
           <CardHeader>
@@ -636,32 +644,34 @@ export default function EngagementDetailPage({
       )}
 
       {!isEditing && linkedContractors.length > 0 && (
-        <Card className="border-none shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-lg font-bold text-[#111827]">
-              Assigned Contractors ({linkedContractors.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {linkedContractors.map((c) => (
-                <Link key={c.id} href={`/contractors/${c.id}`}>
-                  <div className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 border border-slate-100 cursor-pointer">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
-                        <HardHat className="w-4 h-4 text-amber-700" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-[#111827]">{c.full_name}</p>
-                        <p className="text-xs text-[#6B7280]">{c.title_role || "Contractor"}</p>
+        <Can module="contractors" action="view">
+          <Card className="border-none shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-lg font-bold text-[#111827]">
+                Assigned Contractors ({linkedContractors.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {linkedContractors.map((c) => (
+                  <Link key={c.id} href={`/contractors/${c.id}`}>
+                    <div className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 border border-slate-100 cursor-pointer">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
+                          <HardHat className="w-4 h-4 text-amber-700" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-[#111827]">{c.full_name}</p>
+                          <p className="text-xs text-[#6B7280]">{c.title_role || "Contractor"}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                  </Link>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </Can>
       )}
     </div>
   );

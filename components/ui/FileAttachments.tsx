@@ -22,10 +22,11 @@ export function FileAttachments({ value, onChange, disabled, label = "Attachment
     if (!files?.length) return;
     setUploading(true);
     try {
+      const added: string[] = [];
       for (let i = 0; i < files.length; i++) {
-        const url = await uploadAttachment(files[i]);
-        onChange([...value, url]);
+        added.push(await uploadAttachment(files[i]));
       }
+      onChange([...value, ...added]);
       toast.success("File(s) added");
     } catch (err: any) {
       toast.error(err.message || "Upload failed");

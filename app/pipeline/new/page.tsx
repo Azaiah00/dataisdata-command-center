@@ -107,7 +107,7 @@ function OpportunityForm() {
       related_account_ids: values.related_account_ids?.length
         ? values.related_account_ids
         : null,
-      primary_contact_id: values.primary_contact_id || null,
+      primary_contact_id: values.primary_contact_id && values.primary_contact_id !== "none" ? values.primary_contact_id : null,
       expected_start: values.expected_start || null,
       expected_end: values.expected_end || null,
       next_step_due: values.next_step_due || null,

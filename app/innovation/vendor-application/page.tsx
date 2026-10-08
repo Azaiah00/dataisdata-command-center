@@ -1,5 +1,6 @@
 "use client";
 
+import { Can } from "@/components/auth/AccessProvider";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
@@ -57,9 +58,11 @@ export default function VendorApplicationListPage() {
           <h1 className="text-2xl font-bold text-[#111827]">Vendor Applications</h1>
           <p className="text-[#6B7280]">Stage 2 and 3 of partner enrollment.</p>
         </div>
-        <Link href="/innovation/vendor-application/new">
-          <Button className="bg-primary hover:bg-primary/90">New Application</Button>
-        </Link>
+        <Can module="vendor_applications" action="create">
+          <Link href="/innovation/vendor-application/new">
+            <Button className="bg-primary hover:bg-primary/90">New Application</Button>
+          </Link>
+        </Can>
       </div>
       {loading ? <p className="text-sm text-[#6B7280]">Loading...</p> : <DataTable columns={columns} data={data} />}
     </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { Can } from "@/components/auth/AccessProvider";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Account } from "@/lib/types";
@@ -111,12 +112,14 @@ export default function AccountsPage() {
           <h1 className="text-2xl font-bold text-[#111827]">Accounts</h1>
           <p className="text-[#6B7280]">Manage your public-sector clients and partners.</p>
         </div>
-        <Link href="/accounts/new">
-          <Button className="bg-primary hover:bg-primary/90 text-white">
-            <Plus className="w-4 h-4 mr-2" />
-            New Account
-          </Button>
-        </Link>
+        <Can module="accounts" action="create">
+          <Link href="/accounts/new">
+            <Button className="bg-primary hover:bg-primary/90 text-white">
+              <Plus className="w-4 h-4 mr-2" />
+              New Account
+            </Button>
+          </Link>
+        </Can>
       </div>
 
       {loading ? (
