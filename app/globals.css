@@ -134,13 +134,19 @@
 }
 
 /* Phones: iOS Safari zooms the whole page when you tap a field with text under 16px.
-   Kept outside @layer so it wins over utilities like text-sm. Tablets/desktop are unaffected. */
+   Only bumps fields that use small text (text-xs / text-sm), so big fields like the PIN keep their size.
+   Kept outside @layer so it wins over those utilities. Tablets/desktop are unaffected. */
 @media (max-width: 767px) {
-  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
-  select,
-  textarea {
+  :is(input, select, textarea):is(.text-xs, .text-sm) {
     font-size: 16px;
   }
+}
+
+/* Keep the screen steady on phones: nothing can make the page slide sideways.
+   "clip" (not "hidden") so sticky/fixed headers keep working. Wide tables still scroll inside their own box. */
+html,
+body {
+  overflow-x: clip;
 }
 
 /* Brand scrollbars (deep green thumb on a soft green track) */

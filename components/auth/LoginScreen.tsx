@@ -47,7 +47,9 @@ function GoogleIcon() {
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen grid lg:grid-cols-[1.05fr_1fr] bg-background">
+    // grid-cols-1 gives phones a column that can shrink. Without it the column grows to the
+    // longest seat title and the page slides sideways.
+    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] bg-background">
       <div className="hidden lg:flex relative flex-col justify-between overflow-hidden bg-gradient-to-br from-brand-green-dark via-primary to-brand-green-muted p-12 text-white">
         <div className="absolute -top-32 -left-32 w-[30rem] h-[30rem] rounded-full bg-white/10 blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 right-0 w-[26rem] h-[26rem] rounded-full bg-brand-green-bright/30 blur-3xl pointer-events-none" />
@@ -65,8 +67,8 @@ function Shell({ children }: { children: React.ReactNode }) {
         </div>
         <p className="relative text-xs text-white/60">Access is managed per seat. Contact an administrator for changes.</p>
       </div>
-      <div className="flex items-center justify-center p-6 sm:p-10">
-        <div className="w-full max-w-md space-y-8">
+      <div className="min-w-0 flex items-center justify-center p-5 sm:p-10">
+        <div className="w-full min-w-0 max-w-md space-y-8">
           <div className="lg:hidden flex items-center gap-3">
             <BrandMark size={40} rounded="rounded-xl" />
             <span className="text-2xl font-bold font-mono tracking-tight">DataIsData</span>
@@ -107,7 +109,8 @@ export function LoginScreen() {
         <Button
           type="button"
           variant="outline"
-          className="w-full h-12 rounded-xl text-base gap-3"
+          // h-auto + flex-wrap: on very narrow phones the "Coming next" badge wraps instead of spilling out.
+          className="w-full h-auto min-h-12 py-2 flex-wrap whitespace-normal rounded-xl text-base gap-x-3 gap-y-1"
           disabled={authMode !== "google"}
           onClick={() => {
             setBusy("google");
@@ -170,8 +173,8 @@ export function LoginScreen() {
                   {initials(u.full_name)}
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="flex items-center gap-2">
-                    <span className="font-semibold text-foreground truncate">{u.full_name}</span>
+                  <span className="flex items-center gap-2 min-w-0">
+                    <span className="min-w-0 font-semibold text-foreground truncate">{u.full_name}</span>
                     <RoleBadge role={u.seat_role} />
                   </span>
                   <span className="block text-xs text-muted-foreground truncate">
