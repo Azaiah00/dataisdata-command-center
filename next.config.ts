@@ -12,6 +12,9 @@ const nextConfig: NextConfig = {
   // Keep them out of the server bundle so the server never compiles jsPDF's
   // Node build and its canvg/@babel/runtime dependency chain.
   serverExternalPackages: ["jspdf", "jspdf-autotable", "canvg"],
+  // Hide the floating Next.js "N" dev-tools button (bottom-left, dev mode only).
+  // Build errors still show as a full-screen overlay.
+  devIndicators: false,
 };
 
 export default nextConfig;

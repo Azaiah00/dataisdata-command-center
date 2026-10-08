@@ -189,11 +189,12 @@ function OpportunityForm() {
                   )}
                 />
 
+                {/* FormItem is a grid; grid-cols-1 + min-w-0 let it shrink so long account-name chips truncate instead of overflowing on phones. */}
                 <FormField
                   control={form.control}
                   name="related_account_ids"
                   render={({ field }) => (
-                    <FormItem className="md:col-span-2">
+                    <FormItem className="md:col-span-2 min-w-0 grid-cols-1">
                       <FormLabel>Additional Accounts (optional)</FormLabel>
                       <FormControl>
                         <div className="flex flex-wrap gap-2">

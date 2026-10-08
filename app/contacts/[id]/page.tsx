@@ -80,20 +80,22 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
-      <div className="flex items-center gap-4">
+      {/* flex-wrap lets the action buttons drop below the name on phones instead of pushing the page wider. */}
+      <div className="flex flex-wrap items-center gap-4">
         <Button variant="ghost" size="icon" onClick={() => window.history.back()}>
           <ChevronLeft className="w-5 h-5" />
         </Button>
-        <div className="flex-1">
-          <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900">{contact.full_name}</h1>
+        {/* 14rem base width: when the name and buttons can't share a row, the buttons wrap below instead of squeezing the name. */}
+        <div className="flex-[1_1_14rem] min-w-0">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">{contact.full_name}</h1>
             <Badge className={cn("font-medium border-none", healthColors[contact.relationship_health])}>
               {contact.relationship_health} Relationship
             </Badge>
           </div>
           <p className="text-slate-500 mt-1">{contact.title_role} at {contact.accounts?.name}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Can module="contacts" action="edit">
             <Link href={`/contacts/${id}/edit`}>
               <Button variant="outline">Edit Contact</Button>

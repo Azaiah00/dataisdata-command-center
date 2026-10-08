@@ -190,11 +190,12 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
       <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex items-start gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center text-white">
+            <div className="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center text-white shrink-0">
               <Building2 className="w-8 h-8" />
             </div>
-            <div>
-              <div className="flex items-center gap-3">
+            <div className="min-w-0">
+              {/* flex-wrap lets the status badge drop under long account names on phones. */}
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                 <h1 className="text-2xl font-bold text-[#111827]">{account.name}</h1>
                 <Badge className={cn("font-medium border-none text-[10px] h-5 px-2", getStatusColor(account.status))}>
                   {account.status}
@@ -218,7 +219,7 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Can module="accounts" action="edit">
               <Link href={`/accounts/${id}/edit`}>
                 <Button variant="outline" className="border-slate-200 text-slate-700 bg-white">

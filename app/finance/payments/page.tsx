@@ -84,12 +84,13 @@ export default function PaymentsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      {/* Stack title and buttons on phones (same pattern as the Invoices page). */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Payments</h1>
           <p className="text-muted-foreground">All payments received against invoices.</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
         <PdfButton
           onExport={() =>
             exportListPdf({

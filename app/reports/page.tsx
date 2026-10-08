@@ -298,7 +298,8 @@ export default function ReportsPage() {
             <CardContent className="space-y-4">
               {pipelineByStage.map((item) => (
                 <div key={item.stage} className="space-y-1.5">
-                  <div className="flex items-center justify-between text-sm">
+                  {/* flex-wrap moves large dollar totals onto their own line on narrow phones. */}
+                  <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-sm">
                     <div className="flex items-center gap-2">
                       <div className={cn("w-2.5 h-2.5 rounded-full", stageColors[item.stage] || "bg-gray-400")} />
                       <span className="font-medium text-[#111827]">{item.stage}</span>
@@ -336,7 +337,7 @@ export default function ReportsPage() {
               {engagementsByStatus.length > 0 ? (
                 <div className="space-y-3">
                   {engagementsByStatus.map((item) => (
-                    <div key={item.status} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 border border-gray-100">
+                    <div key={item.status} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 p-3 rounded-lg bg-gray-50 border border-gray-100">
                       <div className="flex items-center gap-3">
                         <Badge className={cn("text-[10px] h-5 px-2 border-none", getStatusColor(item.status))}>
                           {item.status}
