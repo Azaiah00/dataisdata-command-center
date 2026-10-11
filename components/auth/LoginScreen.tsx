@@ -49,8 +49,8 @@ function Shell({ children }: { children: React.ReactNode }) {
   return (
     // grid-cols-1 gives phones a column that can shrink. Without it the column grows to the
     // longest seat title and the page slides sideways.
-    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] bg-background">
-      <div className="hidden lg:flex relative flex-col justify-between overflow-hidden bg-gradient-to-br from-brand-green-dark via-primary to-brand-green-muted p-12 text-white">
+    <div className="min-h-screen w-full grid grid-cols-1 md:grid-cols-[1.05fr_1fr] bg-background">
+      <div className="hidden md:flex relative flex-col justify-between overflow-hidden bg-gradient-to-br from-brand-green-dark via-primary to-brand-green-muted p-12 text-white">
         <div className="absolute -top-32 -left-32 w-[30rem] h-[30rem] rounded-full bg-white/10 blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 right-0 w-[26rem] h-[26rem] rounded-full bg-brand-green-bright/30 blur-3xl pointer-events-none" />
         <div className="relative flex items-center gap-3">
@@ -67,9 +67,9 @@ function Shell({ children }: { children: React.ReactNode }) {
         </div>
         <p className="relative text-xs text-white/60">Access is managed per seat. Contact an administrator for changes.</p>
       </div>
-      <div className="min-w-0 flex items-center justify-center p-5 sm:p-10">
-        <div className="w-full min-w-0 max-w-md space-y-8">
-          <div className="lg:hidden flex items-center gap-3">
+      <div className="min-w-0 w-full flex items-center justify-center p-5 sm:p-10">
+        <div className="w-full min-w-0 max-w-md md:max-w-lg space-y-8">
+          <div className="md:hidden flex items-center gap-3">
             <BrandMark size={40} rounded="rounded-xl" />
             <span className="text-2xl font-bold font-mono tracking-tight">DataIsData</span>
           </div>

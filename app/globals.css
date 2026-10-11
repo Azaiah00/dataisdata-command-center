@@ -142,11 +142,19 @@
   }
 }
 
-/* Keep the screen steady on phones: nothing can make the page slide sideways.
-   "clip" (not "hidden") so sticky/fixed headers keep working. Wide tables still scroll inside their own box. */
+/* Full width on every screen size — layout follows the browser window, not a fixed phone width. */
 html,
 body {
-  overflow-x: clip;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Phones only: stop sideways wobble. Desktop/tablet keep normal overflow so resizing feels natural. */
+@media (max-width: 767px) {
+  html,
+  body {
+    overflow-x: clip;
+  }
 }
 
 /* Brand scrollbars (deep green thumb on a soft green track) */

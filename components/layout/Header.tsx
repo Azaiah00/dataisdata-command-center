@@ -280,7 +280,7 @@ export function Header() {
             <span className="text-xl font-bold text-foreground tracking-tight hidden sm:block font-mono">DataIsData</span>
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="hidden md:flex items-center gap-1">
             {showDashboard && <NavLink href="/" label="Dashboard" icon={LayoutDashboard} active={pathname === "/"} />}
             {sections.map((section) => {
               const active = section.prefixes.some((p) => pathname === p || pathname?.startsWith(p + "/"));
@@ -405,7 +405,7 @@ export function Header() {
           {/* Mobile Menu Trigger */}
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden text-muted-foreground" aria-label="Open menu">
+              <Button variant="ghost" size="icon" className="md:hidden text-muted-foreground" aria-label="Open menu">
                 <Menu className="w-6 h-6" />
               </Button>
             </SheetTrigger>

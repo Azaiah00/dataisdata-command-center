@@ -17,6 +17,7 @@ export const SEED_IDS = {
   tony: "a1000000-0000-4000-8000-000000000001",
   azaiah: "a1000000-0000-4000-8000-000000000002",
   john: "a1000000-0000-4000-8000-000000000003",
+  pc: "a1000000-0000-4000-8000-000000000004",
 } as const;
 
 const now = () => new Date().toISOString();
@@ -67,6 +68,21 @@ export const SEED_USERS: PortalUser[] = [
     created_at: "2026-10-07T00:00:00.000Z",
     updated_at: "2026-10-07T00:00:00.000Z",
   },
+  {
+    id: SEED_IDS.pc,
+    email: null,
+    full_name: "PC",
+    title: "Consultant",
+    organization: "DataIsData",
+    seat_role: "member",
+    status: "active",
+    scope_mode: "all",
+    hidden_modules: [],
+    auth_user_id: null,
+    last_login_at: null,
+    created_at: "2026-10-11T00:00:00.000Z",
+    updated_at: "2026-10-11T00:00:00.000Z",
+  },
 ];
 
 export const DEFAULT_SETTINGS: PortalSettings = { seat_limit: 10, organization_name: "DataIsData" };
@@ -81,6 +97,8 @@ interface LocalDb {
   scopes: { user_id: string; account_id: string }[];
   audit: AuditEntry[];
   settings: PortalSettings;
+  /** Seed seats an admin removed, so they are not re-added on the next read. */
+  deleted_ids?: string[];
 }
 
 function readLocal(): LocalDb {
@@ -88,7 +106,12 @@ function readLocal(): LocalDb {
     const raw = typeof window !== "undefined" ? localStorage.getItem(LOCAL_KEY) : null;
     if (raw) {
       const parsed = JSON.parse(raw) as LocalDb;
-      if (parsed && Array.isArray(parsed.users)) return { ...parsed, settings: parsed.settings || DEFAULT_SETTINGS };
+      if (parsed && Array.isArray(parsed.users)) {
+        // Seats added to SEED_USERS after this browser first saved its data.
+        const deleted = new Set(parsed.deleted_ids || []);
+        const missing = SEED_USERS.filter((s) => !deleted.has(s.id) && !parsed.users.some((u) => u.id === s.id));
+        return { ...parsed, users: [...parsed.users, ...missing], settings: parsed.settings || DEFAULT_SETTINGS };
+      }
     }
   } catch {
     /* corrupted local store — start fresh */
@@ -303,6 +326,7 @@ export async function deleteUser(id: string): Promise<void> {
     db.users = db.users.filter((u) => u.id !== id);
     db.permissions = db.permissions.filter((p) => p.user_id !== id);
     db.scopes = db.scopes.filter((s) => s.user_id !== id);
+    db.deleted_ids = [...(db.deleted_ids || []), id];
     writeLocal(db);
     return;
   }
