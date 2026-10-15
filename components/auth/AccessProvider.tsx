@@ -11,6 +11,7 @@ import {
   loadPermissions,
   loadScopes,
   loadUsers,
+  loadPartnerLink,
   logAudit,
   touchLogin,
   updateUser,
@@ -44,6 +45,8 @@ interface AccessContextValue {
   isRealAdmin: boolean;
   isRealOwner: boolean;
   scopedAccountIds: string[] | null;
+  /** Vendor logins: the partner the effective seat belongs to. */
+  partnerId: string | null;
   can: (module: ModuleKey, action?: Action) => boolean;
   /** can view AND not hidden in the user's personal "My View". */
   canSee: (module: ModuleKey) => boolean;
@@ -96,6 +99,7 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
   const [effectiveUser, setEffectiveUser] = useState<PortalUser | null>(null);
   const [permissions, setPermissions] = useState<PermissionMap>({});
   const [scopedAccountIds, setScopedAccountIds] = useState<string[] | null>(null);
+  const [partnerId, setPartnerId] = useState<string | null>(null);
   const [previewId, setPreviewId] = useState<string | null>(null);
   const [unauthorizedEmail, setUnauthorizedEmail] = useState<string | null>(null);
   const [storageMode, setStorageMode] = useState<StorageMode>("local");
@@ -187,6 +191,7 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
       // 4) Permissions + scope of the effective user (applied only if this load is still current)
       const rows = hasFullAccess(target) ? [] : await loadPermissions(target.id);
       const resolved = await resolveScopeFor(target);
+      const linkedPartner = target.seat_role === "guest" ? await loadPartnerLink(target.id) : null;
       if (seq !== loadSeq.current) return;
       if (resolved.accountIds) {
         const ids = resolved.accountIds;
@@ -200,6 +205,7 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
         setDataScope(EMPTY_SCOPE);
       }
       setScopedAccountIds(resolved.accountIds);
+      setPartnerId(linkedPartner);
 
       setRealUser(me);
       setEffectiveUser(target);
@@ -292,6 +298,7 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
     setRealUser(null);
     setEffectiveUser(null);
     setPermissions({});
+    setPartnerId(null);
     setPreviewId(null);
     setStatus("signedOut");
   }, []);
@@ -353,6 +360,7 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
       isRealAdmin: hasFullAccess(realUser),
       isRealOwner: realUser?.seat_role === "owner",
       scopedAccountIds,
+      partnerId,
       can,
       canSee,
       firstAccessiblePath,
@@ -376,6 +384,7 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
       permissions,
       previewId,
       scopedAccountIds,
+      partnerId,
       can,
       canSee,
       firstAccessiblePath,

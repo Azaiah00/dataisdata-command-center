@@ -48,6 +48,9 @@ import {
   Eye,
   Repeat,
   X,
+  Layers,
+  SquareKanban,
+  Landmark,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAccess } from "@/components/auth/AccessProvider";
@@ -90,6 +93,8 @@ const financeItems: NavItem[] = [
 ];
 
 const innovationItems: NavItem[] = [
+  { path: "/innovation/exchange", label: "Vendor & Event Module", icon: Layers, module: "innovation_exchange" },
+  { path: "/innovation/vendor-pipeline", label: "Vendor Pipeline", icon: SquareKanban, module: "vendor_inquiries" },
   { path: "/innovation", label: "Executive Portfolio", icon: Rocket, module: "innovation_portfolio" },
   { path: "/innovation/maturity", label: "Maturity Index", icon: Gauge, module: "innovation_maturity" },
   { path: "/innovation/vendor-inquiry", label: "Vendor Inquiries", icon: ClipboardList, module: "vendor_inquiries" },
@@ -103,12 +108,18 @@ const insightItems: NavItem[] = [
   { path: "/documents", label: "Documents", icon: FolderOpen, module: "documents" },
 ];
 
+const portalItems: NavItem[] = [
+  { path: "/portal/city", label: "My Innovation Portal", icon: Landmark, module: "client_portal" },
+  { path: "/portal/partner", label: "My Partner Portal", icon: Handshake, module: "partner_portal" },
+];
+
 const SECTIONS: { label: string; items: NavItem[]; prefixes: string[] }[] = [
   { label: "CRM", items: crmItems, prefixes: ["/accounts", "/contacts", "/partners", "/contractors"] },
   { label: "Work", items: workItems, prefixes: ["/engagements", "/activities", "/pipeline"] },
   { label: "Finance", items: financeItems, prefixes: ["/finance"] },
   { label: "Innovation", items: innovationItems, prefixes: ["/innovation"] },
   { label: "Insights", items: insightItems, prefixes: ["/reports", "/documents"] },
+  { label: "My Portal", items: portalItems, prefixes: ["/portal"] },
 ];
 
 function isActivePath(pathname: string | null, path: string) {
@@ -146,7 +157,10 @@ export function Header() {
   const [searchLoading, setSearchLoading] = useState(false);
   const searchContainerRef = useRef<HTMLDivElement | null>(null);
 
-  const sections = SECTIONS.map((s) => ({ ...s, items: s.items.filter((i) => canSee(i.module)) })).filter((s) => s.items.length);
+  // "My Portal" is for outside city / vendor logins; the team reaches portals through Preview.
+  const sections = SECTIONS.map((s) => ({ ...s, items: s.items.filter((i) => canSee(i.module)) }))
+    .filter((s) => s.items.length)
+    .filter((s) => s.label !== "My Portal" || user?.seat_role === "guest");
   const showDashboard = canSee("dashboard");
 
   const searchable = {
@@ -280,7 +294,7 @@ export function Header() {
             <span className="text-xl font-bold text-foreground tracking-tight hidden sm:block font-mono">DataIsData</span>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-1">
             {showDashboard && <NavLink href="/" label="Dashboard" icon={LayoutDashboard} active={pathname === "/"} />}
             {sections.map((section) => {
               const active = section.prefixes.some((p) => pathname === p || pathname?.startsWith(p + "/"));
@@ -317,13 +331,13 @@ export function Header() {
 
         {/* Right: Actions & Mobile Menu */}
         <div className="flex items-center gap-2">
-          {canSearch && searchBox("hidden md:flex w-40 lg:w-64")}
+          {canSearch && searchBox("hidden xl:flex w-56 2xl:w-64")}
 
           {canSearch && (
             <Button
               variant="ghost"
               size="icon"
-              className="text-muted-foreground md:hidden"
+              className="text-muted-foreground xl:hidden"
               aria-label="Search"
               onClick={() => setMobileSearchOpen((v) => !v)}
             >
@@ -337,7 +351,7 @@ export function Header() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center gap-2 p-1 pl-2 rounded-full hover:bg-muted" aria-label="Account menu">
-                <div className="hidden sm:flex flex-col items-end text-right">
+                <div className="hidden sm:flex lg:hidden xl:flex flex-col items-end text-right">
                   <span className="text-xs font-semibold text-foreground leading-none">{realUser?.full_name}</span>
                   <span className="text-[10px] text-muted-foreground mt-0.5">
                     {realUser ? ROLE_LABELS[realUser.seat_role] : ""}
@@ -405,7 +419,7 @@ export function Header() {
           {/* Mobile Menu Trigger */}
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden text-muted-foreground" aria-label="Open menu">
+              <Button variant="ghost" size="icon" className="lg:hidden text-muted-foreground" aria-label="Open menu">
                 <Menu className="w-6 h-6" />
               </Button>
             </SheetTrigger>
@@ -451,7 +465,7 @@ export function Header() {
         </div>
       </div>
       {mobileSearchOpen && canSearch && (
-        <div className="md:hidden absolute top-16 left-0 right-0 bg-white border-b border-border p-3 shadow-sm">
+        <div className="xl:hidden absolute top-16 left-0 right-0 bg-white border-b border-border p-3 shadow-sm">
           {searchBox("flex w-full")}
         </div>
       )}

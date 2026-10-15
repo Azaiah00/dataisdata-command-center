@@ -44,7 +44,7 @@ export default function VendorApplicationListPage() {
       header: "Actions",
       accessorKey: "actions",
       cell: (item: VendorApplicationRow) => (
-        <Link href={`/innovation/vendor-application/${item.id}`}>
+        <Link href={item.inquiry_id ? `/innovation/vendor-pipeline/${item.inquiry_id}` : `/innovation/vendor-application/${item.id}`}>
           <Button size="sm" className="bg-primary hover:bg-primary/90">Review</Button>
         </Link>
       ),
@@ -56,7 +56,7 @@ export default function VendorApplicationListPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-[#111827]">Vendor Applications</h1>
-          <p className="text-[#6B7280]">Stage 2 and 3 of partner enrollment.</p>
+          <p className="text-[#6B7280]">Stage 2 and 3 of partner enrollment. Invited vendors now apply through their private link and show up here automatically.</p>
         </div>
         <Can module="vendor_applications" action="create">
           <Link href="/innovation/vendor-application/new">

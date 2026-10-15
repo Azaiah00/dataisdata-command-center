@@ -2,7 +2,7 @@
 
 import { Can } from "@/components/auth/AccessProvider";
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,6 +33,7 @@ const weights = {
 
 export default function VendorApplicationReviewPage() {
   const params = useParams<{ id: string }>();
+  const router = useRouter();
   const [application, setApplication] = useState<VendorApplication | null>(null);
   const [status, setStatus] = useState("Pending Review");
   const [reviewer, setReviewer] = useState("Tony Wood");
@@ -56,6 +57,11 @@ export default function VendorApplicationReviewPage() {
       return;
     }
     const row = data as unknown as VendorApplication;
+    // Applications that came from an inquiry are scored on the vendor's record in the pipeline.
+    if (row.inquiry_id) {
+      router.replace(`/innovation/vendor-pipeline/${row.inquiry_id}#scorecard`);
+      return;
+    }
     setApplication(row);
     setStatus(row.status || "Pending Review");
   }

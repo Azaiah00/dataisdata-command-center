@@ -10,6 +10,9 @@ import { RouteGuard } from "@/components/auth/RouteGuard";
 import { Button } from "@/components/ui/button";
 import { Eye, DatabaseZap } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { isPublicPath } from "@/lib/access/modules";
+import { ModuleTour } from "@/components/innovation/ModuleTour";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -78,11 +81,24 @@ function Shell({ children }: DashboardLayoutProps) {
           <RouteGuard key={user?.id || "anon"}>{children}</RouteGuard>
         </div>
       </main>
+      <ModuleTour />
     </div>
   );
 }
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
+  const pathname = usePathname();
+  // Public pages (vendor interest form, invite-only application, Innovation Assessment)
+  // skip the PIN and sign-in entirely.
+  if (isPublicPath(pathname)) {
+    return (
+      <>
+        {children}
+        <ModuleTour />
+        <Toaster position="top-right" />
+      </>
+    );
+  }
   return (
     <TooltipProvider delayDuration={0}>
       <PinGate>

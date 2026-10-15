@@ -661,4 +661,73 @@ CREATE POLICY "portal_attachments_rw" ON storage.objects FOR ALL TO authenticate
 -- NOTE: the bucket itself is still "Public", so anyone with a file's exact URL can open it.
 -- For stricter privacy switch the bucket to Private and use signed URLs (ask Claude to do this next).
 
+-- -----------------------------------------------------------------------------
+-- 6) Vendor & Event Module (supabase/2026-10-vendor-event-module.sql)
+--    Public pages and the city / vendor portals use SECURITY DEFINER functions,
+--    so no anon access is needed. Team pages follow the module switches.
+-- -----------------------------------------------------------------------------
+DO $$ BEGIN
+  IF to_regclass('public.event_attendees') IS NOT NULL THEN
+    EXECUTE 'ALTER TABLE public.event_attendees ENABLE ROW LEVEL SECURITY';
+    EXECUTE $p$CREATE POLICY portal_select ON public.event_attendees FOR SELECT TO authenticated USING (public.portal_can_view_any(ARRAY['events','client_intake','innovation_exchange']) AND public.portal_account_ok(account_id))$p$;
+    EXECUTE $p$CREATE POLICY portal_insert ON public.event_attendees FOR INSERT TO authenticated WITH CHECK (public.portal_can('events','edit') AND public.portal_account_ok(account_id))$p$;
+    EXECUTE $p$CREATE POLICY portal_update ON public.event_attendees FOR UPDATE TO authenticated USING (public.portal_can('events','edit') AND public.portal_account_ok(account_id)) WITH CHECK (public.portal_can('events','edit') AND public.portal_account_ok(account_id))$p$;
+    EXECUTE $p$CREATE POLICY portal_delete ON public.event_attendees FOR DELETE TO authenticated USING (public.portal_can('events','edit') AND public.portal_account_ok(account_id))$p$;
+    EXECUTE 'GRANT SELECT, INSERT, UPDATE, DELETE ON public.event_attendees TO authenticated';
+    EXECUTE 'REVOKE ALL ON public.event_attendees FROM anon';
+  END IF;
+  IF to_regclass('public.event_vendor_requests') IS NOT NULL THEN
+    EXECUTE 'ALTER TABLE public.event_vendor_requests ENABLE ROW LEVEL SECURITY';
+    EXECUTE $p$CREATE POLICY portal_select ON public.event_vendor_requests FOR SELECT TO authenticated USING (public.portal_can_view_any(ARRAY['events','innovation_exchange']))$p$;
+    EXECUTE $p$CREATE POLICY portal_insert ON public.event_vendor_requests FOR INSERT TO authenticated WITH CHECK (public.portal_can('events','edit'))$p$;
+    EXECUTE $p$CREATE POLICY portal_update ON public.event_vendor_requests FOR UPDATE TO authenticated USING (public.portal_can('events','edit')) WITH CHECK (public.portal_can('events','edit'))$p$;
+    EXECUTE $p$CREATE POLICY portal_delete ON public.event_vendor_requests FOR DELETE TO authenticated USING (public.portal_can('events','edit'))$p$;
+    EXECUTE 'GRANT SELECT, INSERT, UPDATE, DELETE ON public.event_vendor_requests TO authenticated';
+    EXECUTE 'REVOKE ALL ON public.event_vendor_requests FROM anon';
+  END IF;
+  IF to_regclass('public.event_tasks') IS NOT NULL THEN
+    EXECUTE 'ALTER TABLE public.event_tasks ENABLE ROW LEVEL SECURITY';
+    EXECUTE $p$CREATE POLICY portal_select ON public.event_tasks FOR SELECT TO authenticated USING (public.portal_can_view_any(ARRAY['events']))$p$;
+    EXECUTE $p$CREATE POLICY portal_insert ON public.event_tasks FOR INSERT TO authenticated WITH CHECK (public.portal_can_write_any(ARRAY['events']))$p$;
+    EXECUTE $p$CREATE POLICY portal_update ON public.event_tasks FOR UPDATE TO authenticated USING (public.portal_can_write_any(ARRAY['events'])) WITH CHECK (public.portal_can_write_any(ARRAY['events']))$p$;
+    EXECUTE $p$CREATE POLICY portal_delete ON public.event_tasks FOR DELETE TO authenticated USING (public.portal_can('events','edit'))$p$;
+    EXECUTE 'GRANT SELECT, INSERT, UPDATE, DELETE ON public.event_tasks TO authenticated';
+    EXECUTE 'REVOKE ALL ON public.event_tasks FROM anon';
+  END IF;
+  IF to_regclass('public.innovation_activity') IS NOT NULL THEN
+    EXECUTE 'ALTER TABLE public.innovation_activity ENABLE ROW LEVEL SECURITY';
+    EXECUTE $p$CREATE POLICY portal_select ON public.innovation_activity FOR SELECT TO authenticated USING (public.portal_can_view_any(ARRAY['innovation_exchange','vendor_inquiries','vendor_applications','events','client_intake']))$p$;
+    EXECUTE $p$CREATE POLICY portal_insert ON public.innovation_activity FOR INSERT TO authenticated WITH CHECK (public.portal_can_write_any(ARRAY['vendor_inquiries','vendor_applications','events','client_intake']) OR public.portal_is_admin())$p$;
+    EXECUTE $p$CREATE POLICY portal_delete ON public.innovation_activity FOR DELETE TO authenticated USING (public.portal_is_admin())$p$;
+    EXECUTE 'GRANT SELECT, INSERT, DELETE ON public.innovation_activity TO authenticated';
+    EXECUTE 'REVOKE ALL ON public.innovation_activity FROM anon';
+  END IF;
+  IF to_regclass('public.portal_user_partners') IS NOT NULL THEN
+    EXECUTE 'ALTER TABLE public.portal_user_partners ENABLE ROW LEVEL SECURITY';
+    EXECUTE $p$CREATE POLICY portal_select ON public.portal_user_partners FOR SELECT TO authenticated USING (public.portal_is_admin() OR user_id = public.portal_me_id())$p$;
+    EXECUTE $p$CREATE POLICY portal_write ON public.portal_user_partners FOR ALL TO authenticated USING (public.portal_is_admin()) WITH CHECK (public.portal_is_admin())$p$;
+    EXECUTE 'GRANT SELECT, INSERT, UPDATE, DELETE ON public.portal_user_partners TO authenticated';
+    EXECUTE 'REVOKE ALL ON public.portal_user_partners FROM anon';
+  END IF;
+  -- Extra read paths the module's pages need (permissive policies add to the ones above).
+  IF to_regclass('public.partners') IS NOT NULL THEN
+    EXECUTE $p$CREATE POLICY portal_vem_select ON public.partners FOR SELECT TO authenticated USING (public.portal_can_view_any(ARRAY['client_intake','vendor_inquiries','innovation_exchange']))$p$;
+  END IF;
+  IF to_regclass('public.event_vendors') IS NOT NULL THEN
+    EXECUTE $p$CREATE POLICY portal_vem_select ON public.event_vendors FOR SELECT TO authenticated USING (public.portal_can_view_any(ARRAY['vendor_inquiries','vendor_applications','innovation_exchange']))$p$;
+  END IF;
+  IF to_regclass('public.events') IS NOT NULL THEN
+    EXECUTE $p$CREATE POLICY portal_vem_select ON public.events FOR SELECT TO authenticated USING (public.portal_can_view_any(ARRAY['vendor_inquiries','vendor_applications','client_intake','innovation_exchange']))$p$;
+  END IF;
+  IF to_regclass('public.vendor_inquiries') IS NOT NULL THEN
+    EXECUTE $p$CREATE POLICY portal_vem_select ON public.vendor_inquiries FOR SELECT TO authenticated USING (public.portal_can_view_any(ARRAY['innovation_exchange']))$p$;
+  END IF;
+  IF to_regclass('public.vendor_applications') IS NOT NULL THEN
+    EXECUTE $p$CREATE POLICY portal_vem_select ON public.vendor_applications FOR SELECT TO authenticated USING (public.portal_can_view_any(ARRAY['innovation_exchange']))$p$;
+  END IF;
+  IF to_regclass('public.client_intakes') IS NOT NULL THEN
+    EXECUTE $p$CREATE POLICY portal_vem_select ON public.client_intakes FOR SELECT TO authenticated USING (public.portal_can_view_any(ARRAY['innovation_exchange']) AND public.portal_account_ok(account_id))$p$;
+  END IF;
+END $$;
+
 NOTIFY pgrst, 'reload schema';

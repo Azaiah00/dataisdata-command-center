@@ -29,7 +29,7 @@ export function PermissionMatrix({
   lockedReason?: string;
   scoped?: boolean;
 }) {
-  const [open, setOpen] = useState<Record<GroupKey, boolean>>({ overview: true, crm: true, work: true, finance: true, innovation: true });
+  const [open, setOpen] = useState<Record<GroupKey, boolean>>({ overview: true, crm: true, work: true, finance: true, innovation: true, portals: true });
 
   const get = (m: ModuleKey): ModulePermission => value[m] || NO_PERMISSION;
 

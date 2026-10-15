@@ -35,9 +35,12 @@ export type ModuleKey =
   | "vendor_inquiries"
   | "vendor_applications"
   | "events"
-  | "client_intake";
+  | "client_intake"
+  | "innovation_exchange"
+  | "client_portal"
+  | "partner_portal";
 
-export type GroupKey = "overview" | "crm" | "work" | "finance" | "innovation";
+export type GroupKey = "overview" | "crm" | "work" | "finance" | "innovation" | "portals";
 
 export interface ModuleDef {
   key: ModuleKey;
@@ -59,6 +62,7 @@ export const GROUPS: { key: GroupKey; label: string; description: string }[] = [
   { key: "work", label: "Work", description: "Engagements, activities and the sales pipeline" },
   { key: "finance", label: "Finance", description: "Money in, money out, tracker and forecasts" },
   { key: "innovation", label: "Innovation", description: "Innovation-as-a-Service operating system" },
+  { key: "portals", label: "Client & vendor portals", description: "What an outside city or vendor login sees. Give these to Guest seats only." },
 ];
 
 const CRUD: Action[] = ["view", "create", "edit", "delete"];
@@ -90,6 +94,10 @@ export const MODULES: ModuleDef[] = [
   { key: "vendor_applications", label: "Vendor Applications", group: "innovation", path: "/innovation/vendor-application", description: "Vendor vetting and scoring", actions: ["view", "create", "edit"], scopeable: false },
   { key: "events", label: "Events", group: "innovation", path: "/innovation/events", description: "Showcases and innovation events", actions: ["view", "create", "edit"], scopeable: false },
   { key: "client_intake", label: "Client Intake", group: "innovation", path: "/innovation/client-intake", description: "New client intake and readiness", actions: ["view", "create", "edit"], scopeable: true },
+  { key: "innovation_exchange", label: "Vendor & Event Module", group: "innovation", path: "/innovation/exchange", description: "Overview of vendor enrollment, scoring, showcase events and city matching, with the guided walkthrough", actions: ["view"], scopeable: false },
+
+  { key: "client_portal", label: "City Portal", group: "portals", path: "/portal/city", description: "A city's own assessment, tier, event invitations (with RSVP) and matched partners. Needs an account scope.", actions: ["view"], scopeable: true },
+  { key: "partner_portal", label: "Vendor Portal", group: "portals", path: "/portal/partner", description: "A vendor's own application status, events, invoices and spot requests. Needs a linked partner.", actions: ["view"], scopeable: false },
 ];
 
 export const MODULE_MAP: Record<ModuleKey, ModuleDef> = MODULES.reduce(
@@ -116,6 +124,8 @@ const PREFIXES: { prefix: string; module: ModuleKey }[] = [
   { prefix: "/finance/pnl", module: "pnl" },
   { prefix: "/finance", module: "finance_dashboard" },
   { prefix: "/innovation/maturity", module: "innovation_maturity" },
+  { prefix: "/innovation/exchange", module: "innovation_exchange" },
+  { prefix: "/innovation/vendor-pipeline", module: "vendor_inquiries" },
   { prefix: "/innovation/vendor-inquiry", module: "vendor_inquiries" },
   { prefix: "/innovation/vendor-application", module: "vendor_applications" },
   { prefix: "/innovation/events", module: "events" },
@@ -130,7 +140,15 @@ const PREFIXES: { prefix: string; module: ModuleKey }[] = [
   { prefix: "/pipeline", module: "pipeline" },
   { prefix: "/reports", module: "reports" },
   { prefix: "/documents", module: "documents" },
+  { prefix: "/portal/city", module: "client_portal" },
+  { prefix: "/portal/partner", module: "partner_portal" },
 ];
+
+/** Public pages (no PIN, no sign-in): vendor interest form, invite-only application, Innovation Assessment. */
+export function isPublicPath(pathname: string | null | undefined): boolean {
+  const p = (pathname || "/").replace(/\/+$/, "") || "/";
+  return p === "/join" || p.startsWith("/join/");
+}
 
 function matchesPrefix(pathname: string, prefix: string) {
   return pathname === prefix || pathname.startsWith(prefix + "/");
@@ -139,7 +157,7 @@ function matchesPrefix(pathname: string, prefix: string) {
 /** Work out which module + action a URL requires. */
 export function resolveRoute(pathname: string | null | undefined): RouteRequirement {
   const p = (pathname || "/").replace(/\/+$/, "") || "/";
-  if (p === "/login" || p === "/no-access") return { kind: "public" };
+  if (p === "/login" || p === "/no-access" || isPublicPath(p)) return { kind: "public" };
   if (p === "/settings") return { kind: "self" };
   if (matchesPrefix(p, "/admin")) return { kind: "admin" };
   if (p === "/") return { kind: "module", module: "dashboard", action: "view" };

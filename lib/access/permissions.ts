@@ -101,7 +101,7 @@ export const PERMISSION_TEMPLATES: PermissionTemplate[] = [
     label: "Partner — view only",
     description: "Dashboard, CRM, Work and Innovation as read-only. No Finance.",
     build: () =>
-      build((m) => (m.group === "finance" || m.key === "documents" ? null : viewOnly)),
+      build((m) => (m.group === "finance" || m.group === "portals" || m.key === "documents" ? null : viewOnly)),
   },
   {
     key: "partner_collab",
@@ -109,7 +109,7 @@ export const PERMISSION_TEMPLATES: PermissionTemplate[] = [
     description: "Read CRM/Work/Innovation, log activities and add notes. No Finance, no deletes.",
     build: () =>
       build((m) => {
-        if (m.group === "finance") return null;
+        if (m.group === "finance" || m.group === "portals") return null;
         if (m.key === "activities") return contribute;
         if (m.group === "innovation") return contribute;
         return viewOnly;
@@ -119,7 +119,7 @@ export const PERMISSION_TEMPLATES: PermissionTemplate[] = [
     key: "team",
     label: "Team member",
     description: "Everything except Finance. Can create and edit, cannot delete.",
-    build: () => build((m) => (m.group === "finance" ? null : contribute)),
+    build: () => build((m) => (m.group === "finance" || m.group === "portals" ? null : contribute)),
   },
   {
     key: "finance",
@@ -136,7 +136,19 @@ export const PERMISSION_TEMPLATES: PermissionTemplate[] = [
     key: "everything",
     label: "Everything (no admin rights)",
     description: "All modules and actions, but cannot manage seats or permissions.",
-    build: () => build(() => all),
+    build: () => build((m) => (m.group === "portals" ? null : all)),
+  },
+  {
+    key: "city_login",
+    label: "City client login",
+    description: "Only the City Portal. Also limit this seat to the city's account under Record scope.",
+    build: () => build((m) => (m.key === "client_portal" ? viewOnly : null)),
+  },
+  {
+    key: "vendor_login",
+    label: "Vendor login",
+    description: "Only the Vendor Portal. Create it from the vendor's record so it is linked to the right partner.",
+    build: () => build((m) => (m.key === "partner_portal" ? viewOnly : null)),
   },
 ];
 

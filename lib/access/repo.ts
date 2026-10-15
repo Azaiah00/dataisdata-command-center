@@ -95,6 +95,8 @@ interface LocalDb {
   users: PortalUser[];
   permissions: PermissionRow[];
   scopes: { user_id: string; account_id: string }[];
+  /** Vendor logins: which partner a Guest seat belongs to. */
+  partner_links?: { user_id: string; partner_id: string }[];
   audit: AuditEntry[];
   settings: PortalSettings;
   /** Seed seats an admin removed, so they are not re-added on the next read. */
@@ -331,5 +333,36 @@ export async function deleteUser(id: string): Promise<void> {
     return;
   }
   const { error } = await supabaseRaw.from("portal_users").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+}
+
+/* ----------------------- vendor logins (seat -> partner) ------------------- */
+
+/** The partner a vendor-login seat belongs to, or null. */
+export async function loadPartnerLink(userId: string): Promise<string | null> {
+  if (getStorageMode() === "local") {
+    return (readLocal().partner_links || []).find((l) => l.user_id === userId)?.partner_id || null;
+  }
+  const { data, error } = await supabaseRaw.from("portal_user_partners").select("partner_id").eq("user_id", userId).maybeSingle();
+  if (error) return null; // table not created yet: no vendor logins
+  return (data?.partner_id as string | undefined) || null;
+}
+
+/** Seats already linked to partners, as partner_id -> user_id. */
+export async function loadPartnerLinks(): Promise<{ user_id: string; partner_id: string }[]> {
+  if (getStorageMode() === "local") return readLocal().partner_links || [];
+  const { data, error } = await supabaseRaw.from("portal_user_partners").select("user_id, partner_id");
+  if (error) return [];
+  return (data || []) as { user_id: string; partner_id: string }[];
+}
+
+export async function linkPartner(userId: string, partnerId: string): Promise<void> {
+  if (getStorageMode() === "local") {
+    const db = readLocal();
+    db.partner_links = [...(db.partner_links || []).filter((l) => l.user_id !== userId), { user_id: userId, partner_id: partnerId }];
+    writeLocal(db);
+    return;
+  }
+  const { error } = await supabaseRaw.from("portal_user_partners").upsert({ user_id: userId, partner_id: partnerId }, { onConflict: "user_id" });
   if (error) throw new Error(error.message);
 }
