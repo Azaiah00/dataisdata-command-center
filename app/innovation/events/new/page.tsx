@@ -58,7 +58,8 @@ export default function NewEventPage() {
       return;
     }
     const id = res.data.id as string;
-    await supabase.from("event_tasks").insert([{ event_id: id, title: "Publish the vendor fee disclosure on the event page" }]);
+    const task = await supabase.from("event_tasks").insert([{ event_id: id, title: "Publish the vendor fee disclosure on the event page" }]);
+    if (task.error) toast.error(`Event created, but its starter task was not added: ${task.error.message}`);
     await logActivity(`Event created: ${base.name}`, "event", id, realUser?.full_name);
     toast.success("Event created");
     router.push(`/innovation/events/${id}`);

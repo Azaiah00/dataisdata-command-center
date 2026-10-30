@@ -1,6 +1,9 @@
 "use client";
 
-import { Can } from "@/components/auth/AccessProvider";
+import { Can, useAccess } from "@/components/auth/AccessProvider";
+import { LinkedRecordsCard, partnerOptions } from "@/components/shared/LinkedRecordsCard";
+import { Handshake, CalendarDays, Plus } from "lucide-react";
+import { CardDescription } from "@/components/ui/card";
 import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -32,6 +35,10 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [linkedEngagement, setLinkedEngagement] = useState<{ id: string; name: string } | null>(null);
   const [converting, setConverting] = useState(false);
+  const { can } = useAccess();
+  const [partners, setPartners] = useState<{ id: string; name: string; partner_type: string | null }[]>([]);
+  const [oppActivities, setOppActivities] = useState<{ id: string; activity_type: string; date_time: string; summary: string | null }[]>([]);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     async function fetchOpportunity() {
@@ -65,10 +72,18 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
           setRelatedAccounts([]);
         }
       }
+      /* eslint-disable @typescript-eslint/no-explicit-any */
+      const [pl, acts] = await Promise.all([
+        supabase.from("opportunity_partners").select("partners(id, name, partner_type)").eq("opportunity_id", id),
+        supabase.from("activities").select("id, activity_type, date_time, summary").eq("opportunity_id", id).order("date_time", { ascending: false }),
+      ]);
+      setPartners(((pl.data || []) as any[]).map((r) => (Array.isArray(r.partners) ? r.partners[0] : r.partners)).filter(Boolean));
+      setOppActivities((acts.data || []) as any[]);
+      /* eslint-enable @typescript-eslint/no-explicit-any */
       setLoading(false);
     }
     fetchOpportunity();
-  }, [id]);
+  }, [id, reloadKey]);
 
   /** Awarded work becomes an engagement so delivery, billing and finance pick it up. */
   async function convertToEngagement() {
@@ -93,6 +108,13 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
       toast.error(error.message);
       return;
     }
+    // Carry the people over so the new engagement starts connected.
+    const carry = await Promise.all([
+      opportunity.primary_contact_id ? supabase.from("engagement_contacts").insert({ engagement_id: data.id, contact_id: opportunity.primary_contact_id }) : Promise.resolve({ error: null }),
+      partners.length ? supabase.from("engagement_partners").insert(partners.map((p) => ({ engagement_id: data.id, partner_id: p.id }))) : Promise.resolve({ error: null }),
+    ]);
+    const carryErr = carry.find((c) => c.error)?.error;
+    if (carryErr) toast.error(`Engagement created, but contacts/partners were not copied: ${carryErr.message}`);
     toast.success("Engagement created from the awarded opportunity");
     router.push(`/engagements/${data.id}`);
   }
@@ -257,9 +279,7 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
             <div className="flex justify-between py-2 border-b border-slate-100">
               <span className="text-sm text-[#6B7280]">Estimated value</span>
               <span className="font-bold text-[#111827]">
-                {opportunity.estimated_value != null
-                  ? formatCurrency(opportunity.estimated_value)
-                  : "—"}
+                {opportunity.estimated_value != null ? formatCurrency(opportunity.estimated_value) : <span className="text-amber-700 text-sm">Not entered</span>}
               </span>
             </div>
             <div className="flex justify-between py-2 border-b border-slate-100">
@@ -371,6 +391,59 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
           </CardContent>
         </Card>
       )}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {can("partners") && (
+          <LinkedRecordsCard
+            title="Partners"
+            description="Teaming partners on this pursuit — they see it on their partner page"
+            icon={Handshake}
+            table="opportunity_partners"
+            ownerColumn="opportunity_id"
+            ownerId={opportunity.id}
+            otherColumn="partner_id"
+            hrefBase="/partners"
+            items={partners.map((p) => ({ id: p.id, label: p.name, sub: p.partner_type }))}
+            loadOptions={partnerOptions}
+            canEdit={can("pipeline", "edit")}
+            emptyText="No partners on this opportunity."
+            onChanged={() => setReloadKey((k) => k + 1)}
+          />
+        )}
+        {can("activities") && (
+          <Card>
+            <CardHeader className="flex flex-row items-start justify-between gap-3">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <CalendarDays className="w-4 h-4 text-muted-foreground" /> Activities ({oppActivities.length})
+                </CardTitle>
+                <CardDescription className="mt-1">Touchpoints logged on this opportunity</CardDescription>
+              </div>
+              {can("activities", "create") && (
+                <Link href={`/activities/new?account_id=${opportunity.account_id || ""}&opportunity_id=${opportunity.id}${opportunity.primary_contact_id ? `&contact_id=${opportunity.primary_contact_id}` : ""}`}>
+                  <Button size="sm" variant="outline">
+                    <Plus className="w-4 h-4" /> Log
+                  </Button>
+                </Link>
+              )}
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {oppActivities.length ? (
+                oppActivities.slice(0, 8).map((a) => (
+                  <Link key={a.id} href={`/activities/${a.id}`} className="list-row">
+                    <span className="min-w-0">
+                      <span className="block text-sm font-medium text-foreground">{a.activity_type}</span>
+                      <span className="block text-xs text-muted-foreground truncate">{a.summary || "No notes"}</span>
+                    </span>
+                    <span className="text-xs text-muted-foreground shrink-0">{formatDate(a.date_time)}</span>
+                  </Link>
+                ))
+              ) : (
+                <p className="text-sm text-muted-foreground">No activities logged on this opportunity yet.</p>
+              )}
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </div>
   );
 }

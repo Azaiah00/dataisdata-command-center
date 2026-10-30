@@ -158,7 +158,8 @@ export async function recomputeInvoiceStatus(invoiceId: string): Promise<string 
     next = inv.due_date && inv.due_date < iso ? "Overdue" : "Sent";
   }
   if (next !== inv.status) {
-    await supabase.from("invoices").update({ status: next, updated_at: new Date().toISOString() }).eq("id", invoiceId);
+    const { error } = await supabase.from("invoices").update({ status: next, updated_at: new Date().toISOString() }).eq("id", invoiceId);
+    if (error) throw new Error(`Invoice status not updated: ${error.message}`);
   }
   return next;
 }

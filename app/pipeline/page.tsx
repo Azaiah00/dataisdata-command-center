@@ -86,7 +86,7 @@ function SortableOpportunityCard({ op, onClick }: { op: any; onClick: () => void
 
           <div className="flex items-center justify-between pt-3 border-t border-slate-50">
             <div className="flex items-center gap-1 text-[#111827] font-bold text-sm">
-              {formatCurrency(op.estimated_value)}
+              {op.estimated_value != null ? formatCurrency(op.estimated_value) : "Not entered"}
             </div>
             <div className="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded">
               {op.probability_pct}%
@@ -376,7 +376,7 @@ export default function PipelinePage() {
                     </div>
                     <div className="flex items-center justify-between pt-3 border-t border-slate-50">
                       <div className="flex items-center gap-1 text-[#111827] font-bold text-sm">
-                        {formatCurrency(activeOp.estimated_value)}
+                        {activeOp.estimated_value != null ? formatCurrency(activeOp.estimated_value) : "Not entered"}
                       </div>
                       <div className="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded">
                         {activeOp.probability_pct}%

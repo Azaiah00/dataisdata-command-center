@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, use } from "react";
+import { syncLinks } from "@/lib/links";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -88,7 +89,8 @@ export default function EditContactPage({ params }: { params: Promise<{ id: stri
         influence_level: contact.influence_level?.toString() || "3",
         relationship_health: contact.relationship_health,
         next_step: contact.next_step || "",
-        existing_account_ids: currentLinksRes.data?.map(l => l.account_id) || [],
+        // Primary account first, then every linked account — so saving never drops one.
+        existing_account_ids: Array.from(new Set([...(contact.account_id ? [contact.account_id] : []), ...(currentLinksRes.data?.map(l => l.account_id) || [])])),
       });
       
       setLoading(false);
@@ -110,29 +112,23 @@ export default function EditContactPage({ params }: { params: Promise<{ id: stri
           influence_level: parseInt(values.influence_level, 10),
           relationship_health: values.relationship_health,
           next_step: values.next_step,
-          // We update account_id to the first selected account for backward compatibility
+          // Primary account = the first one listed (the current primary is loaded first).
           account_id: values.existing_account_ids[0] || null,
+          updated_at: new Date().toISOString(),
         })
         .eq("id", id);
 
       if (conError) throw conError;
 
-      // 2. Update account links
-      const { error: deleteError } = await supabase
-        .from("account_contacts")
-        .delete()
-        .eq("contact_id", id);
-      
-      if (deleteError) throw deleteError;
-
-      if (values.existing_account_ids.length > 0) {
-        const links = values.existing_account_ids.map(accountId => ({
-          account_id: accountId,
-          contact_id: id,
-        }));
-        const { error: linkError } = await supabase.from("account_contacts").insert(links);
-        if (linkError) throw linkError;
-      }
+      // 2. Account links: only add/remove the ones that changed (never wipe the list).
+      const links = await syncLinks({
+        table: "account_contacts",
+        ownerColumn: "contact_id",
+        ownerId: id,
+        otherColumn: "account_id",
+        desiredIds: values.existing_account_ids,
+      });
+      if (links.error) throw new Error(`Contact saved, but account links were not updated: ${links.error}`);
 
       toast.success("Contact updated successfully");
       router.push("/contacts");

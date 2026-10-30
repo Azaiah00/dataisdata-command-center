@@ -43,7 +43,7 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
   const [engagements, setEngagements] = useState<Engagement[]>([]);
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
-  const [contractors, setContractors] = useState<(Contractor & { engagement_name?: string })[]>([]);
+  const [contractors, setContractors] = useState<(Contractor & { engagement_name?: string; engagement_names?: string[]; contract_total?: number; missing_values?: number })[]>([]);
   const [partners, setPartners] = useState<(Partner & { engagement_name?: string })[]>([]);
   const [engContractorMap, setEngContractorMap] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(true);
@@ -79,18 +79,21 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
       }
 
       // Fetch Related Data (opportunities: primary account + linked via related_account_ids)
-      const [linksRes, engagementsRes, opportunitiesPrimaryRes, opportunitiesLinkedRes, activitiesRes] = await Promise.all([
+      const [linksRes, engagementsRes, opportunitiesPrimaryRes, opportunitiesLinkedRes, activitiesRes, directContactsRes] = await Promise.all([
         supabase.from("account_contacts").select("contacts(*)").eq("account_id", id),
         supabase.from("engagements").select("*").eq("account_id", id),
         supabase.from("opportunities").select("*").eq("account_id", id),
         supabase.from("opportunities").select("*").contains("related_account_ids", [id]),
         supabase.from("activities").select("*, accounts(name)").eq("account_id", id).order("date_time", { ascending: false }),
+        supabase.from("contacts").select("*").eq("account_id", id),
       ]);
 
-      // Map contacts from junction table
-      const mappedContacts = (linksRes.data || [])
-        .map((link: any) => link.contacts)
-        .filter(Boolean) as Contact[];
+      // Contacts linked through the link table OR whose primary account is this one (deduped).
+      const contactMap = new Map<string, Contact>();
+      [...(linksRes.data || []).map((link: any) => link.contacts), ...(directContactsRes.data || [])]
+        .filter(Boolean)
+        .forEach((c: Contact) => contactMap.set(c.id, c));
+      const mappedContacts = Array.from(contactMap.values()).sort((a, b) => a.full_name.localeCompare(b.full_name));
       
       setContacts(mappedContacts);
       const engs = engagementsRes.data || [];
@@ -119,18 +122,25 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
 
         // Build engagement -> contractor names map and deduplicated contractor list
         const cMap: Record<string, string[]> = {};
-        const seen = new Map<string, Contractor & { engagement_name?: string }>();
+        const seen = new Map<string, Contractor & { engagement_name?: string; engagement_names?: string[]; contract_total?: number; missing_values?: number }>();
         const engNameMap: Record<string, string> = {};
-        engs.forEach((e: any) => { engNameMap[e.id] = e.name; });
+        const engValueMap: Record<string, number | null> = {};
+        engs.forEach((e: any) => {
+          engNameMap[e.id] = e.name;
+          engValueMap[e.id] = e.contract_value == null ? null : Number(e.contract_value);
+        });
 
         (ecLinks || []).forEach((link: any) => {
           if (!link.contractors) return;
           const c = link.contractors as Contractor;
           if (!cMap[link.engagement_id]) cMap[link.engagement_id] = [];
           cMap[link.engagement_id].push(c.full_name);
-          if (!seen.has(c.id)) {
-            seen.set(c.id, { ...c, engagement_name: engNameMap[link.engagement_id] });
-          }
+          const prev = seen.get(c.id) || { ...c, engagement_name: engNameMap[link.engagement_id], engagement_names: [], contract_total: 0, missing_values: 0 };
+          prev.engagement_names = [...(prev.engagement_names || []), engNameMap[link.engagement_id]];
+          const v = engValueMap[link.engagement_id];
+          if (v == null) prev.missing_values = (prev.missing_values || 0) + 1;
+          else prev.contract_total = (prev.contract_total || 0) + v;
+          seen.set(c.id, prev);
         });
         setEngContractorMap(cMap);
         setContractors(Array.from(seen.values()));
@@ -150,6 +160,26 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
           }
         });
         setPartners(Array.from(pSeen.values()));
+      }
+
+      // Partners teaming on this account's opportunities show here too.
+      if (merged.length > 0) {
+        const { data: opLinks } = await supabase
+          .from("opportunity_partners")
+          .select("opportunity_id, partners(*)")
+          .in("opportunity_id", merged.map((o) => o.id));
+        const oppName: Record<string, string> = Object.fromEntries(merged.map((o) => [o.id, o.name]));
+        if (opLinks && opLinks.length) {
+          setPartners((prev) => {
+            const m = new Map(prev.map((p) => [p.id, p]));
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            opLinks.forEach((link: any) => {
+              const p = (Array.isArray(link.partners) ? link.partners[0] : link.partners) as Partner | null;
+              if (p && !m.has(p.id)) m.set(p.id, { ...p, engagement_name: oppName[link.opportunity_id] });
+            });
+            return Array.from(m.values());
+          });
+        }
       }
 
       setLoading(false);
@@ -378,6 +408,20 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
                   <span className="text-sm text-[#6B7280]">Active Projects</span>
                   <span className="font-bold text-[#111827]">{engagements.filter(e => e.status === 'In Progress').length}</span>
                 </div>
+                <Can module="engagements">
+                <div className="flex justify-between items-center py-2 border-b border-slate-50">
+                  <span className="text-sm text-[#6B7280]">Contract Value</span>
+                  <span className="font-bold text-[#111827] tabular-nums">
+                    {formatCurrency(engagements.reduce((sum, e) => sum + (e.contract_value == null ? 0 : Number(e.contract_value)), 0))}
+                  </span>
+                </div>
+                {engagements.some((e) => e.contract_value == null) && (
+                  <div className="flex justify-between items-center py-2 border-b border-slate-50">
+                    <span className="text-sm text-[#6B7280]">Values Not Entered</span>
+                    <span className="font-bold text-amber-700">{engagements.filter((e) => e.contract_value == null).length}</span>
+                  </div>
+                )}
+                </Can>
                 <Can module="pipeline">
                 <div className="flex justify-between items-center py-2 border-b border-slate-50">
                   <span className="text-sm text-[#6B7280]">Pipeline Value</span>
@@ -525,7 +569,11 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
                     <div className="flex items-center justify-between pt-4 border-t border-slate-50">
                       <div className="flex flex-col">
                         <span className="text-xs text-[#6B7280]">Value</span>
-                        <span className="text-sm font-bold text-[#111827]">{formatCurrency(eng.contract_value)}</span>
+                        {eng.contract_value != null ? (
+                          <span className="text-sm font-bold text-[#111827]">{formatCurrency(eng.contract_value)}</span>
+                        ) : (
+                          <span className="text-xs font-semibold text-amber-700">Not entered</span>
+                        )}
                       </div>
                       <div className="text-right">
                         <span className="text-xs text-[#6B7280]">Timeline</span>
@@ -594,11 +642,11 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
                     <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-50">
                       <div>
                         <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block mb-1">Value</span>
-                        <span className="text-sm font-bold text-[#111827]">{formatCurrency(opp.estimated_value)}</span>
+                        <span className="text-sm font-bold text-[#111827]">{opp.estimated_value != null ? formatCurrency(opp.estimated_value) : "Not entered"}</span>
                       </div>
                       <div>
                         <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block mb-1">Weighted</span>
-                        <span className="text-sm font-bold text-green-600">{formatCurrency(opp.weighted_value)}</span>
+                        <span className="text-sm font-bold text-green-600">{opp.weighted_value != null ? formatCurrency(opp.weighted_value) : "—"}</span>
                       </div>
                       <div>
                         <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block mb-1">Probability</span>
@@ -651,11 +699,17 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
                         {c.full_name}
                       </h4>
                       <p className="text-xs text-[#6B7280] truncate">{c.title_role || "Contractor"}</p>
-                      {c.engagement_name && (
-                        <p className="text-[10px] text-[#9CA3AF] mt-1 truncate">
-                          On: {c.engagement_name}
+                      {c.engagement_names && c.engagement_names.length > 0 && (
+                        <p className="text-[11px] text-[#6B7280] mt-1 line-clamp-2" title={c.engagement_names.join(", ")}>
+                          On: {c.engagement_names.join(", ")}
                         </p>
                       )}
+                      <p className="text-xs font-semibold text-[#111827] mt-1 tabular-nums">
+                        {c.contract_total ? formatCurrency(c.contract_total) : "No value entered"}
+                        {!!c.missing_values && c.contract_total ? (
+                          <span className="ml-1 font-medium text-amber-700">· {c.missing_values} missing</span>
+                        ) : null}
+                      </p>
                       <div className="mt-2 flex items-center gap-2">
                         {c.email && (
                           <span className="text-[10px] text-[#6B7280] flex items-center gap-1">

@@ -30,12 +30,12 @@ export function DataTable<T>({
   className,
 }: DataTableProps<T>) {
   return (
-    <div className={cn("rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm", className)}>
+    <div className={cn("rounded-[1.125rem] border border-[var(--card-border)] bg-white/95 overflow-hidden shadow-[var(--shadow-soft)]", className)}>
       <Table>
         <TableHeader>
-          <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-b border-slate-200">
+          <TableRow className="hover:bg-transparent border-b border-[#e6eaf1]">
             {columns.map((column, index) => (
-              <TableHead key={index} className="h-12 px-4 text-xs font-bold text-[#6B7280] uppercase tracking-wider">
+              <TableHead key={index} className="h-11 px-4 whitespace-nowrap">
                 {column.header}
               </TableHead>
             ))}
@@ -47,8 +47,8 @@ export function DataTable<T>({
               <TableRow
                 key={rowIndex}
                 className={cn(
-                  "border-b border-slate-100 last:border-0",
-                  onRowClick && "cursor-pointer hover:bg-blue-50/30 transition-colors"
+                  "border-b border-[#eef1f6] last:border-0",
+                  onRowClick && "cursor-pointer hover:bg-[#f5f7fb] transition-colors"
                 )}
                 onClick={() => onRowClick?.(item)}
               >

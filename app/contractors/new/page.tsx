@@ -53,7 +53,7 @@ export default function NewContractorPage() {
     }]);
 
     if (error) {
-      toast.error("Failed to create contractor");
+      toast.error(`Contractor not saved: ${error.message}`);
       console.error(error);
       return;
     }

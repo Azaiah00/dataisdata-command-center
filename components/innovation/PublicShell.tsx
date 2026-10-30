@@ -12,7 +12,7 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
           <a href="https://dataisdata.com" className="flex min-h-11 items-center gap-2.5" aria-label="DataIsData website">
             <BrandMark size={34} />
             <span className="flex flex-col leading-none">
-              <span className="font-mono text-lg font-bold tracking-tight text-foreground">DataIsData</span>
+              <span className="wordmark text-lg text-foreground">Data<span className="wm-is">Is</span>Data</span>
               <span className="mt-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Innovation Partners</span>
             </span>
           </a>

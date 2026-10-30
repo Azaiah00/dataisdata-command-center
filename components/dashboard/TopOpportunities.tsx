@@ -61,7 +61,7 @@ export function TopOpportunities({ opportunities }: TopOpportunitiesProps) {
                 </div>
                 <div className="text-right ml-4">
                   <p className="font-bold text-[#111827] text-sm">
-                    {formatCompactCurrency(opp.estimated_value)}
+                    {opp.estimated_value != null ? formatCompactCurrency(opp.estimated_value) : "Not entered"}
                   </p>
                   <p className="text-[10px] text-[#6B7280] mt-0.5">
                     {opp.probability_pct}% probability

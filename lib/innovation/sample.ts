@@ -192,7 +192,9 @@ export async function removeSampleData(actor: string): Promise<{ keptAccounts: s
     }
     const remove = ids.filter((id) => !used.has(id));
     if (remove.length) {
-      await supabase.from("contacts").delete().in("account_id", remove);
+      // Never delete people: unlink any contacts (including ones the team added) from the sample accounts.
+      const unlink = await supabase.from("contacts").update({ account_id: null }).in("account_id", remove);
+      if (unlink.error) throw unlink.error;
       const { error } = await supabase.from("accounts").delete().in("id", remove);
       if (error) throw error;
     }

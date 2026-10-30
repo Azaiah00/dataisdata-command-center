@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, use } from "react";
+import { syncAccountContacts } from "@/lib/links";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -71,11 +72,12 @@ export default function EditAccountPage({ params }: { params: Promise<{ id: stri
 
   useEffect(() => {
     async function fetchData() {
-      const [accRes, conRes, currentAccRes, currentLinksRes] = await Promise.all([
+      const [accRes, conRes, currentAccRes, currentLinksRes, directContactsRes] = await Promise.all([
         supabase.from("accounts").select("id, name").order("name"),
         supabase.from("contacts").select("id, full_name").order("full_name"),
         supabase.from("accounts").select("*").eq("id", id).single(),
         supabase.from("account_contacts").select("contact_id").eq("account_id", id),
+        supabase.from("contacts").select("id").eq("account_id", id),
       ]);
 
       if (currentAccRes.error) {
@@ -98,7 +100,8 @@ export default function EditAccountPage({ params }: { params: Promise<{ id: stri
         owner: account.owner || "",
         notes: account.notes || "",
         parent_account_id: account.parent_account_id || "none",
-        existing_contact_ids: currentLinksRes.data?.map(l => l.contact_id) || [],
+        // Link table + contacts whose primary account is this one, so none are dropped on save.
+        existing_contact_ids: Array.from(new Set([...(currentLinksRes.data?.map(l => l.contact_id) || []), ...(directContactsRes.data?.map((c: { id: string }) => c.id) || [])])),
       });
       
       setLoading(false);
@@ -134,28 +137,16 @@ export default function EditAccountPage({ params }: { params: Promise<{ id: stri
           owner: values.owner,
           notes: values.notes,
           parent_account_id: values.parent_account_id === "none" ? null : (values.parent_account_id || null),
+          updated_at: new Date().toISOString(),
         })
         .eq("id", id);
 
       if (accError) throw accError;
 
-      // 2. Update contact links (delete all and re-insert for simplicity in this MVP)
-      // In a production app, you'd diff them to avoid unnecessary churn.
-      const { error: deleteError } = await supabase
-        .from("account_contacts")
-        .delete()
-        .eq("account_id", id);
-      
-      if (deleteError) throw deleteError;
-
-      if (values.existing_contact_ids.length > 0) {
-        const links = values.existing_contact_ids.map(contactId => ({
-          account_id: id,
-          contact_id: contactId,
-        }));
-        const { error: linkError } = await supabase.from("account_contacts").insert(links);
-        if (linkError) throw linkError;
-      }
+      // 2. Contact links: only add/remove the ones that changed, and keep each
+      //    contact's primary account in step with the link table.
+      const linkError = await syncAccountContacts(id, values.existing_contact_ids);
+      if (linkError) throw new Error(`Account saved, but contact links were not updated: ${linkError}`);
 
       toast.success("Account updated successfully");
       router.push(`/accounts/${id}`);

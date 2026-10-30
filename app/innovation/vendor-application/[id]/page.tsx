@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { Can } from "@/components/auth/AccessProvider";
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -12,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
 type VendorApplication = {
+  partner_id?: string | null;
   id: string;
   status: string | null;
   score: number | null;
@@ -49,7 +52,7 @@ export default function VendorApplicationReviewPage() {
   async function loadApplication() {
     const { data, error } = await supabase
       .from("vendor_applications")
-      .select("id, status, score, inquiry_id, core_offerings, contract_vehicles, strategic_alignment, vendor_inquiries(company_name)")
+      .select("id, status, score, inquiry_id, partner_id, core_offerings, contract_vehicles, strategic_alignment, vendor_inquiries(company_name)")
       .eq("id", params.id)
       .single();
     if (error) {
@@ -99,6 +102,10 @@ export default function VendorApplicationReviewPage() {
 
   async function approveAndCreatePartner() {
     if (!application) return;
+    if (application.partner_id) {
+      toast.error("This application is already linked to a partner");
+      return;
+    }
     const companyName = application.vendor_inquiries?.company_name || "New Partner";
     const { data: partner, error: partnerError } = await supabase
       .from("partners")
@@ -173,9 +180,15 @@ export default function VendorApplicationReviewPage() {
             <Can module="vendor_applications" action="edit">
               <Button onClick={saveReview} variant="outline">Save Review</Button>
             </Can>
-            <Can module="partners" action="create">
-              <Button onClick={approveAndCreatePartner} className="bg-blue-600 hover:bg-blue-700">Approve and Create Partner</Button>
-            </Can>
+            {application?.partner_id ? (
+              <Link href={`/partners/${application.partner_id}`}>
+                <Button variant="outline">Open linked partner</Button>
+              </Link>
+            ) : (
+              <Can module="partners" action="create">
+                <Button onClick={approveAndCreatePartner}>Approve and Create Partner</Button>
+              </Can>
+            )}
           </div>
         </CardContent>
       </Card>

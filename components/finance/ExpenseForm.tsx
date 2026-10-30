@@ -215,7 +215,7 @@ export function ExpenseFormFields({ value, onChange }: { value: ExpenseFormState
 
       {fields.length > 0 && <CustomFieldInputs fields={fields} values={value.custom_fields} onChange={(v) => set({ custom_fields: v })} base={{ amount: num(value.amount) }} />}
 
-      <FileAttachments label="Receipt" value={value.receipt_urls} onChange={(urls) => set({ receipt_urls: urls })} />
+      <FileAttachments label="Receipt (one file — a new upload replaces it)" value={value.receipt_urls} onChange={(urls) => set({ receipt_urls: urls.slice(-1) })} />
     </div>
   );
 }

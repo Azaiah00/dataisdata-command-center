@@ -131,7 +131,7 @@ function ContactForm() {
           .insert([{ account_id: accountId, contact_id: newContact.id }]);
         
         if (linkError) {
-          console.warn("Failed to create account_contacts link, but contact was created:", linkError);
+          toast.error(`Contact created, but not linked to the account list: ${linkError.message}`);
         }
       }
 

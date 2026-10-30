@@ -27,7 +27,16 @@ export default function ContactsPage() {
       if (error) {
         console.error("Error fetching contacts:", error);
       }
-      setContacts(data ?? []);
+      // Also show every other account each person is linked to (account_contacts).
+      const { data: links } = await supabase.from("account_contacts").select("contact_id, accounts(name)");
+      const extra: Record<string, string[]> = {};
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      (links || []).forEach((l: any) => {
+        const n = (Array.isArray(l.accounts) ? l.accounts[0] : l.accounts)?.name;
+        if (n) (extra[l.contact_id] ||= []).push(n);
+      });
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      setContacts(((data ?? []) as any[]).map((c) => ({ ...c, account_names: Array.from(new Set([...(c.accounts?.name ? [c.accounts.name] : []), ...(extra[c.id] || [])])) })));
       setLoading(false);
     }
 
@@ -56,7 +65,14 @@ export default function ContactsPage() {
       cell: (contact: any) => (
         <div className="flex items-center gap-1.5 text-[#6B7280] text-xs">
           <Building2 className="w-3.5 h-3.5" />
-          {contact.accounts?.name ?? <span className="italic text-slate-400">No Account</span>}
+          {contact.account_names?.length ? (
+            <span className="truncate max-w-[16rem]" title={contact.account_names.join(", ")}>
+              {contact.account_names[0]}
+              {contact.account_names.length > 1 && <span className="ml-1 text-muted-foreground">+{contact.account_names.length - 1} more</span>}
+            </span>
+          ) : (
+            <span className="italic text-slate-400">No Account</span>
+          )}
         </div>
       ),
     },

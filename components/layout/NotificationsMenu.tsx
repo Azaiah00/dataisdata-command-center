@@ -110,7 +110,7 @@ export function NotificationsMenu() {
                 id: `act-${a.id}-${a.next_action_due}`,
                 title: overdue ? `Overdue follow-up: ${a.next_action}` : `Follow-up due ${formatDate(a.next_action_due)}`,
                 detail: `${overdue ? "" : a.next_action + " · "}${acct || "Account"}`,
-                href: `/activities`,
+                href: `/activities/${a.id}`,
                 tone: overdue ? "warning" : "info",
                 icon: Clock,
                 sortKey: `${overdue ? 1 : 3}-${a.next_action_due}`,

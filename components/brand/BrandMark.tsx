@@ -52,7 +52,7 @@ export function BrandLockup({
     <span className={cn("flex items-center gap-2.5", className)}>
       <BrandMark size={size} />
       <span className="flex flex-col leading-none">
-        <span className={cn("text-xl font-bold tracking-tight text-foreground font-mono", textClassName)}>DataIsData</span>
+        <span className={cn("wordmark text-xl text-foreground", textClassName)}>Data<span className="wm-is">Is</span>Data</span>
         {subtitle && <span className="mt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">{subtitle}</span>}
       </span>
     </span>

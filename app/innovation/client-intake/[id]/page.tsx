@@ -96,11 +96,15 @@ export default function ClientIntakeDetailPage() {
       .update({ ...base, advisory_engagement: advisory, review_notes: notes.trim() || null, reviewed_at: new Date().toISOString(), reviewed_by: actor })
       .eq("id", intake.id);
     if (res.error && /advisory_engagement|review_notes|reviewed_/.test(res.error.message || "")) res = await supabase.from("client_intakes").update(base).eq("id", intake.id);
+    let accountSyncError: string | null = null;
     if (!res.error && intake.account_id) {
-      await supabase.from("accounts").update({ innovation_tier: tier, readiness_score: readiness, top_challenges: base.top_challenges }).eq("id", intake.account_id);
+      // Keep the client account's tier/readiness identical to the reviewed intake.
+      const acc = await supabase.from("accounts").update({ innovation_tier: tier, readiness_score: readiness, top_challenges: base.top_challenges }).eq("id", intake.account_id);
+      accountSyncError = acc.error?.message || null;
     }
     setBusy(false);
     if (res.error) return toast.error(errorText(res.error, "Could not save the review"));
+    if (accountSyncError) toast.error(`Review saved, but the client account was not updated: ${accountSyncError}`);
     await logActivity(`${intake.organization_name} reviewed: ${tier}, readiness ${readiness}${est ? `, advisory estimate ${money(Number(est))}` : ""}`, "client_intake", intake.id, actor);
     toast.success("Review saved");
     load();
@@ -134,7 +138,13 @@ export default function ClientIntakeDetailPage() {
       return toast.error(errorText(accountError, "Could not create the account"));
     }
     if (intake.contact_name) {
-      await supabase.from("contacts").insert([{ full_name: intake.contact_name, title_role: intake.contact_title, email: intake.contact_email, account_id: account.id }]);
+      const con = await supabase
+        .from("contacts")
+        .insert([{ full_name: intake.contact_name, title_role: intake.contact_title, email: intake.contact_email, account_id: account.id }])
+        .select("id")
+        .single();
+      if (con.error) toast.error(`Account created, but the contact was not added: ${con.error.message}`);
+      else await supabase.from("account_contacts").insert([{ account_id: account.id, contact_id: con.data.id }]);
     }
     const { error } = await supabase.from("client_intakes").update({ account_id: account.id, status: "Converted" }).eq("id", intake.id);
     setBusy(false);

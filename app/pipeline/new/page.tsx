@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
+import { toast } from "sonner";
+import { parseAmount, loadAccountContacts } from "@/lib/links";
+import { FUNDING_SOURCES } from "@/lib/constants";
 import { useRouter, useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -37,8 +40,11 @@ const formSchema = z.object({
   primary_contact_id: z.string().optional(),
   service_line: z.string().optional(),
   stage: z.enum(PIPELINE_STAGES),
-  probability_pct: z.string().transform((v) => parseInt(v, 10)),
-  estimated_value: z.string().transform((v) => (v === "" ? 0 : parseFloat(v))),
+  probability_pct: z.string().transform((v) => {
+    const n = parseAmount(v);
+    return n == null ? null : Math.max(0, Math.min(100, Math.round(n)));
+  }),
+  estimated_value: z.string().transform((v) => parseAmount(v)),
   expected_start: z.string().optional(),
   expected_end: z.string().optional(),
   funding_source: z.string().optional(),
@@ -95,8 +101,8 @@ function OpportunityForm() {
         setContacts([]);
         return;
       }
-      const { data } = await supabase.from("contacts").select("id, full_name").eq("account_id", selectedAccountId);
-      setContacts(data || []);
+      const list = await loadAccountContacts(selectedAccountId, form.getValues("primary_contact_id"));
+      setContacts(list);
     }
     fetchContacts();
   }, [selectedAccountId]);
@@ -118,6 +124,7 @@ function OpportunityForm() {
 
     if (error) {
       console.error("Error creating opportunity:", error);
+      toast.error(`Opportunity not saved: ${error.message}`);
       return;
     }
 
@@ -344,6 +351,20 @@ function OpportunityForm() {
                         <Input placeholder="e.g. Cyber, Broadband" {...field} />
                       </FormControl>
                       <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="funding_source"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Funding Source</FormLabel>
+                      <FormControl>
+                        <Input {...field} value={field.value ?? ""} list="funding-sources" placeholder="e.g. ARPA, State Grant" />
+                      </FormControl>
+                      <FormMessage />
+                      <datalist id="funding-sources">{FUNDING_SOURCES.map((f) => <option key={f} value={f} />)}</datalist>
                     </FormItem>
                   )}
                 />

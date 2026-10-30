@@ -484,9 +484,10 @@ function PlacementDialog({ data, state, onClose, onSaved }: { data: FinanceData;
     }
     // Keep the CRM in sync: make sure the contractor is linked to the engagement.
     if (payload.contractor_id && payload.engagement_id) {
-      await supabase
+      const link = await supabase
         .from("engagement_contractors")
         .upsert({ engagement_id: payload.engagement_id, contractor_id: payload.contractor_id }, { onConflict: "engagement_id,contractor_id", ignoreDuplicates: true });
+      if (link.error) toast.error(`Placement saved, but the contractor was not linked to the engagement: ${link.error.message}`);
     }
     setSaving(false);
     toast.success(f.id ? "Placement updated" : "Placement added");

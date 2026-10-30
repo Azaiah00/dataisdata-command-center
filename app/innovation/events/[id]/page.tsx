@@ -90,7 +90,13 @@ export default function EventDetailPage() {
       toast.error(errorText(res.error));
       return false;
     }
-    if (after) await after();
+    if (after) {
+      try {
+        await after();
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "A follow-up update failed");
+      }
+    }
     if (ok) toast.success(ok);
     await load();
     return true;

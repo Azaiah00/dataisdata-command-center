@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
+import { toast } from "sonner";
+import { parseAmount } from "@/lib/links";
 import { useRouter, useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -39,9 +41,9 @@ const formSchema = z.object({
   status: z.enum(ENGAGEMENT_STATUSES),
   scope_summary: z.string().optional(),
   attachments: z.array(z.string()),
-  budget: z.string().transform((v) => (v === "" ? null : parseFloat(v))),
-  contract_value: z.string().transform((v) => (v === "" ? null : parseFloat(v))),
-  margin_pct: z.string().transform((v) => (v === "" ? null : parseFloat(v))),
+  budget: z.string().optional(),
+  contract_value: z.string().optional(),
+  margin_pct: z.string().optional(),
 });
 
 function EngagementForm() {
@@ -79,15 +81,29 @@ function EngagementForm() {
   }, []);
 
   async function onSubmit(values: any) {
-    const payload = { ...values, attachments: values.attachments?.length ? values.attachments : null };
-    const { error } = await supabase.from("engagements").insert([payload]);
+    const payload = {
+      ...values,
+      budget: parseAmount(values.budget),
+      contract_value: parseAmount(values.contract_value),
+      margin_pct: parseAmount(values.margin_pct),
+      engagement_type: values.engagement_type || null,
+      start_date: values.start_date || null,
+      end_date: values.end_date || null,
+      scope_summary: values.scope_summary || null,
+      attachments: values.attachments?.length ? values.attachments : null,
+    };
+    const { data: created, error } = await supabase.from("engagements").insert([payload]).select("id").single();
 
     if (error) {
       console.error("Error creating engagement:", error);
+      toast.error(`Engagement not saved: ${error.message}`);
       return;
     }
 
-    if (preselectedAccountId) {
+    toast.success("Engagement created — link its contractor here");
+    if (created?.id) {
+      router.push(`/engagements/${created.id}`);
+    } else if (preselectedAccountId) {
       router.push(`/accounts/${preselectedAccountId}`);
     } else {
       router.push("/engagements");
@@ -228,6 +244,32 @@ function EngagementForm() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Contract Value ($)</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="0.01" placeholder="0.00" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+<FormField
+                  control={form.control}
+                  name="budget"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Budget</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="0.01" placeholder="0.00" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+<FormField
+                  control={form.control}
+                  name="margin_pct"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Planned margin (%)</FormLabel>
                       <FormControl>
                         <Input type="number" step="0.01" placeholder="0.00" {...field} />
                       </FormControl>

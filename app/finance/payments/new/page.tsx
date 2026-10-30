@@ -131,7 +131,8 @@ function NewPaymentPageContent() {
       // Recalculate status from all payments (Paid when fully covered; a Draft that receives money is clearly Sent).
       const next = await recomputeInvoiceStatus(values.invoice_id);
       if (next === "Draft") {
-        await supabase.from("invoices").update({ status: "Sent", updated_at: new Date().toISOString() }).eq("id", values.invoice_id);
+        const st = await supabase.from("invoices").update({ status: "Sent", updated_at: new Date().toISOString() }).eq("id", values.invoice_id);
+        if (st.error) toast.error(`Payment recorded, but the invoice status was not updated: ${st.error.message}`);
       }
 
       toast.success("Payment recorded");

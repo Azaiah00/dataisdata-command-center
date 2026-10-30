@@ -8,10 +8,10 @@
 import type { jsPDF as JsPDFType } from "jspdf";
 
 export const BRAND = {
-  primary: [20, 70, 35] as [number, number, number], // #144623
-  dark: [25, 59, 34] as [number, number, number], // #193b22
-  bright: [5, 137, 62] as [number, number, number], // #05893e
-  light: [225, 245, 228] as [number, number, number], // #e1f5e4
+  primary: [75, 95, 134] as [number, number, number], // #4b5f86 slate-blue
+  dark: [38, 50, 72] as [number, number, number], // #263248
+  bright: [95, 114, 154] as [number, number, number], // #5f729a
+  light: [230, 235, 243] as [number, number, number], // #e6ebf3
   ink: [17, 24, 39] as [number, number, number], // #111827
   muted: [107, 114, 128] as [number, number, number], // #6b7280
   line: [229, 231, 235] as [number, number, number],
@@ -268,7 +268,7 @@ export class BrandedPdf {
       },
       headStyles: { fillColor: BRAND.primary, textColor: [255, 255, 255], fontStyle: "bold", fontSize: (opts.fontSize || 8.5) - 0.5 },
       footStyles: { fillColor: BRAND.light, textColor: BRAND.ink, fontStyle: "bold" },
-      alternateRowStyles: { fillColor: [249, 252, 250] },
+      alternateRowStyles: { fillColor: [246, 248, 251] },
       columnStyles,
       didDrawPage: () => {
         // Continuation pages created by autotable need our branded header.

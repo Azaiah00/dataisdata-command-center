@@ -150,8 +150,8 @@ function NewInvoiceInner() {
       }));
       const { error: liErr } = await supabase.from("invoice_line_items").insert(rows);
       if (liErr) {
-        await supabase.from("invoices").delete().eq("id", inv.id);
-        throw liErr;
+        const rb = await supabase.from("invoices").delete().eq("id", inv.id);
+        throw new Error(liErr.message + (rb.error ? ` (and invoice ${invoiceNumber} could not be removed — delete it manually)` : ""));
       }
 
       toast.success(`Invoice ${invoiceNumber} created`);

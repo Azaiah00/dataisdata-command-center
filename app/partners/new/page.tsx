@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -58,6 +59,7 @@ export default function NewPartnerPage() {
 
     if (error) {
       console.error("Error creating partner:", error);
+      toast.error(`Partner not saved: ${error.message}`);
       return;
     }
 

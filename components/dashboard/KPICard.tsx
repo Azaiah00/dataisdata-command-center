@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { Sparkline } from "@/components/ui/page";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 interface KPICardProps {
   title: string;
@@ -9,58 +10,38 @@ interface KPICardProps {
   changeType?: "positive" | "negative" | "neutral";
   icon: React.ElementType;
   description?: string;
+  spark?: number[];
+  href?: string;
 }
 
-export function KPICard({
-  title,
-  value,
-  change,
-  changeType = "neutral",
-  icon: Icon,
-  description,
-}: KPICardProps) {
-  return (
-    <Card className="hover:shadow-lg transition-all duration-300 border-none shadow-md rounded-3xl group">
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between">
-          <div className="space-y-3">
-            <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{title}</p>
-            <p className="text-3xl font-bold text-foreground tracking-tight">{value}</p>
-            {change && (
-              <div className="flex items-center gap-1.5">
-                <div className={cn(
-                  "p-1 rounded-full",
-                  changeType === "positive" && "bg-green-100",
-                  changeType === "negative" && "bg-red-100",
-                  changeType === "neutral" && "bg-slate-100"
-                )}>
-                  {changeType === "positive" ? (
-                    <TrendingUp className="w-3 h-3 text-green-600" />
-                  ) : changeType === "negative" ? (
-                    <TrendingDown className="w-3 h-3 text-red-600" />
-                  ) : null}
-                </div>
-                <span
-                  className={cn(
-                    "text-xs font-bold",
-                    changeType === "positive" && "text-green-600",
-                    changeType === "negative" && "text-red-600",
-                    changeType === "neutral" && "text-muted-foreground"
-                  )}
-                >
-                  {change}
-                </span>
-              </div>
-            )}
-            {description && (
-              <p className="text-xs font-medium text-muted-foreground">{description}</p>
-            )}
-          </div>
-          <div className="p-4 rounded-2xl bg-muted group-hover:bg-primary/10 transition-colors">
-            <Icon className="w-6 h-6 text-primary" />
-          </div>
+/** KPI tile in the frosted reference style: label + trend chip, big number, soft area sparkline. */
+export function KPICard({ title, value, change, changeType = "neutral", icon: Icon, description, spark, href }: KPICardProps) {
+  const body = (
+    <Card className={cn("h-full gap-0 py-0", href && "cursor-pointer")}>
+      <CardContent className="p-5 flex flex-col h-full">
+        <div className="flex flex-wrap items-start justify-between gap-x-2 gap-y-1.5">
+          <p className="stat-label flex items-center gap-2 min-w-0">
+            <Icon className="w-4 h-4 text-[#7d8fb3] shrink-0" />
+            <span>{title}</span>
+          </p>
+          {change && (
+            <span className={cn("trend-chip shrink-0", changeType === "positive" ? "is-up" : changeType === "negative" ? "is-down" : "bg-[#eceff4] text-[#59647a]")}>
+              {changeType === "positive" ? "▲ " : changeType === "negative" ? "▼ " : ""}
+              {change}
+            </span>
+          )}
         </div>
+        <p className="stat-value text-[1.75rem] mt-2">{value}</p>
+        {description && <p className="stat-hint">{description}</p>}
+        <div className="mt-auto pt-3">{spark && spark.length > 1 ? <Sparkline values={spark} height={44} /> : <div className="h-[44px]" />}</div>
       </CardContent>
     </Card>
+  );
+  return href ? (
+    <Link href={href} className="block h-full">
+      {body}
+    </Link>
+  ) : (
+    body
   );
 }

@@ -184,7 +184,8 @@ export async function recordDecision(opts: {
 export async function syncEventRevenue(eventId: string) {
   const { data } = await supabase.from("event_vendors").select("fee, paid").eq("event_id", eventId);
   const collected = (data || []).filter((r: { paid?: boolean | null }) => r.paid).reduce((t: number, r: { fee: number | string | null }) => t + toNum(r.fee), 0);
-  await supabase.from("events").update({ revenue_generated: collected }).eq("id", eventId);
+  const { error } = await supabase.from("events").update({ revenue_generated: collected }).eq("id", eventId);
+  if (error) throw new Error(`Event revenue not updated: ${error.message}`);
 }
 
 export const isPastEvent = (e: { status: string | null; event_date: string | null }) => {

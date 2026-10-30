@@ -130,18 +130,23 @@ function isActivePath(pathname: string | null, path: string) {
 
 function NavLink({ href, label, icon: Icon, active, onClick }: { href: string; label: string; icon?: React.ElementType; active?: boolean; onClick?: () => void }) {
   return (
-    <Link
-      href={href}
-      onClick={onClick}
-      className={cn(
-        "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-        active ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"
-      )}
-    >
-      {Icon && <Icon className="w-4 h-4" />}
-      <span>{label}</span>
+    <Link href={href} onClick={onClick} aria-current={active ? "page" : undefined} className={cn("side-link", active && "is-active")}>
+      {Icon && <Icon />}
+      <span className="truncate">{label}</span>
     </Link>
   );
+}
+
+function currentTitle(pathname: string | null, sections: { items: NavItem[] }[]) {
+  if (!pathname || pathname === "/") return "Dashboard";
+  let best: NavItem | null = null;
+  for (const sec of sections)
+    for (const it of sec.items)
+      if ((pathname === it.path || pathname.startsWith(it.path + "/")) && (!best || it.path.length > best.path.length)) best = it;
+  if (best) return best.label;
+  if (pathname.startsWith("/admin")) return "Users & Permissions";
+  if (pathname.startsWith("/settings")) return "Profile & My View";
+  return "DataIsData";
 }
 
 export function Header() {
@@ -198,7 +203,7 @@ export function Header() {
       const empty = Promise.resolve({ data: [] as never[] });
       const [accountsRes, contactsRes, opportunitiesRes, engagementsRes, partnersRes, contractorsRes, invoicesRes] = await Promise.all([
         searchable.accounts ? supabase.from("accounts").select("id, name, account_type").ilike("name", `%${term}%`).limit(4) : empty,
-        searchable.contacts ? supabase.from("contacts").select("id, full_name, title_role").ilike("full_name", `%${term}%`).limit(4) : empty,
+        searchable.contacts ? supabase.from("contacts").select("id, full_name, title_role").or(`full_name.ilike.%${term}%,email.ilike.%${term}%`).limit(4) : empty,
         searchable.pipeline ? supabase.from("opportunities").select("id, name, stage").ilike("name", `%${term}%`).limit(4) : empty,
         searchable.engagements ? supabase.from("engagements").select("id, name, status").ilike("name", `%${term}%`).limit(4) : empty,
         searchable.partners ? supabase.from("partners").select("id, name, partner_type").ilike("name", `%${term}%`).limit(4) : empty,
@@ -229,7 +234,7 @@ export function Header() {
 
   const searchBox = (className: string) => (
     <div ref={searchContainerRef} className={cn("items-center relative", className)}>
-      <Search className="absolute left-3 w-4 h-4 text-muted-foreground" />
+      <Search className="absolute left-3 w-4 h-4 text-muted-foreground z-10" />
       <input
         type="text"
         placeholder="Search..."
@@ -247,10 +252,10 @@ export function Header() {
           }
           if (e.key === "Escape") setSearchOpen(false);
         }}
-        className="pl-9 pr-4 py-1.5 bg-muted/50 border-none rounded-full text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all w-full"
+        className="search-field"
       />
       {searchOpen && (
-        <div className="absolute top-11 left-0 w-full min-w-[18rem] rounded-xl border border-border bg-white shadow-lg z-50 overflow-hidden">
+        <div className="absolute top-12 right-0 w-full min-w-[18rem] rounded-2xl border border-[#e2e7ef] bg-white/95 backdrop-blur-xl shadow-[0_20px_50px_-24px_rgba(24,32,47,0.4)] z-50 overflow-hidden">
           {searchLoading ? (
             <div className="px-3 py-3 text-sm text-muted-foreground">Searching...</div>
           ) : searchResults.length > 0 ? (
@@ -284,191 +289,174 @@ export function Header() {
 
   const previewTargets = users.filter((u) => u.id !== realUser?.id && u.status === "active");
 
-  return (
-    <header className="fixed top-0 left-0 right-0 z-50 h-16 bg-white/80 backdrop-blur-md border-b border-border shadow-sm print:hidden">
-      <div className="flex items-center justify-between h-full px-4 max-w-7xl mx-auto">
-        {/* Left: Logo & Desktop Nav */}
-        <div className="flex items-center gap-6 min-w-0">
-          <Link href={showDashboard ? "/" : sections[0]?.items[0]?.path || "/"} className="flex items-center gap-2.5 shrink-0" aria-label="DataIsData home">
-            <BrandMark size={34} />
-            <span className="text-xl font-bold text-foreground tracking-tight hidden sm:block font-mono">DataIsData</span>
-          </Link>
-
-          <nav className="hidden lg:flex items-center gap-1">
-            {showDashboard && <NavLink href="/" label="Dashboard" icon={LayoutDashboard} active={pathname === "/"} />}
-            {sections.map((section) => {
-              const active = section.prefixes.some((p) => pathname === p || pathname?.startsWith(p + "/"));
-              return (
-                <DropdownMenu key={section.label}>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className={cn(
-                        "flex items-center gap-1 px-3 py-2 h-9 rounded-lg text-sm font-medium transition-colors",
-                        active ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                      )}
-                    >
-                      <span>{section.label}</span>
-                      <ChevronDown className="w-4 h-4 opacity-50" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-56">
-                    {section.items.map((item) => (
-                      <DropdownMenuItem key={item.path} asChild>
-                        <Link href={item.path} className={cn("flex items-center gap-2 w-full", isActivePath(pathname, item.path) && "text-primary font-semibold")}>
-                          <item.icon className="w-4 h-4" />
-                          <span>{item.label}</span>
-                        </Link>
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              );
-            })}
-          </nav>
+  const navList = (close?: () => void) => (
+    <>
+      {showDashboard && <NavLink href="/" label="Dashboard" icon={LayoutDashboard} active={pathname === "/"} onClick={close} />}
+      {sections.map((section) => (
+        <div key={section.label}>
+          <p className="side-section">{section.label}</p>
+          <div className="space-y-0.5">
+            {section.items.map((item) => (
+              <NavLink key={item.path} href={item.path} label={item.label} icon={item.icon} active={isActivePath(pathname, item.path)} onClick={close} />
+            ))}
+          </div>
         </div>
-
-        {/* Right: Actions & Mobile Menu */}
-        <div className="flex items-center gap-2">
-          {canSearch && searchBox("hidden xl:flex w-56 2xl:w-64")}
-
-          {canSearch && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-muted-foreground xl:hidden"
-              aria-label="Search"
-              onClick={() => setMobileSearchOpen((v) => !v)}
-            >
-              {mobileSearchOpen ? <X className="w-5 h-5" /> : <Search className="w-5 h-5" />}
-            </Button>
-          )}
-
-          <NotificationsMenu />
-
-          {/* User Menu */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-2 p-1 pl-2 rounded-full hover:bg-muted" aria-label="Account menu">
-                <div className="hidden sm:flex lg:hidden xl:flex flex-col items-end text-right">
-                  <span className="text-xs font-semibold text-foreground leading-none">{realUser?.full_name}</span>
-                  <span className="text-[10px] text-muted-foreground mt-0.5">
-                    {realUser ? ROLE_LABELS[realUser.seat_role] : ""}
-                    {isPreviewing && user ? ` · viewing as ${user.full_name.split(" ")[0]}` : ""}
-                  </span>
-                </div>
-                <Avatar className="h-8 w-8 border-2 border-white shadow-sm">
-                  <AvatarFallback className={cn("text-white text-xs", isPreviewing ? "bg-amber-500" : "bg-primary")}>
-                    {initials(realUser?.full_name || "?")}
-                  </AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-64">
-              <DropdownMenuLabel className="space-y-1">
-                <span className="block text-sm font-semibold">{realUser?.full_name}</span>
-                <span className="block text-xs font-normal text-muted-foreground truncate">{realUser?.email || "No email on file"}</span>
-                {realUser && <RoleBadge role={realUser.seat_role} />}
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link href="/settings" className="flex items-center">
-                  <Settings className="w-4 h-4 mr-2" /> Profile & My View
-                </Link>
-              </DropdownMenuItem>
-              {isAdmin && (
-                <DropdownMenuItem asChild>
-                  <Link href="/admin/users" className="flex items-center">
-                    <ShieldCheck className="w-4 h-4 mr-2" /> Users & Permissions
-                  </Link>
-                </DropdownMenuItem>
-              )}
-              {isRealAdmin && previewTargets.length > 0 && (
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>
-                    <Eye className="w-4 h-4 mr-2" /> Preview as…
-                  </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent className="w-56">
-                    {previewTargets.map((u) => (
-                      <DropdownMenuItem key={u.id} onClick={() => startPreview(u.id)}>
-                        <span className="truncate">{u.full_name}</span>
-                        <span className="ml-auto text-[10px] text-muted-foreground">{ROLE_LABELS[u.seat_role]}</span>
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuSubContent>
-                </DropdownMenuSub>
-              )}
-              {isPreviewing && (
-                <DropdownMenuItem onClick={stopPreview}>
-                  <Eye className="w-4 h-4 mr-2" /> Exit preview
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuSeparator />
-              {authMode === "demo" && (
-                <DropdownMenuItem onClick={() => signOut()}>
-                  <Repeat className="w-4 h-4 mr-2" /> Switch demo user
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuItem className="text-destructive" onClick={() => signOut()}>
-                <LogOut className="w-4 h-4 mr-2" /> Sign out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {/* Mobile Menu Trigger */}
-          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden text-muted-foreground" aria-label="Open menu">
-                <Menu className="w-6 h-6" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-72 p-0">
-              <SheetHeader className="p-6 border-b text-left">
-                <SheetTitle className="flex items-center gap-2.5">
-                  <BrandMark size={32} />
-                  <span className="font-mono">DataIsData</span>
-                </SheetTitle>
-              </SheetHeader>
-              <div className="flex flex-col py-4 overflow-y-auto h-[calc(100vh-5rem)]">
-                {showDashboard && (
-                  <div className="px-4 py-2">
-                    <NavLink href="/" label="Dashboard" icon={LayoutDashboard} active={pathname === "/"} onClick={() => setIsMobileMenuOpen(false)} />
-                  </div>
-                )}
-                <div className="px-4 py-4 space-y-4">
-                  {sections.map((section) => (
-                    <div key={section.label}>
-                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2 px-3">{section.label}</p>
-                      {section.items.map((item) => (
-                        <NavLink
-                          key={item.path}
-                          href={item.path}
-                          label={item.label}
-                          icon={item.icon}
-                          active={isActivePath(pathname, item.path)}
-                          onClick={() => setIsMobileMenuOpen(false)}
-                        />
-                      ))}
-                    </div>
-                  ))}
-                  {isAdmin && (
-                    <div>
-                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2 px-3">Admin</p>
-                      <NavLink href="/admin/users" label="Users & Permissions" icon={ShieldCheck} active={pathname?.startsWith("/admin")} onClick={() => setIsMobileMenuOpen(false)} />
-                    </div>
-                  )}
-                </div>
-              </div>
-            </SheetContent>
-          </Sheet>
-        </div>
-      </div>
-      {mobileSearchOpen && canSearch && (
-        <div className="xl:hidden absolute top-16 left-0 right-0 bg-white border-b border-border p-3 shadow-sm">
-          {searchBox("flex w-full")}
+      ))}
+      {isAdmin && (
+        <div>
+          <p className="side-section">Admin</p>
+          <NavLink href="/admin/users" label="Users & Permissions" icon={ShieldCheck} active={pathname?.startsWith("/admin")} onClick={close} />
+          <NavLink href="/settings" label="Settings" icon={Settings} active={pathname?.startsWith("/settings")} onClick={close} />
         </div>
       )}
-    </header>
+    </>
+  );
+
+  const title = currentTitle(pathname, sections);
+
+  return (
+    <>
+      {/* Desktop: frosted sidebar */}
+      <aside className="app-sidebar hidden lg:flex fixed inset-y-0 left-0 z-40 w-64 flex-col print:hidden" aria-label="Main navigation">
+        <Link href={showDashboard ? "/" : sections[0]?.items[0]?.path || "/"} className="flex items-center gap-3 px-6 h-20 shrink-0" aria-label="DataIsData home">
+          <BrandMark size={36} />
+          <span className="leading-tight">
+            <span className="wordmark block text-[1.1rem] text-foreground">Data<span className="wm-is">Is</span>Data</span>
+            <span className="block text-[11px] font-medium text-muted-foreground">Command Center</span>
+          </span>
+        </Link>
+        <nav className="flex-1 overflow-y-auto px-3 pb-4 sidebar-scroll">{navList()}</nav>
+        <div className="p-3 border-t border-white/70">
+          <div className="flex items-center gap-3 rounded-xl px-3 py-2.5 bg-white/55 border border-white/80">
+            <Avatar className="h-8 w-8">
+              <AvatarFallback className={cn("text-white text-xs", isPreviewing ? "bg-amber-500" : "bg-gradient-to-br from-[#5f729a] to-[#3d4e70]")}>
+                {initials(realUser?.full_name || "?")}
+              </AvatarFallback>
+            </Avatar>
+            <div className="min-w-0">
+              <p className="text-xs font-semibold text-foreground truncate">{realUser?.full_name}</p>
+              <p className="text-[10px] text-muted-foreground truncate">{realUser ? ROLE_LABELS[realUser.seat_role] : ""}</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <header className="app-topbar fixed top-0 right-0 left-0 lg:left-64 z-30 h-16 print:hidden">
+        <div className="flex items-center justify-between h-full px-4 sm:px-6 lg:px-8 max-w-[90rem] mx-auto gap-3">
+          <div className="flex items-center gap-2 min-w-0">
+            {/* Mobile Menu Trigger */}
+            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="lg:hidden text-muted-foreground -ml-2" aria-label="Open menu">
+                  <Menu className="w-6 h-6" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-72 p-0 app-sidebar">
+                <SheetHeader className="px-6 h-20 justify-center border-b border-white/70 text-left">
+                  <SheetTitle className="flex items-center gap-2.5">
+                    <BrandMark size={32} />
+                    <span className="wordmark">Data<span className="wm-is">Is</span>Data</span>
+                  </SheetTitle>
+                </SheetHeader>
+                <nav className="px-3 py-3 overflow-y-auto h-[calc(100dvh-5rem)] sidebar-scroll">{navList(() => setIsMobileMenuOpen(false))}</nav>
+              </SheetContent>
+            </Sheet>
+            <Link href={showDashboard ? "/" : sections[0]?.items[0]?.path || "/"} className="lg:hidden shrink-0" aria-label="DataIsData home">
+              <BrandMark size={30} />
+            </Link>
+            <span className="text-base sm:text-lg font-semibold text-foreground truncate">{title}</span>
+          </div>
+
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {canSearch && searchBox("hidden md:flex w-56 xl:w-72")}
+
+            {canSearch && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground md:hidden"
+                aria-label="Search"
+                onClick={() => setMobileSearchOpen((v) => !v)}
+              >
+                {mobileSearchOpen ? <X className="w-5 h-5" /> : <Search className="w-5 h-5" />}
+              </Button>
+            )}
+
+            <div className="topbar-icon">
+              <NotificationsMenu />
+            </div>
+
+            {/* User Menu */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="flex items-center gap-2 p-1 pl-1 rounded-full hover:bg-white/70" aria-label="Account menu">
+                  <Avatar className="h-9 w-9 border-2 border-white shadow-sm">
+                    <AvatarFallback className={cn("text-white text-xs", isPreviewing ? "bg-amber-500" : "bg-gradient-to-br from-[#5f729a] to-[#3d4e70]")}>
+                      {initials(realUser?.full_name || "?")}
+                    </AvatarFallback>
+                  </Avatar>
+                  <ChevronDown className="w-4 h-4 text-muted-foreground hidden sm:block" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-64">
+                <DropdownMenuLabel className="space-y-1">
+                  <span className="block text-sm font-semibold">{realUser?.full_name}</span>
+                  <span className="block text-xs font-normal text-muted-foreground truncate">{realUser?.email || "No email on file"}</span>
+                  {realUser && <RoleBadge role={realUser.seat_role} />}
+                  {isPreviewing && user && <span className="block text-[11px] font-normal text-amber-700">Viewing as {user.full_name}</span>}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/settings" className="flex items-center">
+                    <Settings className="w-4 h-4 mr-2" /> Profile & My View
+                  </Link>
+                </DropdownMenuItem>
+                {isAdmin && (
+                  <DropdownMenuItem asChild>
+                    <Link href="/admin/users" className="flex items-center">
+                      <ShieldCheck className="w-4 h-4 mr-2" /> Users & Permissions
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+                {isRealAdmin && previewTargets.length > 0 && (
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>
+                      <Eye className="w-4 h-4 mr-2" /> Preview as…
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent className="w-56">
+                      {previewTargets.map((u) => (
+                        <DropdownMenuItem key={u.id} onClick={() => startPreview(u.id)}>
+                          <span className="truncate">{u.full_name}</span>
+                          <span className="ml-auto text-[10px] text-muted-foreground">{ROLE_LABELS[u.seat_role]}</span>
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+                )}
+                {isPreviewing && (
+                  <DropdownMenuItem onClick={stopPreview}>
+                    <Eye className="w-4 h-4 mr-2" /> Exit preview
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuSeparator />
+                {authMode === "demo" && (
+                  <DropdownMenuItem onClick={() => signOut()}>
+                    <Repeat className="w-4 h-4 mr-2" /> Switch demo user
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem className="text-destructive" onClick={() => signOut()}>
+                  <LogOut className="w-4 h-4 mr-2" /> Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+        {mobileSearchOpen && canSearch && (
+          <div className="md:hidden absolute top-16 left-0 right-0 app-topbar p-3">
+            {searchBox("flex w-full")}
+          </div>
+        )}
+      </header>
+    </>
   );
 }

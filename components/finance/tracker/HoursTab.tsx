@@ -105,7 +105,12 @@ export function HoursTab({ data, reload }: { data: FinanceData; reload: () => Pr
         .select("id")
         .single();
       if (error) throw new Error(error.message);
-      await supabase.from("placement_hours").update({ expense_id: exp.id }).eq("id", h.id);
+      const mark = await supabase.from("placement_hours").update({ expense_id: exp.id }).eq("id", h.id);
+      if (mark.error) {
+        // Undo the expense so a retry can't pay the same hours twice.
+        await supabase.from("expenses").delete().eq("id", exp.id);
+        throw new Error(mark.error.message);
+      }
       created++;
     }
     return created;
@@ -163,9 +168,10 @@ export function HoursTab({ data, reload }: { data: FinanceData; reload: () => Pr
         const up = li.error ? null : await supabase.from("placement_hours").update({ invoice_id: inv.id }).in("id", list.map((h) => h.id));
         if (li.error || up?.error) {
           // Roll back so a retry can't double-bill the same hours.
-          await supabase.from("placement_hours").update({ invoice_id: null }).eq("invoice_id", inv.id);
-          await supabase.from("invoices").delete().eq("id", inv.id);
-          throw new Error((li.error || up?.error)!.message);
+          const r1 = await supabase.from("placement_hours").update({ invoice_id: null }).eq("invoice_id", inv.id);
+          const r2 = await supabase.from("invoices").delete().eq("id", inv.id);
+          const rollback = r1.error || r2.error ? ` (cleanup also failed — check invoice ${inv.invoice_number})` : "";
+          throw new Error((li.error || up?.error)!.message + rollback);
         }
         created.push(inv.invoice_number);
       }

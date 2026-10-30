@@ -34,18 +34,25 @@ import {
   DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { syncLinks } from "@/lib/links";
+import { loadContractorRollup, type ContractorRollup } from "@/lib/contractorLinks";
+import { useAccess } from "@/components/auth/AccessProvider";
+import { StatTile } from "@/components/ui/page";
+import { formatCurrency } from "@/lib/utils";
+import { AlertCircle, Building2 } from "lucide-react";
 
 export default function ContractorDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
   const [contractor, setContractor] = useState<Contractor | null>(null);
-  const [engagements, setEngagements] = useState<(Engagement & { accounts?: { name: string } })[]>([]);
+  const { can } = useAccess();
+  const [roll, setRoll] = useState<ContractorRollup | null>(null);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [managingEngagements, setManagingEngagements] = useState(false);
   const [savingEngagements, setSavingEngagements] = useState(false);
-  const [allEngagements, setAllEngagements] = useState<Pick<Engagement, "id" | "name" | "status">[]>([]);
+  const [allEngagements, setAllEngagements] = useState<(Pick<Engagement, "id" | "name" | "status" | "start_date" | "contract_value"> & { accounts?: { name: string } | null })[]>([]);
   const [selectedEngIds, setSelectedEngIds] = useState<string[]>([]);
 
   async function fetchData() {
@@ -56,24 +63,18 @@ export default function ContractorDetailPage({ params }: { params: Promise<{ id:
       .single();
     if (cData) setContractor(cData);
 
-    // Fetch linked engagements via junction table
-    const { data: links } = await supabase
-      .from("engagement_contractors")
-      .select("engagements(*, accounts(name))")
-      .eq("contractor_id", id);
-
-    const mapped = (links || [])
-      .map((l: any) => l.engagements)
-      .filter(Boolean);
-    setEngagements(mapped);
-    setSelectedEngIds(mapped.map((e: any) => e.id));
+    // Linked engagements (with their contract values) — same records the Engagements pages edit.
+    const r = await loadContractorRollup(id);
+    setRoll(r);
+    setSelectedEngIds(r.engagements.map((e) => e.id));
 
     // Fetch all engagements for the dropdown
     const { data: allEngs } = await supabase
       .from("engagements")
-      .select("id, name, status")
+      .select("id, name, status, start_date, contract_value, accounts(name)")
       .order("name");
-    setAllEngagements(allEngs || []);
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    setAllEngagements(((allEngs || []) as any[]).map((e) => ({ ...e, accounts: Array.isArray(e.accounts) ? e.accounts[0] : e.accounts })));
 
     setLoading(false);
   }
@@ -209,6 +210,34 @@ export default function ContractorDetailPage({ params }: { params: Promise<{ id:
         </Card>
       </div>
 
+      {can("engagements") && roll && (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatTile label="Total contract value" value={roll.withValue ? formatCurrency(roll.totalValue) : "Not entered"} hint={`${roll.withValue} of ${roll.engagements.length} engagements have a value`} />
+          <StatTile label="Engagements" value={String(roll.engagements.length)} hint={`${roll.activeCount} open`} />
+          <StatTile
+            label="Agencies"
+            value={String(roll.agencies.length)}
+            hint={roll.agencies.map((a) => a.name).join(", ") || "None yet"}
+          />
+          <StatTile
+            label="Missing values"
+            value={String(roll.missingValue)}
+            hint={roll.missingValue ? "Open an engagement below to add its value" : "All values entered"}
+            tone={roll.missingValue ? "warn" : "good"}
+          />
+        </div>
+      )}
+
+      {can("accounts") && roll && roll.agencies.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {roll.agencies.map((a) => (
+            <Link key={a.id} href={`/accounts/${a.id}`} className="filter-pill inline-flex items-center gap-1.5">
+              <Building2 className="w-3.5 h-3.5" /> {a.name}
+            </Link>
+          ))}
+        </div>
+      )}
+
       <EntityFinancePanel scope={{ contractorId: id }} title="Placements & pay" />
 
       {/* Linked Engagements */}
@@ -216,7 +245,7 @@ export default function ContractorDetailPage({ params }: { params: Promise<{ id:
         <Card className="border-none shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg font-bold text-[#111827]">
-              Linked Engagements ({managingEngagements ? selectedEngIds.length : engagements.length})
+              Linked Engagements ({managingEngagements ? selectedEngIds.length : roll?.engagements.length || 0})
             </CardTitle>
             {!managingEngagements ? (
               <Can module="contractors" action="edit">
@@ -237,13 +266,19 @@ export default function ContractorDetailPage({ params }: { params: Promise<{ id:
                   disabled={savingEngagements}
                   onClick={async () => {
                     setSavingEngagements(true);
-                    // Delete existing links, re-insert selected
-                    await supabase.from("engagement_contractors").delete().eq("contractor_id", id);
-                    if (selectedEngIds.length > 0) {
-                      const rows = selectedEngIds.map((eid) => ({ engagement_id: eid, contractor_id: id }));
-                      await supabase.from("engagement_contractors").insert(rows);
-                    }
+                    // Only add/remove the links that changed — never wipe the list.
+                    const res = await syncLinks({
+                      table: "engagement_contractors",
+                      ownerColumn: "contractor_id",
+                      ownerId: id,
+                      otherColumn: "engagement_id",
+                      desiredIds: selectedEngIds,
+                    });
                     setSavingEngagements(false);
+                    if (res.error) {
+                      toast.error(`Engagements not updated: ${res.error}`);
+                      return;
+                    }
                     setManagingEngagements(false);
                     toast.success("Engagements updated");
                     await fetchData();
@@ -255,7 +290,7 @@ export default function ContractorDetailPage({ params }: { params: Promise<{ id:
                   variant="outline"
                   size="sm"
                   onClick={() => {
-                    setSelectedEngIds(engagements.map((e) => e.id));
+                    setSelectedEngIds((roll?.engagements || []).map((e) => e.id));
                     setManagingEngagements(false);
                   }}
                 >
@@ -275,10 +310,11 @@ export default function ContractorDetailPage({ params }: { params: Promise<{ id:
                       return (
                         <Badge key={eid} variant="secondary" className="gap-1 px-2 py-1 bg-blue-50 text-blue-800 border-none">
                           <Briefcase className="w-3 h-3" />
-                          {eng?.name || "Unknown"}
+                          {eng ? `${eng.name} — ${eng.accounts?.name || "No account"}` : "Unknown"}
                           <button
                             type="button"
                             className="ml-1 hover:text-red-600"
+                            aria-label={`Remove ${eng?.name || "engagement"}`}
                             onClick={() => setSelectedEngIds((prev) => prev.filter((x) => x !== eid))}
                           >
                             <X className="w-3 h-3" />
@@ -304,28 +340,42 @@ export default function ContractorDetailPage({ params }: { params: Promise<{ id:
                       .filter((e) => !selectedEngIds.includes(e.id))
                       .map((e) => (
                         <SelectItem key={e.id} value={e.id}>
-                          {e.name} ({e.status})
+                          {e.name} — {e.accounts?.name || "No account"}
+                          {e.start_date ? ` · ${formatDate(e.start_date)}` : ""} · {e.contract_value != null ? formatCurrency(e.contract_value) : "no value"} ({e.status})
                         </SelectItem>
                       ))}
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-[#6B7280]">Add or remove engagement assignments for this contractor.</p>
               </div>
-            ) : engagements.length > 0 ? (
-              <div className="space-y-3">
-                {engagements.map((eng) => (
-                  <Link key={eng.id} href={`/engagements/${eng.id}`}>
-                    <div className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 border border-slate-100 cursor-pointer">
-                      <div className="flex items-center gap-3">
-                        <Briefcase className="w-4 h-4 text-blue-600" />
-                        <div>
-                          <p className="text-sm font-bold text-[#111827]">{eng.name}</p>
-                          <p className="text-xs text-[#6B7280]">{eng.accounts?.name}</p>
+            ) : roll && roll.engagements.length > 0 ? (
+              <div className="space-y-2.5">
+                {roll.engagements.map((eng) => (
+                  <Link key={eng.id} href={`/engagements/${eng.id}`} className="block">
+                    <div className="list-row">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="icon-chip">
+                          <Briefcase className="w-4 h-4" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-foreground truncate">{eng.name}</p>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {eng.account_name || "No account"} · {eng.start_date || eng.end_date ? `${eng.start_date ? formatDate(eng.start_date) : "?"} → ${eng.end_date ? formatDate(eng.end_date) : "open"}` : "No dates"}
+                          </p>
                         </div>
                       </div>
-                      <Badge className={cn("text-[10px] h-5 px-2 border-none", getStatusColor(eng.status))}>
-                        {eng.status}
-                      </Badge>
+                      <div className="flex items-center gap-3 shrink-0">
+                        {eng.contract_value != null ? (
+                          <span className="text-sm font-semibold tabular-nums text-foreground">{formatCurrency(eng.contract_value)}</span>
+                        ) : (
+                          <span className="text-xs font-medium text-amber-700 flex items-center gap-1">
+                            <AlertCircle className="w-3.5 h-3.5" /> Value not entered
+                          </span>
+                        )}
+                        <Badge variant="outline" className={cn("status-pill", getStatusColor(eng.status))}>
+                          {eng.status}
+                        </Badge>
+                      </div>
                     </div>
                   </Link>
                 ))}

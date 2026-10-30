@@ -117,7 +117,11 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
   async function deletePayment(p: Payment) {
     const { error } = await supabase.from("payments").delete().eq("id", p.id);
     if (error) return toast.error(error.message);
-    await recomputeInvoiceStatus(id);
+    try {
+      await recomputeInvoiceStatus(id);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Invoice status not updated");
+    }
     setPaymentToDelete(null);
     toast.success("Payment removed and invoice balance updated");
     await fetchInvoice();

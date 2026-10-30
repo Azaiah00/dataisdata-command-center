@@ -281,12 +281,18 @@ export async function replaceScopes(userId: string, accountIds: string[]): Promi
     writeLocal(db);
     return;
   }
-  const del = await supabaseRaw.from("user_account_scopes").delete().eq("user_id", userId);
-  if (del.error) throw new Error(del.error.message);
-  if (unique.length) {
-    const { error } = await supabaseRaw
-      .from("user_account_scopes")
-      .insert(unique.map((account_id) => ({ user_id: userId, account_id })));
+  // Only add/remove what changed, so a failed write never leaves the user with no account limits.
+  const cur = await supabaseRaw.from("user_account_scopes").select("account_id").eq("user_id", userId);
+  if (cur.error) throw new Error(cur.error.message);
+  const existing = new Set((cur.data || []).map((r: { account_id: string }) => r.account_id));
+  const toAdd = unique.filter((id) => !existing.has(id));
+  const toRemove = Array.from(existing).filter((id) => !unique.includes(id));
+  if (toAdd.length) {
+    const { error } = await supabaseRaw.from("user_account_scopes").insert(toAdd.map((account_id) => ({ user_id: userId, account_id })));
+    if (error) throw new Error(error.message);
+  }
+  if (toRemove.length) {
+    const { error } = await supabaseRaw.from("user_account_scopes").delete().eq("user_id", userId).in("account_id", toRemove);
     if (error) throw new Error(error.message);
   }
 }

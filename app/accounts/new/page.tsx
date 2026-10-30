@@ -128,6 +128,13 @@ export default function NewAccountPage() {
         }));
         const { error: linkError } = await supabase.from("account_contacts").insert(links);
         if (linkError) throw linkError;
+        // Contacts with no primary account yet get this one, so their own page shows it too.
+        const { error: primaryError } = await supabase
+          .from("contacts")
+          .update({ account_id: accountId, updated_at: new Date().toISOString() })
+          .in("id", values.existing_contact_ids)
+          .is("account_id", null);
+        if (primaryError) throw primaryError;
       }
 
       // 3. Create and link inline contacts

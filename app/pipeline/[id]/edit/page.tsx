@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
+import { toast } from "sonner";
+import { parseAmount, loadAccountContacts } from "@/lib/links";
+import { FUNDING_SOURCES } from "@/lib/constants";
 import { useRouter, useParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -37,8 +40,11 @@ const formSchema = z.object({
   primary_contact_id: z.string().optional().nullable(),
   service_line: z.string().optional().nullable(),
   stage: z.enum(PIPELINE_STAGES),
-  probability_pct: z.string().transform((v) => parseInt(v, 10)),
-  estimated_value: z.string().transform((v) => (v === "" ? 0 : parseFloat(v))),
+  probability_pct: z.string().transform((v) => {
+    const n = parseAmount(v);
+    return n == null ? null : Math.max(0, Math.min(100, Math.round(n)));
+  }),
+  estimated_value: z.string().transform((v) => parseAmount(v)),
   expected_start: z.string().optional().nullable(),
   expected_end: z.string().optional().nullable(),
   funding_source: z.string().optional().nullable(),
@@ -104,7 +110,7 @@ function EditOpportunityForm() {
         ...opportunity,
         related_account_ids: opportunity.related_account_ids || [],
         probability_pct: opportunity.probability_pct?.toString() || "0",
-        estimated_value: opportunity.estimated_value?.toString() || "0",
+        estimated_value: opportunity.estimated_value != null ? String(opportunity.estimated_value) : "",
         primary_contact_id: opportunity.primary_contact_id || "none",
         expected_start: opportunity.expected_start || "",
         expected_end: opportunity.expected_end || "",
@@ -124,8 +130,8 @@ function EditOpportunityForm() {
         setContacts([]);
         return;
       }
-      const { data } = await supabase.from("contacts").select("id, full_name").eq("account_id", selectedAccountId);
-      setContacts(data || []);
+      const list = await loadAccountContacts(selectedAccountId, form.getValues("primary_contact_id"));
+      setContacts(list);
     }
     fetchContacts();
   }, [selectedAccountId]);
@@ -151,8 +157,10 @@ function EditOpportunityForm() {
 
     if (error) {
       console.error("Error updating opportunity:", error);
+      toast.error(`Opportunity not saved: ${error.message}`);
       return;
     }
+    toast.success("Opportunity saved");
 
     router.push(`/pipeline/${id}`);
     router.refresh();
@@ -375,6 +383,20 @@ function EditOpportunityForm() {
                         <Input placeholder="e.g. Cyber, Broadband" {...field} />
                       </FormControl>
                       <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="funding_source"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Funding Source</FormLabel>
+                      <FormControl>
+                        <Input {...field} value={field.value ?? ""} list="funding-sources" placeholder="e.g. ARPA, State Grant" />
+                      </FormControl>
+                      <FormMessage />
+                      <datalist id="funding-sources">{FUNDING_SOURCES.map((f) => <option key={f} value={f} />)}</datalist>
                     </FormItem>
                   )}
                 />

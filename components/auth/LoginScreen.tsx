@@ -55,7 +55,7 @@ function Shell({ children }: { children: React.ReactNode }) {
         <div className="absolute bottom-0 right-0 w-[26rem] h-[26rem] rounded-full bg-brand-green-bright/30 blur-3xl pointer-events-none" />
         <div className="relative flex items-center gap-3">
           <BrandMark size={44} rounded="rounded-xl" className="ring-white/20" />
-          <span className="text-2xl font-bold font-mono tracking-tight">DataIsData</span>
+          <span className="wordmark text-2xl">Data<span className="wm-is">Is</span>Data</span>
         </div>
         <div className="relative space-y-5 max-w-md">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -71,7 +71,7 @@ function Shell({ children }: { children: React.ReactNode }) {
         <div className="w-full min-w-0 max-w-md md:max-w-lg space-y-8">
           <div className="md:hidden flex items-center gap-3">
             <BrandMark size={40} rounded="rounded-xl" />
-            <span className="text-2xl font-bold font-mono tracking-tight">DataIsData</span>
+            <span className="wordmark text-2xl">Data<span className="wm-is">Is</span>Data</span>
           </div>
           {children}
         </div>

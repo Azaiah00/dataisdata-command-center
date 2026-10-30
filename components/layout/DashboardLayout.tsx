@@ -22,7 +22,7 @@ function PreviewBanner() {
   const { isPreviewing, user, stopPreview } = useAccess();
   if (!isPreviewing || !user) return null;
   return (
-    <div className="fixed top-16 left-0 right-0 z-40 bg-amber-400 text-amber-950 print:hidden">
+    <div className="fixed top-16 left-0 lg:left-64 right-0 z-20 bg-amber-300/95 backdrop-blur text-amber-950 print:hidden">
       <div className="max-w-7xl mx-auto px-4 h-10 flex items-center justify-between gap-3 text-sm">
         <span className="flex items-center gap-2 font-medium truncate">
           <Eye className="w-4 h-4 shrink-0" />
@@ -42,7 +42,7 @@ function SetupBanner() {
   const { storageMode, isRealAdmin, isPreviewing } = useAccess();
   if (storageMode !== "local" || !isRealAdmin || isPreviewing) return null;
   return (
-    <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 flex flex-col sm:flex-row sm:items-center gap-3 justify-between print:hidden">
+    <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50/90 p-4 text-sm text-amber-800 flex flex-col sm:flex-row sm:items-center gap-3 justify-between print:hidden">
       <span className="flex items-start gap-2">
         <DatabaseZap className="w-4 h-4 mt-0.5 shrink-0" />
         <span>
@@ -62,8 +62,8 @@ function Shell({ children }: DashboardLayoutProps) {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="spinner" />
       </div>
     );
   }
@@ -71,11 +71,11 @@ function Shell({ children }: DashboardLayoutProps) {
   if (status === "unauthorized" || status === "suspended" || status === "error") return <BlockedScreen kind={status} />;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <Header />
       <PreviewBanner />
-      <main className={isPreviewing ? "transition-all duration-300 ease-in-out pt-26 print:pt-0" : "transition-all duration-300 ease-in-out pt-16 print:pt-0"}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main className={(isPreviewing ? "pt-26" : "pt-16") + " lg:pl-64 transition-[padding] duration-300 ease-in-out print:pt-0 print:pl-0"}>
+        <div className="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
           <SetupBanner />
           {/* Remount pages when the effective user changes so every query re-runs with the right access. */}
           <RouteGuard key={user?.id || "anon"}>{children}</RouteGuard>

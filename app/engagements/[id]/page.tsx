@@ -55,6 +55,12 @@ import {
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { syncLinks, parseAmount } from "@/lib/links";
+import { useAccess } from "@/components/auth/AccessProvider";
+import { EngagementInnovationCard } from "@/components/shared/EngagementInnovationCard";
+import { LinkedRecordsCard, contractorOptions, contactOptions, partnerOptions } from "@/components/shared/LinkedRecordsCard";
+import { Users, Handshake, CalendarDays, TrendingUp, Plus } from "lucide-react";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
@@ -87,6 +93,11 @@ export default function EngagementDetailPage({
   const [linkedContractors, setLinkedContractors] = useState<Contractor[]>([]);
   const [allContractors, setAllContractors] = useState<Pick<Contractor, "id" | "full_name" | "title_role">[]>([]);
   const [selectedContractorIds, setSelectedContractorIds] = useState<string[]>([]);
+  const { can } = useAccess();
+  const [linkedContacts, setLinkedContacts] = useState<{ id: string; full_name: string; title_role: string | null }[]>([]);
+  const [linkedPartners, setLinkedPartners] = useState<{ id: string; name: string; partner_type: string | null }[]>([]);
+  const [engActivities, setEngActivities] = useState<{ id: string; activity_type: string; date_time: string; summary: string | null; outcome: string }[]>([]);
+  const [sourceOpp, setSourceOpp] = useState<{ id: string; name: string; estimated_value: number | null; stage: string } | null>(null);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -127,6 +138,23 @@ export default function EngagementDetailPage({
     const contractors = (cLinks || []).map((l: any) => l.contractors).filter(Boolean);
     setLinkedContractors(contractors);
     setSelectedContractorIds(contractors.map((c: Contractor) => c.id));
+
+    // Everything else tied to this engagement, so it all shows in one place.
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    const one = (v: any) => (Array.isArray(v) ? v[0] : v);
+    const [conLinks, partLinks, acts, opp] = await Promise.all([
+      supabase.from("engagement_contacts").select("contacts(id, full_name, title_role)").eq("engagement_id", id),
+      supabase.from("engagement_partners").select("partners(id, name, partner_type)").eq("engagement_id", id),
+      supabase.from("activities").select("id, activity_type, date_time, summary, outcome").eq("engagement_id", id).order("date_time", { ascending: false }),
+      data.account_id
+        ? supabase.from("opportunities").select("id, name, estimated_value, stage").eq("account_id", data.account_id).eq("name", data.name).limit(1)
+        : Promise.resolve({ data: [] as any[] }),
+    ]);
+    setLinkedContacts(((conLinks.data || []) as any[]).map((r) => one(r.contacts)).filter(Boolean));
+    setLinkedPartners(((partLinks.data || []) as any[]).map((r) => one(r.partners)).filter(Boolean));
+    setEngActivities((acts.data || []) as any[]);
+    setSourceOpp(((opp.data || []) as any[])[0] || null);
+    /* eslint-enable @typescript-eslint/no-explicit-any */
 
     form.reset({
       name: data.name,
@@ -171,27 +199,41 @@ export default function EngagementDetailPage({
       status: values.status,
       scope_summary: values.scope_summary || null,
       attachments: values.attachments?.length ? values.attachments : null,
-      budget: values.budget === "" || values.budget == null ? null : parseFloat(values.budget),
-      contract_value: values.contract_value === "" || values.contract_value == null ? null : parseFloat(values.contract_value),
-      margin_pct: values.margin_pct === "" || values.margin_pct == null ? null : parseFloat(values.margin_pct),
+      budget: parseAmount(values.budget),
+      contract_value: parseAmount(values.contract_value),
+      margin_pct: parseAmount(values.margin_pct),
       updated_at: new Date().toISOString(),
     };
+    const previousAccountId = engagement?.account_id;
     const { error } = await supabase.from("engagements").update(payload).eq("id", id);
     if (error) {
       console.error("Error updating engagement:", error);
+      toast.error(`Engagement not saved: ${error.message}`);
       setSaving(false);
       return;
     }
 
-    // Update contractor assignments: delete existing, insert new
-    await supabase.from("engagement_contractors").delete().eq("engagement_id", id);
-    if (selectedContractorIds.length > 0) {
-      const rows = selectedContractorIds.map((cid) => ({
-        engagement_id: id,
-        contractor_id: cid,
-      }));
-      await supabase.from("engagement_contractors").insert(rows);
+    // Moved to a different account: carry its activities, invoices, expenses and placements along.
+    if (previousAccountId && previousAccountId !== values.account_id) {
+      const moves = await Promise.all(
+        ["activities", "invoices", "expenses", "placements"].map((t) =>
+          supabase.from(t).update({ account_id: values.account_id }).eq("engagement_id", id).eq("account_id", previousAccountId)
+        )
+      );
+      const failed = moves.find((m) => m.error);
+      if (failed?.error) toast.error(`Engagement moved, but some linked records kept the old account: ${failed.error.message}`);
     }
+
+    // Contractor assignments: only add/remove what changed (never wipe the list).
+    const links = await syncLinks({
+      table: "engagement_contractors",
+      ownerColumn: "engagement_id",
+      ownerId: id,
+      otherColumn: "contractor_id",
+      desiredIds: selectedContractorIds,
+    });
+    if (links.error) toast.error(`Engagement saved, but contractor links were not updated: ${links.error}`);
+    else toast.success("Engagement saved");
 
     setSaving(false);
     setIsEditing(false);
@@ -206,6 +248,7 @@ export default function EngagementDetailPage({
     setDeleteDialogOpen(false);
     if (error) {
       console.error("Error deleting engagement:", error);
+      toast.error(`Engagement not deleted: ${error.message}`);
       return;
     }
     router.push("/engagements");
@@ -460,6 +503,19 @@ export default function EngagementDetailPage({
                       </FormItem>
                     )}
                   />
+                  <FormField
+                    control={form.control}
+                    name="margin_pct"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Planned margin (%)</FormLabel>
+                        <FormControl>
+                          <Input type="number" step="0.01" placeholder="0" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
                 <FormField
                   control={form.control}
@@ -564,9 +620,11 @@ export default function EngagementDetailPage({
               <div className="flex justify-between items-center py-2 border-b border-slate-100">
                 <span className="text-sm text-[#6B7280]">Contract value</span>
                 <span className="font-bold text-[#111827]">
-                  {engagement.contract_value != null
-                    ? formatCurrency(engagement.contract_value)
-                    : "—"}
+                  {engagement.contract_value != null ? (
+                    formatCurrency(engagement.contract_value)
+                  ) : (
+                    <span className="text-amber-700 text-sm">Not entered</span>
+                  )}
                 </span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-slate-100">
@@ -606,6 +664,116 @@ export default function EngagementDetailPage({
         </div>
       )}
 
+      {!isEditing && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {can("contractors") && (
+            <LinkedRecordsCard
+              title="Contractors"
+              description="Shows on each contractor's page with this engagement's value"
+              icon={HardHat}
+              table="engagement_contractors"
+              ownerColumn="engagement_id"
+              ownerId={engagement.id}
+              otherColumn="contractor_id"
+              hrefBase="/contractors"
+              items={linkedContractors.map((c) => ({ id: c.id, label: c.full_name, sub: c.title_role || "Contractor" }))}
+              loadOptions={contractorOptions}
+              canEdit={can("engagements", "edit")}
+              emptyText="No contractor linked yet — use Manage to add one."
+              onChanged={fetchEngagement}
+            />
+          )}
+          {can("contacts") && (
+            <LinkedRecordsCard
+              title="Client contacts"
+              description="Stakeholders at the client for this engagement"
+              icon={Users}
+              table="engagement_contacts"
+              ownerColumn="engagement_id"
+              ownerId={engagement.id}
+              otherColumn="contact_id"
+              hrefBase="/contacts"
+              items={linkedContacts.map((c) => ({ id: c.id, label: c.full_name, sub: c.title_role }))}
+              loadOptions={() => contactOptions(engagement.account_id ? [engagement.account_id] : [])}
+              canEdit={can("engagements", "edit")}
+              emptyText="No client contacts added yet."
+              onChanged={fetchEngagement}
+            />
+          )}
+          {can("partners") && (
+            <LinkedRecordsCard
+              title="Partners"
+              description="Teaming partners and vendors on this engagement"
+              icon={Handshake}
+              table="engagement_partners"
+              ownerColumn="engagement_id"
+              ownerId={engagement.id}
+              otherColumn="partner_id"
+              hrefBase="/partners"
+              items={linkedPartners.map((p) => ({ id: p.id, label: p.name, sub: p.partner_type }))}
+              loadOptions={partnerOptions}
+              canEdit={can("engagements", "edit")}
+              emptyText="No partners on this engagement."
+              onChanged={fetchEngagement}
+            />
+          )}
+          {can("activities") && (
+            <Card>
+              <CardHeader className="flex flex-row items-start justify-between gap-3">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <CalendarDays className="w-4 h-4 text-muted-foreground" /> Activities ({engActivities.length})
+                  </CardTitle>
+                  <CardDescription className="mt-1">Meetings, calls and visits logged on this engagement</CardDescription>
+                </div>
+                {can("activities", "create") && (
+                  <Link href={`/activities/new?account_id=${engagement.account_id || ""}&engagement_id=${engagement.id}`}>
+                    <Button size="sm" variant="outline">
+                      <Plus className="w-4 h-4" /> Log
+                    </Button>
+                  </Link>
+                )}
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {engActivities.length ? (
+                  engActivities.slice(0, 8).map((a) => (
+                    <Link key={a.id} href={`/activities/${a.id}`} className="list-row">
+                      <span className="min-w-0">
+                        <span className="block text-sm font-medium text-foreground">{a.activity_type}</span>
+                        <span className="block text-xs text-muted-foreground truncate">{a.summary || "No notes"}</span>
+                      </span>
+                      <span className="text-xs text-muted-foreground shrink-0">{formatDate(a.date_time)}</span>
+                    </Link>
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground">No activities logged on this engagement yet.</p>
+                )}
+              </CardContent>
+            </Card>
+          )}
+          {can("pipeline") && sourceOpp && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-muted-foreground" /> From opportunity
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Link href={`/pipeline/${sourceOpp.id}`} className="list-row">
+                  <span className="text-sm font-medium text-foreground truncate">{sourceOpp.name}</span>
+                  <span className="flex items-center gap-3 shrink-0">
+                    <span className="text-sm font-semibold tabular-nums">{sourceOpp.estimated_value != null ? formatCurrency(sourceOpp.estimated_value) : "Not entered"}</span>
+                    <Badge className={cn("border-none", getStatusColor(sourceOpp.stage))}>{sourceOpp.stage}</Badge>
+                  </span>
+                </Link>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
+
+      {!isEditing && <EngagementInnovationCard engagementId={engagement.id} canEdit={can("engagements", "edit")} />}
+
       {!isEditing && <EntityFinancePanel scope={{ engagementId: engagement.id, contractValue: engagement.contract_value }} title="Billing, costs & placements" />}
 
       {!isEditing && engagement.scope_summary && (
@@ -643,36 +811,6 @@ export default function EngagementDetailPage({
         </Card>
       )}
 
-      {!isEditing && linkedContractors.length > 0 && (
-        <Can module="contractors" action="view">
-          <Card className="border-none shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-lg font-bold text-[#111827]">
-                Assigned Contractors ({linkedContractors.length})
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {linkedContractors.map((c) => (
-                  <Link key={c.id} href={`/contractors/${c.id}`}>
-                    <div className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 border border-slate-100 cursor-pointer">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
-                          <HardHat className="w-4 h-4 text-amber-700" />
-                        </div>
-                        <div>
-                          <p className="text-sm font-bold text-[#111827]">{c.full_name}</p>
-                          <p className="text-xs text-[#6B7280]">{c.title_role || "Contractor"}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </Can>
-      )}
     </div>
   );
 }

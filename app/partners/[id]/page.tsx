@@ -273,7 +273,7 @@ export default function PartnerDetailPage({ params }: { params: Promise<{ id: st
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-green-600">{formatCurrency(opp.estimated_value)}</span>
+                        <span className="text-xs font-bold text-green-600">{opp.estimated_value != null ? formatCurrency(opp.estimated_value) : "Not entered"}</span>
                         <Badge className={cn("text-[10px] h-5 px-2 border-none", getStatusColor(opp.stage))}>
                           {opp.stage}
                         </Badge>
