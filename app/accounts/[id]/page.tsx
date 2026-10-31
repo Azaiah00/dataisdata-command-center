@@ -210,10 +210,10 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
   return (
     <div className="space-y-6">
       {/* Breadcrumb / Back */}
-      <div className="flex items-center gap-2 text-xs font-medium text-[#6B7280] uppercase tracking-wider">
+      <div className="flex items-center gap-2 text-xs font-medium text-[#4f6178] uppercase tracking-wider">
         <Link href="/accounts" className="hover:text-blue-600 transition-colors">Accounts</Link>
         <span>/</span>
-        <span className="text-[#111827]">{account.name}</span>
+        <span className="text-[#1e2c40]">{account.name}</span>
       </div>
 
       {/* Header Profile Section */}
@@ -226,12 +226,12 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
             <div className="min-w-0">
               {/* flex-wrap lets the status badge drop under long account names on phones. */}
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                <h1 className="text-2xl font-bold text-[#111827]">{account.name}</h1>
+                <h1 className="text-2xl font-bold text-[#1e2c40]">{account.name}</h1>
                 <Badge className={cn("font-medium border-none text-[10px] h-5 px-2", getStatusColor(account.status))}>
                   {account.status}
                 </Badge>
               </div>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2 text-[#6B7280] text-sm">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2 text-[#4f6178] text-sm">
                 <div className="flex items-center gap-1.5">
                   <Building2 className="w-4 h-4" />
                   {account.account_type}
@@ -273,14 +273,14 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
           <TabsList className="bg-transparent h-12 p-0 gap-8 border-none w-max">
             <TabsTrigger 
               value="overview" 
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#6B7280] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#4f6178] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
             >
               Overview
             </TabsTrigger>
             <Can module="engagements" action="view">
               <TabsTrigger 
                 value="engagements" 
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#6B7280] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#4f6178] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
               >
                 Engagements ({engagements.length})
               </TabsTrigger>
@@ -288,7 +288,7 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
             <Can module="pipeline" action="view">
               <TabsTrigger 
                 value="pipeline" 
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#6B7280] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#4f6178] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
               >
                 Pipeline ({opportunities.length})
               </TabsTrigger>
@@ -296,7 +296,7 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
             <Can module="contacts" action="view">
               <TabsTrigger 
                 value="contacts" 
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#6B7280] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#4f6178] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
               >
                 Stakeholders ({contacts.length})
               </TabsTrigger>
@@ -304,7 +304,7 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
             <Can module="contractors" action="view">
               <TabsTrigger 
                 value="contractors" 
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#6B7280] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#4f6178] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
               >
                 Contractors ({contractors.length})
               </TabsTrigger>
@@ -312,7 +312,7 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
             <Can module="partners" action="view">
               <TabsTrigger 
                 value="partners" 
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#6B7280] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#4f6178] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
               >
                 Partners ({partners.length})
               </TabsTrigger>
@@ -320,7 +320,7 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
             {showFinance && (
               <TabsTrigger
                 value="finance"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#6B7280] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#4f6178] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
               >
                 Finance
               </TabsTrigger>
@@ -328,7 +328,7 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
             <Can module="activities" action="view">
               <TabsTrigger 
                 value="activities" 
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#6B7280] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#4f6178] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
               >
                 Activity History
               </TabsTrigger>
@@ -346,11 +346,11 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="md:col-span-2 border-none shadow-sm">
               <CardHeader>
-                <CardTitle className="text-lg font-bold text-[#111827]">About this Account</CardTitle>
+                <CardTitle className="text-lg font-bold text-[#1e2c40]">About this Account</CardTitle>
                 <CardDescription>Key details and background information</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="text-sm text-[#4B5563] leading-relaxed">
+                <div className="text-sm text-[#3b4d64] leading-relaxed">
                   {account.notes || "No additional notes available for this account."}
                 </div>
                 
@@ -358,7 +358,7 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
                   <div className="pt-6 border-t border-slate-100 space-y-4">
                     {parentAccount && (
                       <div>
-                        <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-widest block mb-1">Parent Account</span>
+                        <span className="text-[10px] font-bold text-[#4f6178] uppercase tracking-widest block mb-1">Parent Account</span>
                         <Link href={`/accounts/${parentAccount.id}`} className="text-sm font-semibold text-blue-600 hover:underline">
                           {parentAccount.name}
                         </Link>
@@ -366,7 +366,7 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
                     )}
                     {childAccounts.length > 0 && (
                       <div>
-                        <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-widest block mb-1">Child Accounts</span>
+                        <span className="text-[10px] font-bold text-[#4f6178] uppercase tracking-widest block mb-1">Child Accounts</span>
                         <div className="flex flex-wrap gap-2 mt-1">
                           {childAccounts.map(child => (
                             <Link key={child.id} href={`/accounts/${child.id}`}>
@@ -383,16 +383,16 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
 
                 <div className="pt-6 border-t border-slate-100 flex flex-wrap gap-x-12 gap-y-4">
                   <div>
-                    <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-widest block mb-1">Owner</span>
-                    <span className="text-sm font-semibold text-[#111827]">{account.owner || "Unassigned"}</span>
+                    <span className="text-[10px] font-bold text-[#4f6178] uppercase tracking-widest block mb-1">Owner</span>
+                    <span className="text-sm font-semibold text-[#1e2c40]">{account.owner || "Unassigned"}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-widest block mb-1">Created</span>
-                    <span className="text-sm font-semibold text-[#111827]">{formatDate(account.created_at)}</span>
+                    <span className="text-[10px] font-bold text-[#4f6178] uppercase tracking-widest block mb-1">Created</span>
+                    <span className="text-sm font-semibold text-[#1e2c40]">{formatDate(account.created_at)}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-widest block mb-1">Last Updated</span>
-                    <span className="text-sm font-semibold text-[#111827]">{formatDate(account.updated_at)}</span>
+                    <span className="text-[10px] font-bold text-[#4f6178] uppercase tracking-widest block mb-1">Last Updated</span>
+                    <span className="text-sm font-semibold text-[#1e2c40]">{formatDate(account.updated_at)}</span>
                   </div>
                 </div>
               </CardContent>
@@ -400,47 +400,47 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
 
             <Card className="border-none shadow-sm">
               <CardHeader>
-                <CardTitle className="text-lg font-bold text-[#111827]">Quick Stats</CardTitle>
+                <CardTitle className="text-lg font-bold text-[#1e2c40]">Quick Stats</CardTitle>
                 <CardDescription>Performance metrics for this account</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex justify-between items-center py-2 border-b border-slate-50">
-                  <span className="text-sm text-[#6B7280]">Active Projects</span>
-                  <span className="font-bold text-[#111827]">{engagements.filter(e => e.status === 'In Progress').length}</span>
+                  <span className="text-sm text-[#4f6178]">Active Projects</span>
+                  <span className="font-bold text-[#1e2c40]">{engagements.filter(e => e.status === 'In Progress').length}</span>
                 </div>
                 <Can module="engagements">
                 <div className="flex justify-between items-center py-2 border-b border-slate-50">
-                  <span className="text-sm text-[#6B7280]">Contract Value</span>
-                  <span className="font-bold text-[#111827] tabular-nums">
+                  <span className="text-sm text-[#4f6178]">Contract Value</span>
+                  <span className="font-bold text-[#1e2c40] tabular-nums">
                     {formatCurrency(engagements.reduce((sum, e) => sum + (e.contract_value == null ? 0 : Number(e.contract_value)), 0))}
                   </span>
                 </div>
                 {engagements.some((e) => e.contract_value == null) && (
                   <div className="flex justify-between items-center py-2 border-b border-slate-50">
-                    <span className="text-sm text-[#6B7280]">Values Not Entered</span>
+                    <span className="text-sm text-[#4f6178]">Values Not Entered</span>
                     <span className="font-bold text-amber-700">{engagements.filter((e) => e.contract_value == null).length}</span>
                   </div>
                 )}
                 </Can>
                 <Can module="pipeline">
                 <div className="flex justify-between items-center py-2 border-b border-slate-50">
-                  <span className="text-sm text-[#6B7280]">Pipeline Value</span>
+                  <span className="text-sm text-[#4f6178]">Pipeline Value</span>
                   <span className="font-bold text-green-600">
                     {formatCurrency(opportunities.reduce((sum, op) => sum + (op.estimated_value || 0), 0))}
                   </span>
                 </div>
                 </Can>
                 <div className="flex justify-between items-center py-2 border-b border-slate-50">
-                  <span className="text-sm text-[#6B7280]">Stakeholders</span>
-                  <span className="font-bold text-[#111827]">{contacts.length}</span>
+                  <span className="text-sm text-[#4f6178]">Stakeholders</span>
+                  <span className="font-bold text-[#1e2c40]">{contacts.length}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-slate-50">
-                  <span className="text-sm text-[#6B7280]">Contractors</span>
+                  <span className="text-sm text-[#4f6178]">Contractors</span>
                   <span className="font-bold text-amber-600">{contractors.length}</span>
                 </div>
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-sm text-[#6B7280]">Last Interaction</span>
-                  <span className="font-bold text-[#111827]">{activities.length > 0 ? formatDate(activities[0].date_time) : "N/A"}</span>
+                  <span className="text-sm text-[#4f6178]">Last Interaction</span>
+                  <span className="font-bold text-[#1e2c40]">{activities.length > 0 ? formatDate(activities[0].date_time) : "N/A"}</span>
                 </div>
               </CardContent>
             </Card>
@@ -450,7 +450,7 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
         <Can module="contacts" action="view">
           <TabsContent value="contacts" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-bold text-[#111827]">Stakeholders</h3>
+              <h3 className="text-lg font-bold text-[#1e2c40]">Stakeholders</h3>
               <Can module="contacts" action="create">
                 <Link href={`/contacts/new?account_id=${account.id}`}>
                   <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
@@ -472,11 +472,11 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
                       {contact.full_name.charAt(0)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-[#111827] group-hover:text-blue-600 transition-colors truncate">{contact.full_name}</h4>
-                      <p className="text-xs text-[#6B7280] truncate">{contact.title_role}</p>
+                      <h4 className="font-bold text-[#1e2c40] group-hover:text-blue-600 transition-colors truncate">{contact.full_name}</h4>
+                      <p className="text-xs text-[#4f6178] truncate">{contact.title_role}</p>
                       <div className="mt-4 space-y-2">
                         {contact.email && (
-                          <div className="flex items-center gap-2 text-xs text-[#6B7280]">
+                          <div className="flex items-center gap-2 text-xs text-[#4f6178]">
                             <Mail className="w-3.5 h-3.5" /> <span className="truncate">{contact.email}</span>
                           </div>
                         )}
@@ -506,7 +506,7 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
                   <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
                     <User className="w-6 h-6 text-slate-300" />
                   </div>
-                  <p className="text-[#6B7280] text-sm font-medium">No stakeholders found</p>
+                  <p className="text-[#4f6178] text-sm font-medium">No stakeholders found</p>
                   <Can module="contacts" action="create">
                     <Link href={`/contacts/new?account_id=${account.id}`} className="text-blue-600 text-xs font-bold hover:underline mt-2 inline-block">
                       Add your first contact
@@ -521,7 +521,7 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
         <Can module="engagements" action="view">
           <TabsContent value="engagements" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-bold text-[#111827]">Active Engagements</h3>
+              <h3 className="text-lg font-bold text-[#1e2c40]">Active Engagements</h3>
               <Can module="engagements" action="create">
                 <Link href={`/engagements/new?account_id=${account.id}`}>
                   <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
@@ -545,10 +545,10 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
                           <Briefcase className="w-5 h-5 text-blue-600" />
                         </div>
                         <div>
-                          <h4 className="font-bold text-[#111827] group-hover:text-blue-600 transition-colors leading-tight">
+                          <h4 className="font-bold text-[#1e2c40] group-hover:text-blue-600 transition-colors leading-tight">
                             {eng.name}
                           </h4>
-                          <p className="text-xs text-[#6B7280]">{eng.engagement_type}</p>
+                          <p className="text-xs text-[#4f6178]">{eng.engagement_type}</p>
                         </div>
                       </div>
                       <Badge className={cn("text-[10px] h-5 px-2 border-none font-medium", getStatusColor(eng.status))}>
@@ -568,16 +568,16 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
                     )}
                     <div className="flex items-center justify-between pt-4 border-t border-slate-50">
                       <div className="flex flex-col">
-                        <span className="text-xs text-[#6B7280]">Value</span>
+                        <span className="text-xs text-[#4f6178]">Value</span>
                         {eng.contract_value != null ? (
-                          <span className="text-sm font-bold text-[#111827]">{formatCurrency(eng.contract_value)}</span>
+                          <span className="text-sm font-bold text-[#1e2c40]">{formatCurrency(eng.contract_value)}</span>
                         ) : (
                           <span className="text-xs font-semibold text-amber-700">Not entered</span>
                         )}
                       </div>
                       <div className="text-right">
-                        <span className="text-xs text-[#6B7280]">Timeline</span>
-                        <span className="text-sm font-bold text-[#111827] block">
+                        <span className="text-xs text-[#4f6178]">Timeline</span>
+                        <span className="text-sm font-bold text-[#1e2c40] block">
                           {eng.start_date ? new Date(eng.start_date).toLocaleDateString() : "TBD"}
                         </span>
                       </div>
@@ -590,7 +590,7 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
                   <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Briefcase className="w-6 h-6 text-slate-300" />
                   </div>
-                  <p className="text-[#6B7280] text-sm font-medium">No active engagements</p>
+                  <p className="text-[#4f6178] text-sm font-medium">No active engagements</p>
                   <Can module="engagements" action="create">
                     <Link href={`/engagements/new?account_id=${account.id}`} className="text-blue-600 text-xs font-bold hover:underline mt-2 inline-block">
                       Create an engagement
@@ -605,7 +605,7 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
         <Can module="pipeline" action="view">
           <TabsContent value="pipeline" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-bold text-[#111827]">Pipeline Opportunities</h3>
+              <h3 className="text-lg font-bold text-[#1e2c40]">Pipeline Opportunities</h3>
               <Can module="pipeline" action="create">
                 <Link href={`/pipeline/new?account_id=${account.id}`}>
                   <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
@@ -629,10 +629,10 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
                           <GitBranch className="w-5 h-5 text-blue-600" />
                         </div>
                         <div>
-                          <h4 className="font-bold text-[#111827] group-hover:text-blue-600 transition-colors leading-tight">
+                          <h4 className="font-bold text-[#1e2c40] group-hover:text-blue-600 transition-colors leading-tight">
                             {opp.name}
                           </h4>
-                          <p className="text-xs text-[#6B7280]">{opp.service_line}</p>
+                          <p className="text-xs text-[#4f6178]">{opp.service_line}</p>
                         </div>
                       </div>
                       <Badge className={cn("text-[10px] h-5 px-2 border-none font-medium", getStatusColor(opp.stage))}>
@@ -641,20 +641,20 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
                     </div>
                     <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-50">
                       <div>
-                        <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block mb-1">Value</span>
-                        <span className="text-sm font-bold text-[#111827]">{opp.estimated_value != null ? formatCurrency(opp.estimated_value) : "Not entered"}</span>
+                        <span className="text-[10px] font-bold text-[#4f6178] uppercase tracking-wider block mb-1">Value</span>
+                        <span className="text-sm font-bold text-[#1e2c40]">{opp.estimated_value != null ? formatCurrency(opp.estimated_value) : "Not entered"}</span>
                       </div>
                       <div>
-                        <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block mb-1">Weighted</span>
+                        <span className="text-[10px] font-bold text-[#4f6178] uppercase tracking-wider block mb-1">Weighted</span>
                         <span className="text-sm font-bold text-green-600">{opp.weighted_value != null ? formatCurrency(opp.weighted_value) : "—"}</span>
                       </div>
                       <div>
-                        <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block mb-1">Probability</span>
-                        <span className="text-sm font-bold text-[#111827]">{opp.probability_pct}%</span>
+                        <span className="text-[10px] font-bold text-[#4f6178] uppercase tracking-wider block mb-1">Probability</span>
+                        <span className="text-sm font-bold text-[#1e2c40]">{opp.probability_pct}%</span>
                       </div>
                       <div>
-                        <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block mb-1">Expected Start</span>
-                        <span className="text-sm font-bold text-[#111827]">{opp.expected_start ? formatDate(opp.expected_start) : "TBD"}</span>
+                        <span className="text-[10px] font-bold text-[#4f6178] uppercase tracking-wider block mb-1">Expected Start</span>
+                        <span className="text-sm font-bold text-[#1e2c40]">{opp.expected_start ? formatDate(opp.expected_start) : "TBD"}</span>
                       </div>
                     </div>
                   </CardContent>
@@ -665,7 +665,7 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
                   <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
                     <GitBranch className="w-6 h-6 text-slate-300" />
                   </div>
-                  <p className="text-[#6B7280] text-sm font-medium">No opportunities in pipeline</p>
+                  <p className="text-[#4f6178] text-sm font-medium">No opportunities in pipeline</p>
                   <Can module="pipeline" action="create">
                     <Link href={`/pipeline/new?account_id=${account.id}`} className="text-blue-600 text-xs font-bold hover:underline mt-2 inline-block">
                       Add an opportunity
@@ -681,7 +681,7 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
         <Can module="contractors" action="view">
           <TabsContent value="contractors" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-bold text-[#111827]">Contractors</h3>
+              <h3 className="text-lg font-bold text-[#1e2c40]">Contractors</h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {contractors.map((c) => (
@@ -695,16 +695,16 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
                       <HardHat className="w-5 h-5" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-[#111827] group-hover:text-blue-600 transition-colors truncate">
+                      <h4 className="font-bold text-[#1e2c40] group-hover:text-blue-600 transition-colors truncate">
                         {c.full_name}
                       </h4>
-                      <p className="text-xs text-[#6B7280] truncate">{c.title_role || "Contractor"}</p>
+                      <p className="text-xs text-[#4f6178] truncate">{c.title_role || "Contractor"}</p>
                       {c.engagement_names && c.engagement_names.length > 0 && (
-                        <p className="text-[11px] text-[#6B7280] mt-1 line-clamp-2" title={c.engagement_names.join(", ")}>
+                        <p className="text-[11px] text-[#4f6178] mt-1 line-clamp-2" title={c.engagement_names.join(", ")}>
                           On: {c.engagement_names.join(", ")}
                         </p>
                       )}
-                      <p className="text-xs font-semibold text-[#111827] mt-1 tabular-nums">
+                      <p className="text-xs font-semibold text-[#1e2c40] mt-1 tabular-nums">
                         {c.contract_total ? formatCurrency(c.contract_total) : "No value entered"}
                         {!!c.missing_values && c.contract_total ? (
                           <span className="ml-1 font-medium text-amber-700">· {c.missing_values} missing</span>
@@ -712,7 +712,7 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
                       </p>
                       <div className="mt-2 flex items-center gap-2">
                         {c.email && (
-                          <span className="text-[10px] text-[#6B7280] flex items-center gap-1">
+                          <span className="text-[10px] text-[#4f6178] flex items-center gap-1">
                             <Mail className="w-3 h-3" /> {c.email}
                           </span>
                         )}
@@ -729,7 +729,7 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
                   <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
                     <HardHat className="w-6 h-6 text-slate-300" />
                   </div>
-                  <p className="text-[#6B7280] text-sm font-medium">No contractors linked to this account&apos;s engagements</p>
+                  <p className="text-[#4f6178] text-sm font-medium">No contractors linked to this account&apos;s engagements</p>
                 </div>
               )}
             </div>
@@ -740,7 +740,7 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
         <Can module="partners" action="view">
           <TabsContent value="partners" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-bold text-[#111827]">Partners</h3>
+              <h3 className="text-lg font-bold text-[#1e2c40]">Partners</h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {partners.map((p) => (
@@ -754,17 +754,17 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
                       <Handshake className="w-5 h-5" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-[#111827] group-hover:text-blue-600 transition-colors truncate">
+                      <h4 className="font-bold text-[#1e2c40] group-hover:text-blue-600 transition-colors truncate">
                         {p.name}
                       </h4>
-                      <p className="text-xs text-[#6B7280] truncate">{p.partner_type || "Partner"}</p>
+                      <p className="text-xs text-[#4f6178] truncate">{p.partner_type || "Partner"}</p>
                       {p.engagement_name && (
-                        <p className="text-[10px] text-[#9CA3AF] mt-1 truncate">
+                        <p className="text-[10px] text-[#7f8fa3] mt-1 truncate">
                           On: {p.engagement_name}
                         </p>
                       )}
                       {p.capabilities && (
-                        <p className="text-[10px] text-[#6B7280] mt-2 truncate">{p.capabilities}</p>
+                        <p className="text-[10px] text-[#4f6178] mt-2 truncate">{p.capabilities}</p>
                       )}
                     </div>
                   </CardContent>
@@ -775,7 +775,7 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
                   <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Handshake className="w-6 h-6 text-slate-300" />
                   </div>
-                  <p className="text-[#6B7280] text-sm font-medium">No partners linked to this account&apos;s engagements</p>
+                  <p className="text-[#4f6178] text-sm font-medium">No partners linked to this account&apos;s engagements</p>
                 </div>
               )}
             </div>
@@ -785,7 +785,7 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
         <Can module="activities" action="view">
           <TabsContent value="activities" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-bold text-[#111827]">Interaction Timeline</h3>
+              <h3 className="text-lg font-bold text-[#1e2c40]">Interaction Timeline</h3>
               <Can module="activities" action="create">
                 <Link href={`/activities/new?account_id=${account.id}`}>
                   <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">

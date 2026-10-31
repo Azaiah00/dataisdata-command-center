@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Lock } from "lucide-react";
 import { BrandMark } from "@/components/brand/BrandMark";
 import { AUTH_MODE } from "./AccessProvider";
+import { Wordmark } from "@/components/brand/Wordmark";
 
 /** Session storage key. Once set, user stays "verified" until the tab/browser is closed. */
 const PIN_VERIFIED_KEY = "did-pin-verified";
@@ -67,7 +68,8 @@ export function PinGate({ children }: PinGateProps) {
           <div className="flex flex-col items-center gap-3">
             <BrandMark size={64} rounded="rounded-2xl" />
             <div className="text-center space-y-1">
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">DataIsData Command Center</p>
+              <Wordmark className="text-2xl text-foreground" />
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Command Center</p>
               <h1 className="text-xl font-bold text-foreground flex items-center justify-center gap-2">
                 <Lock className="w-4 h-4 text-primary" /> Enter PIN
               </h1>

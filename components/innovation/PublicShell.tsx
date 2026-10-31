@@ -2,6 +2,7 @@
 
 import { BrandMark } from "@/components/brand/BrandMark";
 import { cn } from "@/lib/utils";
+import { Wordmark } from "@/components/brand/Wordmark";
 
 /** Frame for the public pages (no PIN, no login): interest form, application, assessment. */
 export function PublicShell({ children }: { children: React.ReactNode }) {
@@ -12,7 +13,7 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
           <a href="https://dataisdata.com" className="flex min-h-11 items-center gap-2.5" aria-label="DataIsData website">
             <BrandMark size={34} />
             <span className="flex flex-col leading-none">
-              <span className="wordmark text-lg text-foreground">Data<span className="wm-is">Is</span>Data</span>
+              <Wordmark className="text-lg text-foreground" />
               <span className="mt-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Innovation Partners</span>
             </span>
           </a>

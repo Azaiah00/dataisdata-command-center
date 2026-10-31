@@ -146,13 +146,13 @@ function NewPaymentPageContent() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <div className="flex items-center gap-2 text-xs font-medium text-[#6B7280] uppercase tracking-wider">
+      <div className="flex items-center gap-2 text-xs font-medium text-[#4f6178] uppercase tracking-wider">
         <Link href="/finance/payments" className="hover:text-primary">Payments</Link>
         <span>/</span>
-        <span className="text-[#111827]">Record Payment</span>
+        <span className="text-[#1e2c40]">Record Payment</span>
       </div>
 
-      <h1 className="text-2xl font-bold text-[#111827]">Record Payment</h1>
+      <h1 className="text-2xl font-bold text-[#1e2c40]">Record Payment</h1>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">

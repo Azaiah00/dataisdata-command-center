@@ -151,7 +151,7 @@ export default function CityPortalPage() {
                   <li key={e.id} className="flex flex-col gap-3 py-4 sm:flex-row sm:items-start">
                     <span className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-muted text-primary sm:flex"><CalendarDays className="h-4 w-4" /></span>
                     <div className="min-w-0 flex-1">
-                      <p className="font-semibold text-[#111827]">{e.name}</p>
+                      <p className="font-semibold text-[#1e2c40]">{e.name}</p>
                       <p className="text-sm text-muted-foreground">
                         {shortDate(e.event_date)}
                         {e.location ? ` · ${e.location}` : ""} · {toNum(e.cost_to_attendees) ? money(e.cost_to_attendees) : "Free for public sector"}
@@ -190,7 +190,7 @@ export default function CityPortalPage() {
                 <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                   {data.matches.map((m) => (
                     <div key={m.name} className="rounded-2xl border border-border p-4">
-                      <p className="font-semibold text-[#111827]">{m.name}</p>
+                      <p className="font-semibold text-[#1e2c40]">{m.name}</p>
                       <p className="text-xs text-muted-foreground">{m.category} · {m.status}</p>
                       {m.description && <p className="mt-2 text-sm text-muted-foreground">{m.description}</p>}
                     </div>

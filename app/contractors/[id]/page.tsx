@@ -114,10 +114,10 @@ export default function ContractorDetailPage({ params }: { params: Promise<{ id:
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-xs font-medium text-[#6B7280] uppercase tracking-wider">
+      <div className="flex items-center gap-2 text-xs font-medium text-[#4f6178] uppercase tracking-wider">
         <Link href="/contractors" className="hover:text-blue-600 transition-colors">Contractors</Link>
         <span>/</span>
-        <span className="text-[#111827]">{contractor.full_name}</span>
+        <span className="text-[#1e2c40]">{contractor.full_name}</span>
       </div>
 
       {/* Header */}
@@ -129,7 +129,7 @@ export default function ContractorDetailPage({ params }: { params: Promise<{ id:
             </div>
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="text-2xl font-bold text-[#111827]">{contractor.full_name}</h1>
+                <h1 className="text-2xl font-bold text-[#1e2c40]">{contractor.full_name}</h1>
                 <Badge className={cn("font-medium border-none text-[10px] h-5 px-2",
                   contractor.status === "Active" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"
                 )}>
@@ -137,7 +137,7 @@ export default function ContractorDetailPage({ params }: { params: Promise<{ id:
                 </Badge>
               </div>
               {contractor.title_role && (
-                <p className="text-sm text-[#6B7280] mt-1">{contractor.title_role}</p>
+                <p className="text-sm text-[#4f6178] mt-1">{contractor.title_role}</p>
               )}
             </div>
           </div>
@@ -180,7 +180,7 @@ export default function ContractorDetailPage({ params }: { params: Promise<{ id:
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-bold text-[#111827]">Contact Info</CardTitle>
+            <CardTitle className="text-lg font-bold text-[#1e2c40]">Contact Info</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center gap-3 text-slate-600">
@@ -192,18 +192,18 @@ export default function ContractorDetailPage({ params }: { params: Promise<{ id:
               <span className="text-sm">{contractor.phone || "No phone"}</span>
             </div>
             <div className="flex justify-between items-center py-2 border-t border-slate-100">
-              <span className="text-sm text-[#6B7280]">Created</span>
-              <span className="font-bold text-[#111827]">{formatDate(contractor.created_at)}</span>
+              <span className="text-sm text-[#4f6178]">Created</span>
+              <span className="font-bold text-[#1e2c40]">{formatDate(contractor.created_at)}</span>
             </div>
           </CardContent>
         </Card>
 
         <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-bold text-[#111827]">Notes</CardTitle>
+            <CardTitle className="text-lg font-bold text-[#1e2c40]">Notes</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-[#4B5563] whitespace-pre-wrap">
+            <p className="text-sm text-[#3b4d64] whitespace-pre-wrap">
               {contractor.notes || "No notes for this contractor."}
             </p>
           </CardContent>
@@ -244,7 +244,7 @@ export default function ContractorDetailPage({ params }: { params: Promise<{ id:
       <Can module="engagements" action="view">
         <Card className="border-none shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg font-bold text-[#111827]">
+            <CardTitle className="text-lg font-bold text-[#1e2c40]">
               Linked Engagements ({managingEngagements ? selectedEngIds.length : roll?.engagements.length || 0})
             </CardTitle>
             {!managingEngagements ? (
@@ -346,7 +346,7 @@ export default function ContractorDetailPage({ params }: { params: Promise<{ id:
                       ))}
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-[#6B7280]">Add or remove engagement assignments for this contractor.</p>
+                <p className="text-xs text-[#4f6178]">Add or remove engagement assignments for this contractor.</p>
               </div>
             ) : roll && roll.engagements.length > 0 ? (
               <div className="space-y-2.5">

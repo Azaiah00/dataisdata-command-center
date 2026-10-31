@@ -138,13 +138,13 @@ export default function VendorApplicationReviewPage() {
     loadApplication();
   }
 
-  if (!application) return <p className="text-sm text-[#6B7280]">Loading application...</p>;
+  if (!application) return <p className="text-sm text-[#4f6178]">Loading application...</p>;
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#111827]">Vendor Application Review</h1>
-        <p className="text-[#6B7280]">{application.vendor_inquiries?.company_name || "Unlinked application"}</p>
+        <h1 className="text-2xl font-bold text-[#1e2c40]">Vendor Application Review</h1>
+        <p className="text-[#4f6178]">{application.vendor_inquiries?.company_name || "Unlinked application"}</p>
       </div>
 
       <Card className="border-none shadow-sm">
@@ -158,7 +158,7 @@ export default function VendorApplicationReviewPage() {
               </div>
             ))}
           </div>
-          <p className="text-xl font-bold text-[#111827]">Weighted Total: {weightedTotal}</p>
+          <p className="text-xl font-bold text-[#1e2c40]">Weighted Total: {weightedTotal}</p>
         </CardContent>
       </Card>
 

@@ -14,7 +14,7 @@ type Inquiry = { id: string; company_name: string };
 
 export default function VendorApplicationNewPage() {
   return (
-    <Suspense fallback={<p className="text-sm text-[#6B7280]">Loading form...</p>}>
+    <Suspense fallback={<p className="text-sm text-[#4f6178]">Loading form...</p>}>
       <VendorApplicationForm />
     </Suspense>
   );

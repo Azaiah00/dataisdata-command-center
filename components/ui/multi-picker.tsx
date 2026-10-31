@@ -32,7 +32,7 @@ export function MultiPicker({
       {value.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {value.map((id) => (
-            <span key={id} className="inline-flex items-center gap-1 rounded-full bg-[#e6ebf3] text-[#2c3a55] px-3 py-1 text-xs font-medium max-w-full">
+            <span key={id} className="inline-flex items-center gap-1 rounded-full bg-[#eaf5f5] text-[#2a3b52] px-3 py-1 text-xs font-medium max-w-full">
               <span className="truncate">{byId[id]?.label || "Unknown"}</span>
               {!disabled && (
                 <button type="button" className="ml-0.5 rounded-full hover:text-destructive" onClick={() => onChange(value.filter((x) => x !== id))} aria-label={`Remove ${byId[id]?.label || "item"}`}>

@@ -59,6 +59,7 @@ import { initials, RoleBadge } from "@/components/auth/LoginScreen";
 import { NotificationsMenu } from "./NotificationsMenu";
 import type { ModuleKey } from "@/lib/access/modules";
 import { ROLE_LABELS } from "@/lib/access/types";
+import { Wordmark } from "@/components/brand/Wordmark";
 
 type SearchItem = {
   id: string;
@@ -255,7 +256,7 @@ export function Header() {
         className="search-field"
       />
       {searchOpen && (
-        <div className="absolute top-12 right-0 w-full min-w-[18rem] rounded-2xl border border-[#e2e7ef] bg-white/95 backdrop-blur-xl shadow-[0_20px_50px_-24px_rgba(24,32,47,0.4)] z-50 overflow-hidden">
+        <div className="absolute top-12 right-0 w-full min-w-[18rem] rounded-2xl border border-[#d3dce5] bg-white/95 backdrop-blur-xl shadow-[0_20px_50px_-24px_rgba(24,32,47,0.4)] z-50 overflow-hidden">
           {searchLoading ? (
             <div className="px-3 py-3 text-sm text-muted-foreground">Searching...</div>
           ) : searchResults.length > 0 ? (
@@ -321,15 +322,15 @@ export function Header() {
         <Link href={showDashboard ? "/" : sections[0]?.items[0]?.path || "/"} className="flex items-center gap-3 px-6 h-20 shrink-0" aria-label="DataIsData home">
           <BrandMark size={36} />
           <span className="leading-tight">
-            <span className="wordmark block text-[1.1rem] text-foreground">Data<span className="wm-is">Is</span>Data</span>
+            <Wordmark onDark className="block text-[1.15rem]" />
             <span className="block text-[11px] font-medium text-muted-foreground">Command Center</span>
           </span>
         </Link>
         <nav className="flex-1 overflow-y-auto px-3 pb-4 sidebar-scroll">{navList()}</nav>
-        <div className="p-3 border-t border-white/70">
-          <div className="flex items-center gap-3 rounded-xl px-3 py-2.5 bg-white/55 border border-white/80">
+        <div className="p-3 border-t border-white/10">
+          <div className="sidebar-user flex items-center gap-3 rounded-2xl px-3 py-2.5">
             <Avatar className="h-8 w-8">
-              <AvatarFallback className={cn("text-white text-xs", isPreviewing ? "bg-amber-500" : "bg-gradient-to-br from-[#5f729a] to-[#3d4e70]")}>
+              <AvatarFallback className={cn("text-white text-xs", isPreviewing ? "bg-amber-500" : "bg-gradient-to-br from-[#6c63b5] to-[#22566a]")}>
                 {initials(realUser?.full_name || "?")}
               </AvatarFallback>
             </Avatar>
@@ -352,10 +353,10 @@ export function Header() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-72 p-0 app-sidebar">
-                <SheetHeader className="px-6 h-20 justify-center border-b border-white/70 text-left">
+                <SheetHeader className="px-6 h-20 justify-center border-b border-white/10 text-left">
                   <SheetTitle className="flex items-center gap-2.5">
                     <BrandMark size={32} />
-                    <span className="wordmark">Data<span className="wm-is">Is</span>Data</span>
+                    <Wordmark onDark />
                   </SheetTitle>
                 </SheetHeader>
                 <nav className="px-3 py-3 overflow-y-auto h-[calc(100dvh-5rem)] sidebar-scroll">{navList(() => setIsMobileMenuOpen(false))}</nav>
@@ -391,7 +392,7 @@ export function Header() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center gap-2 p-1 pl-1 rounded-full hover:bg-white/70" aria-label="Account menu">
                   <Avatar className="h-9 w-9 border-2 border-white shadow-sm">
-                    <AvatarFallback className={cn("text-white text-xs", isPreviewing ? "bg-amber-500" : "bg-gradient-to-br from-[#5f729a] to-[#3d4e70]")}>
+                    <AvatarFallback className={cn("text-white text-xs", isPreviewing ? "bg-amber-500" : "bg-gradient-to-br from-[#6c63b5] to-[#22566a]")}>
                       {initials(realUser?.full_name || "?")}
                     </AvatarFallback>
                   </Avatar>

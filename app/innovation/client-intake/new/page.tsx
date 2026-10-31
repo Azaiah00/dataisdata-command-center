@@ -60,8 +60,8 @@ export default function ClientIntakeNewPage() {
       <div className="max-w-2xl mx-auto">
         <Card className="border-none shadow-sm">
           <CardContent className="p-6">
-            <h1 className="text-2xl font-bold text-[#111827]">Thanks for your interest</h1>
-            <p className="text-[#6B7280] mt-2">Your intake has been received. DataIsData will follow up with next steps.</p>
+            <h1 className="text-2xl font-bold text-[#1e2c40]">Thanks for your interest</h1>
+            <p className="text-[#4f6178] mt-2">Your intake has been received. DataIsData will follow up with next steps.</p>
           </CardContent>
         </Card>
       </div>

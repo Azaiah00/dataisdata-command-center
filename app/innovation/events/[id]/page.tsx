@@ -177,8 +177,8 @@ export default function EventDetailPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0">
           <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground">{shortDate(event.event_date)}</p>
-          <h1 className="mt-1 text-2xl font-bold text-[#111827] break-words">{event.name}</h1>
-          <p className="mt-1 flex flex-wrap items-center gap-2 text-[#6B7280]">
+          <h1 className="mt-1 text-2xl font-bold text-[#1e2c40] break-words">{event.name}</h1>
+          <p className="mt-1 flex flex-wrap items-center gap-2 text-[#4f6178]">
             <span>{[event.location, event.target_audience].filter(Boolean).join(" · ") || "Details to be set"}</span>
             <SampleBadge show={event.is_sample} />
           </p>
@@ -294,7 +294,7 @@ export default function EventDetailPage() {
                 <tbody>
                   {vendors.map((v) => (
                     <tr key={v.partner_id} className="border-b border-border last:border-0">
-                      <td className="py-2 pr-3"><Link href={`/partners/${v.partner_id}`} className="inline-flex min-h-10 items-center font-semibold text-[#111827] hover:text-primary">{partnerName(v.partner_id)}</Link></td>
+                      <td className="py-2 pr-3"><Link href={`/partners/${v.partner_id}`} className="inline-flex min-h-10 items-center font-semibold text-[#1e2c40] hover:text-primary">{partnerName(v.partner_id)}</Link></td>
                       <td className="py-2 pr-3">{v.sponsorship_tier || "Showcase"}</td>
                       <td className="py-2 pr-3 text-right tabular-nums">{money(v.fee)}</td>
                       <td className="py-2 pr-3">{paidToggle(v)}</td>
@@ -308,7 +308,7 @@ export default function EventDetailPage() {
               {vendors.map((v) => (
                 <div key={v.partner_id} className="rounded-2xl border border-border p-3.5">
                   <div className="flex items-start justify-between gap-2">
-                    <Link href={`/partners/${v.partner_id}`} className="inline-flex min-h-10 items-center font-semibold text-[#111827]">{partnerName(v.partner_id)}</Link>
+                    <Link href={`/partners/${v.partner_id}`} className="inline-flex min-h-10 items-center font-semibold text-[#1e2c40]">{partnerName(v.partner_id)}</Link>
                     {removeBtn(v)}
                   </div>
                   <p className="text-sm text-muted-foreground">{v.sponsorship_tier || "Showcase"} · {money(v.fee)}</p>
@@ -353,7 +353,7 @@ export default function EventDetailPage() {
                 <li key={a.account_id} className="flex flex-wrap items-center gap-3 py-2.5">
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-muted text-primary"><Building2 className="h-4 w-4" /></span>
                   <span className="min-w-0 flex-1">
-                    <Link href={`/accounts/${a.account_id}`} className="font-semibold text-[#111827] hover:text-primary">{accountName(a.account_id)}</Link>
+                    <Link href={`/accounts/${a.account_id}`} className="font-semibold text-[#1e2c40] hover:text-primary">{accountName(a.account_id)}</Link>
                     <span className="block text-xs text-muted-foreground">Invited {timeAgo(a.invited_at)}{a.responded_at ? ` · replied ${timeAgo(a.responded_at)}` : ""}</span>
                   </span>
                   <StatusBadge status={a.rsvp === "yes" ? "Attending" : a.rsvp === "no" ? "Can't attend" : "Invited, no reply"} />

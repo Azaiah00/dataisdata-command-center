@@ -68,10 +68,10 @@ function SortableOpportunityCard({ op, onClick }: { op: any; onClick: () => void
         <CardContent className="p-4 space-y-3">
           <div className="flex justify-between items-start gap-2">
             <div className="flex flex-col flex-1">
-              <h4 className="font-bold text-[#111827] text-sm leading-snug group-hover:text-primary transition-colors">
+              <h4 className="font-bold text-[#1e2c40] text-sm leading-snug group-hover:text-primary transition-colors">
                 {op.name}
               </h4>
-              <div className="flex items-center gap-1.5 text-[11px] text-[#6B7280] mt-1.5">
+              <div className="flex items-center gap-1.5 text-[11px] text-[#4f6178] mt-1.5">
                 <Building2 className="w-3.5 h-3.5" />
                 <span className="truncate">{op.accounts?.name}</span>
               </div>
@@ -85,7 +85,7 @@ function SortableOpportunityCard({ op, onClick }: { op: any; onClick: () => void
           </div>
 
           <div className="flex items-center justify-between pt-3 border-t border-slate-50">
-            <div className="flex items-center gap-1 text-[#111827] font-bold text-sm">
+            <div className="flex items-center gap-1 text-[#1e2c40] font-bold text-sm">
               {op.estimated_value != null ? formatCurrency(op.estimated_value) : "Not entered"}
             </div>
             <div className="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded">
@@ -93,7 +93,7 @@ function SortableOpportunityCard({ op, onClick }: { op: any; onClick: () => void
             </div>
           </div>
 
-          <div className="flex items-center justify-between text-[11px] text-[#6B7280]">
+          <div className="flex items-center justify-between text-[11px] text-[#4f6178]">
             <div className="flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5" />
               {op.expected_start ? new Date(op.expected_start).toLocaleDateString() : "TBD"}
@@ -276,8 +276,8 @@ export default function PipelinePage() {
     <div className="space-y-6 h-full flex flex-col">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#111827]">Pipeline</h1>
-          <p className="text-[#6B7280]">Track potential work and weighted revenue forecasts.</p>
+          <h1 className="text-2xl font-bold text-[#1e2c40]">Pipeline</h1>
+          <p className="text-[#4f6178]">Track potential work and weighted revenue forecasts.</p>
         </div>
         <Can module="pipeline" action="create">
           <Link href="/pipeline/new">
@@ -310,14 +310,14 @@ export default function PipelinePage() {
                 <div key={stage} className="flex-shrink-0 w-80 flex flex-col max-h-full">
                   <div className="flex items-center justify-between mb-3 px-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-[#6B7280] uppercase text-[10px] tracking-widest">
+                      <h3 className="font-bold text-[#4f6178] uppercase text-[10px] tracking-widest">
                         {stage}
                       </h3>
-                      <span className="text-[10px] font-bold text-[#6B7280] bg-slate-100 px-1.5 py-0.5 rounded-full">
+                      <span className="text-[10px] font-bold text-[#4f6178] bg-slate-100 px-1.5 py-0.5 rounded-full">
                         {stageOps.length}
                       </span>
                     </div>
-                    <span className="text-xs font-bold text-[#111827]">
+                    <span className="text-xs font-bold text-[#1e2c40]">
                       {formatCurrency(totalValue)}
                     </span>
                   </div>
@@ -341,7 +341,7 @@ export default function PipelinePage() {
                         />
                       ))}
                       {stageOps.length === 0 && (
-                        <div className="py-12 text-center text-[#6B7280] text-xs font-medium border-2 border-dashed border-slate-200 rounded-xl m-2">
+                        <div className="py-12 text-center text-[#4f6178] text-xs font-medium border-2 border-dashed border-slate-200 rounded-xl m-2">
                           No opportunities
                         </div>
                       )}
@@ -366,16 +366,16 @@ export default function PipelinePage() {
                 <Card className="border-none shadow-xl ring-2 ring-blue-500">
                   <CardContent className="p-4 space-y-3">
                     <div className="flex flex-col">
-                      <h4 className="font-bold text-[#111827] text-sm leading-snug">
+                      <h4 className="font-bold text-[#1e2c40] text-sm leading-snug">
                         {activeOp.name}
                       </h4>
-                      <div className="flex items-center gap-1.5 text-[11px] text-[#6B7280] mt-1.5">
+                      <div className="flex items-center gap-1.5 text-[11px] text-[#4f6178] mt-1.5">
                         <Building2 className="w-3.5 h-3.5" />
                         <span className="truncate">{activeOp.accounts?.name}</span>
                       </div>
                     </div>
                     <div className="flex items-center justify-between pt-3 border-t border-slate-50">
-                      <div className="flex items-center gap-1 text-[#111827] font-bold text-sm">
+                      <div className="flex items-center gap-1 text-[#1e2c40] font-bold text-sm">
                         {activeOp.estimated_value != null ? formatCurrency(activeOp.estimated_value) : "Not entered"}
                       </div>
                       <div className="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded">

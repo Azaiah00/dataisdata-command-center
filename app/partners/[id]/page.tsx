@@ -115,10 +115,10 @@ export default function PartnerDetailPage({ params }: { params: Promise<{ id: st
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-xs font-medium text-[#6B7280] uppercase tracking-wider">
+      <div className="flex items-center gap-2 text-xs font-medium text-[#4f6178] uppercase tracking-wider">
         <Link href="/partners" className="hover:text-blue-600 transition-colors">Partners</Link>
         <span>/</span>
-        <span className="text-[#111827]">{partner.name}</span>
+        <span className="text-[#1e2c40]">{partner.name}</span>
       </div>
 
       {/* Header */}
@@ -130,13 +130,13 @@ export default function PartnerDetailPage({ params }: { params: Promise<{ id: st
             </div>
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="text-2xl font-bold text-[#111827]">{partner.name}</h1>
+                <h1 className="text-2xl font-bold text-[#1e2c40]">{partner.name}</h1>
                 <Badge className={cn("font-medium border-none text-[10px] h-5 px-2", getStatusColor(partner.partner_type))}>
                   {partner.partner_type}
                 </Badge>
               </div>
               {partner.capabilities && (
-                <div className="flex items-center gap-1.5 mt-2 text-[#6B7280] text-sm">
+                <div className="flex items-center gap-1.5 mt-2 text-[#4f6178] text-sm">
                   <Tag className="w-4 h-4" />
                   {partner.capabilities}
                 </div>
@@ -182,34 +182,34 @@ export default function PartnerDetailPage({ params }: { params: Promise<{ id: st
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-bold text-[#111827]">Partner Details</CardTitle>
+            <CardTitle className="text-lg font-bold text-[#1e2c40]">Partner Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between items-center py-2 border-b border-slate-100">
-              <span className="text-sm text-[#6B7280]">Type</span>
-              <span className="font-bold text-[#111827]">{partner.partner_type}</span>
+              <span className="text-sm text-[#4f6178]">Type</span>
+              <span className="font-bold text-[#1e2c40]">{partner.partner_type}</span>
             </div>
             <div className="flex justify-between items-center py-2 border-b border-slate-100">
-              <span className="text-sm text-[#6B7280]">Capabilities</span>
-              <span className="font-bold text-[#111827] text-right max-w-[200px]">{partner.capabilities || "—"}</span>
+              <span className="text-sm text-[#4f6178]">Capabilities</span>
+              <span className="font-bold text-[#1e2c40] text-right max-w-[200px]">{partner.capabilities || "—"}</span>
             </div>
             <div className="flex justify-between items-center py-2 border-b border-slate-100">
-              <span className="text-sm text-[#6B7280]">Contract Vehicles</span>
-              <span className="font-bold text-[#111827] text-right max-w-[200px]">{partner.contract_vehicles || "—"}</span>
+              <span className="text-sm text-[#4f6178]">Contract Vehicles</span>
+              <span className="font-bold text-[#1e2c40] text-right max-w-[200px]">{partner.contract_vehicles || "—"}</span>
             </div>
             <div className="flex justify-between items-center py-2">
-              <span className="text-sm text-[#6B7280]">Created</span>
-              <span className="font-bold text-[#111827]">{formatDate(partner.created_at)}</span>
+              <span className="text-sm text-[#4f6178]">Created</span>
+              <span className="font-bold text-[#1e2c40]">{formatDate(partner.created_at)}</span>
             </div>
           </CardContent>
         </Card>
 
         <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-bold text-[#111827]">Notes</CardTitle>
+            <CardTitle className="text-lg font-bold text-[#1e2c40]">Notes</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-[#4B5563] whitespace-pre-wrap">
+            <p className="text-sm text-[#3b4d64] whitespace-pre-wrap">
               {partner.notes || "No additional notes for this partner."}
             </p>
           </CardContent>
@@ -220,7 +220,7 @@ export default function PartnerDetailPage({ params }: { params: Promise<{ id: st
       <Can module="engagements" action="view">
         <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-bold text-[#111827]">
+            <CardTitle className="text-lg font-bold text-[#1e2c40]">
               Linked Engagements ({engagements.length})
             </CardTitle>
           </CardHeader>
@@ -233,8 +233,8 @@ export default function PartnerDetailPage({ params }: { params: Promise<{ id: st
                       <div className="flex items-center gap-3">
                         <Briefcase className="w-4 h-4 text-blue-600" />
                         <div>
-                          <p className="text-sm font-bold text-[#111827]">{eng.name}</p>
-                          <p className="text-xs text-[#6B7280]">{eng.accounts?.name}</p>
+                          <p className="text-sm font-bold text-[#1e2c40]">{eng.name}</p>
+                          <p className="text-xs text-[#4f6178]">{eng.accounts?.name}</p>
                         </div>
                       </div>
                       <Badge className={cn("text-[10px] h-5 px-2 border-none", getStatusColor(eng.status))}>
@@ -255,7 +255,7 @@ export default function PartnerDetailPage({ params }: { params: Promise<{ id: st
       <Can module="pipeline" action="view">
         <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-bold text-[#111827]">
+            <CardTitle className="text-lg font-bold text-[#1e2c40]">
               Linked Opportunities ({opportunities.length})
             </CardTitle>
           </CardHeader>
@@ -268,8 +268,8 @@ export default function PartnerDetailPage({ params }: { params: Promise<{ id: st
                       <div className="flex items-center gap-3">
                         <TrendingUp className="w-4 h-4 text-blue-600" />
                         <div>
-                          <p className="text-sm font-bold text-[#111827]">{opp.name}</p>
-                          <p className="text-xs text-[#6B7280]">{opp.accounts?.name}</p>
+                          <p className="text-sm font-bold text-[#1e2c40]">{opp.name}</p>
+                          <p className="text-xs text-[#4f6178]">{opp.accounts?.name}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -293,7 +293,7 @@ export default function PartnerDetailPage({ params }: { params: Promise<{ id: st
       {partner.attachments && partner.attachments.length > 0 && (
         <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-bold text-[#111827]">Attachments</CardTitle>
+            <CardTitle className="text-lg font-bold text-[#1e2c40]">Attachments</CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">

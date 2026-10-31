@@ -179,7 +179,7 @@ export default function PartnerPortalPage() {
                   <tbody>
                     {data!.events.map((e) => (
                       <tr key={e.id} className="border-b border-border last:border-0">
-                        <td className="py-3 pr-3 font-semibold text-[#111827]">{e.name}</td>
+                        <td className="py-3 pr-3 font-semibold text-[#1e2c40]">{e.name}</td>
                         <td className="py-3 pr-3">{shortDate(e.event_date)}</td>
                         <td className="py-3 pr-3">{e.tier || "Showcase"}</td>
                         <td className="py-3 pr-3 text-right tabular-nums">{money(e.fee)}</td>
@@ -193,7 +193,7 @@ export default function PartnerPortalPage() {
               <div className="grid gap-2.5 md:hidden">
                 {data!.events.map((e) => (
                   <div key={e.id} className="rounded-2xl border border-border p-3.5">
-                    <p className="font-semibold text-[#111827]">{e.name}</p>
+                    <p className="font-semibold text-[#1e2c40]">{e.name}</p>
                     <p className="text-sm text-muted-foreground">{shortDate(e.event_date)} · {e.tier || "Showcase"} · {money(e.fee)}{e.leads != null ? ` · ${e.leads} leads` : ""}</p>
                     <div className="mt-2"><StatusBadge status={e.paid ? "Paid" : "Invoice sent"} /></div>
                   </div>
@@ -212,7 +212,7 @@ export default function PartnerPortalPage() {
                     <li key={e.id} className="flex flex-col gap-3 py-3 sm:flex-row sm:items-center">
                       <span className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-muted text-primary sm:flex"><CalendarDays className="h-4 w-4" /></span>
                       <div className="min-w-0 flex-1">
-                        <p className="font-semibold text-[#111827]">{e.name}</p>
+                        <p className="font-semibold text-[#1e2c40]">{e.name}</p>
                         <p className="text-sm text-muted-foreground">{shortDate(e.event_date)}{e.location ? ` · ${e.location}` : ""}{e.theme ? ` · ${e.theme}` : ""}</p>
                       </div>
                       {e.requested_tier ? (

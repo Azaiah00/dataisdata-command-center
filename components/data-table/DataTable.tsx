@@ -33,7 +33,7 @@ export function DataTable<T>({
     <div className={cn("rounded-[1.125rem] border border-[var(--card-border)] bg-white/95 overflow-hidden shadow-[var(--shadow-soft)]", className)}>
       <Table>
         <TableHeader>
-          <TableRow className="hover:bg-transparent border-b border-[#e6eaf1]">
+          <TableRow className="hover:bg-transparent border-b border-[#dde5ec]">
             {columns.map((column, index) => (
               <TableHead key={index} className="h-11 px-4 whitespace-nowrap">
                 {column.header}
@@ -47,8 +47,8 @@ export function DataTable<T>({
               <TableRow
                 key={rowIndex}
                 className={cn(
-                  "border-b border-[#eef1f6] last:border-0",
-                  onRowClick && "cursor-pointer hover:bg-[#f5f7fb] transition-colors"
+                  "border-b border-[#e9eef3] last:border-0",
+                  onRowClick && "cursor-pointer hover:bg-[#eef2f6] transition-colors"
                 )}
                 onClick={() => onRowClick?.(item)}
               >
@@ -65,7 +65,7 @@ export function DataTable<T>({
             <TableRow>
               <TableCell
                 colSpan={columns.length}
-                className="h-32 text-center text-[#6B7280] text-sm"
+                className="h-32 text-center text-[#4f6178] text-sm"
               >
                 No results found.
               </TableCell>

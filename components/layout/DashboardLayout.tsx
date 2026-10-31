@@ -71,14 +71,20 @@ function Shell({ children }: DashboardLayoutProps) {
   if (status === "unauthorized" || status === "suspended" || status === "error") return <BlockedScreen kind={status} />;
 
   return (
-    <div className="min-h-screen">
+    <div className="app-backdrop">
       <Header />
       <PreviewBanner />
       <main className={(isPreviewing ? "pt-26" : "pt-16") + " lg:pl-64 transition-[padding] duration-300 ease-in-out print:pt-0 print:pl-0"}>
-        <div className="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+        <div className="app-slab">
+        {/* Large DataIsData mark etched into the background of every page (brand watermark). */}
+        <div className="slab-mark" aria-hidden="true">
+          <span className="slab-mark-face" />
+        </div>
+        <div className="relative z-[1] max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
           <SetupBanner />
           {/* Remount pages when the effective user changes so every query re-runs with the right access. */}
           <RouteGuard key={user?.id || "anon"}>{children}</RouteGuard>
+        </div>
         </div>
       </main>
       <ModuleTour />

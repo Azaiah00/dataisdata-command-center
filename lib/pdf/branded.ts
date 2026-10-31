@@ -8,35 +8,41 @@
 import type { jsPDF as JsPDFType } from "jspdf";
 
 export const BRAND = {
-  primary: [75, 95, 134] as [number, number, number], // #4b5f86 slate-blue
-  dark: [38, 50, 72] as [number, number, number], // #263248
-  bright: [95, 114, 154] as [number, number, number], // #5f729a
-  light: [230, 235, 243] as [number, number, number], // #e6ebf3
-  ink: [17, 24, 39] as [number, number, number], // #111827
-  muted: [107, 114, 128] as [number, number, number], // #6b7280
+  primary: [47, 127, 140] as [number, number, number], // #2f7f8c teal
+  dark: [30, 44, 64] as [number, number, number], // #1e2c40 navy
+  bright: [108, 99, 181] as [number, number, number], // #6c63b5 violet
+  light: [234, 245, 245] as [number, number, number], // #eaf5f5
+  ink: [17, 24, 39] as [number, number, number], // #1e2c40
+  muted: [107, 114, 128] as [number, number, number], // #4f6178
   line: [229, 231, 235] as [number, number, number],
   red: [220, 38, 38] as [number, number, number],
   amber: [217, 119, 6] as [number, number, number],
   silver: [226, 226, 222] as [number, number, number],
 };
 
-let logoCache: string | null = null;
-async function loadLogo(): Promise<string | null> {
-  if (logoCache) return logoCache;
+const imageCache = new Map<string, string>();
+async function loadImage(path: string): Promise<string | null> {
+  const hit = imageCache.get(path);
+  if (hit) return hit;
   try {
-    const res = await fetch("/brand/dataisdata-mark-silver.png");
+    const res = await fetch(path);
+    if (!res.ok) return null;
     const blob = await res.blob();
-    logoCache = await new Promise<string>((resolve, reject) => {
+    const url = await new Promise<string>((resolve, reject) => {
       const r = new FileReader();
       r.onload = () => resolve(r.result as string);
       r.onerror = reject;
       r.readAsDataURL(blob);
     });
-    return logoCache;
+    imageCache.set(path, url);
+    return url;
   } catch {
     return null;
   }
 }
+const loadLogo = () => loadImage("/brand/dataisdata-mark-silver.png");
+/** The trademarked wordmark (Jost + serifed "I"), white, cropped tight to cap height and baseline. */
+const loadWordmark = () => loadImage("/brand/dataisdata-wordmark-white.png");
 
 export interface PdfMeta {
   title: string;
@@ -63,23 +69,25 @@ export class BrandedPdf {
   readonly margin = 40;
   private meta: PdfMeta;
   private logo: string | null;
+  private wordmark: string | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private autoTable: any;
 
-  private constructor(doc: JsPDFType, meta: PdfMeta, logo: string | null, autoTable: unknown) {
+  private constructor(doc: JsPDFType, meta: PdfMeta, logo: string | null, wordmark: string | null, autoTable: unknown) {
     this.doc = doc;
     this.meta = meta;
     this.logo = logo;
+    this.wordmark = wordmark;
     this.autoTable = autoTable;
     this.y = 0;
     this.drawFirstHeader();
   }
 
   static async create(meta: PdfMeta): Promise<BrandedPdf> {
-    const [{ jsPDF }, autoTableMod, logo] = await Promise.all([import("jspdf"), import("jspdf-autotable"), loadLogo()]);
+    const [{ jsPDF }, autoTableMod, logo, wordmark] = await Promise.all([import("jspdf"), import("jspdf-autotable"), loadLogo(), loadWordmark()]);
     const doc = new jsPDF({ unit: "pt", format: "letter", orientation: meta.orientation || "portrait" });
     doc.setProperties({ title: `${meta.title} — DataIsData`, author: meta.preparedBy || "DataIsData", creator: "DataIsData Command Center" });
-    return new BrandedPdf(doc, meta, logo, autoTableMod.default);
+    return new BrandedPdf(doc, meta, logo, wordmark, autoTableMod.default);
   }
 
   get width() {
@@ -92,6 +100,21 @@ export class BrandedPdf {
     return this.width - this.margin * 2;
   }
 
+  /** Wordmark sitting on `baseline`, `capHeight` tall. Falls back to plain text if the image didn't load. */
+  private drawWordmark(x: number, baseline: number, capHeight: number, fallbackSize: number) {
+    const d = this.doc;
+    if (this.wordmark) {
+      const p = d.getImageProperties(this.wordmark);
+      const w = (p.width / p.height) * capHeight;
+      d.addImage(this.wordmark, "PNG", x, baseline - capHeight, w, capHeight);
+      return;
+    }
+    d.setTextColor(255, 255, 255);
+    d.setFont("helvetica", "bold");
+    d.setFontSize(fallbackSize);
+    d.text("DataIsData", x, baseline);
+  }
+
   private drawFirstHeader() {
     const d = this.doc;
     const h = 92;
@@ -102,10 +125,7 @@ export class BrandedPdf {
     d.setFillColor(...BRAND.bright);
     d.rect(0, h, this.width, 3, "F");
     if (this.logo) d.addImage(this.logo, "PNG", this.margin, 20, 52, 52);
-    d.setTextColor(255, 255, 255);
-    d.setFont("helvetica", "bold");
-    d.setFontSize(20);
-    d.text("DataIsData", this.margin + 64, 44);
+    this.drawWordmark(this.margin + 64, 44, 15, 20);
     d.setFont("helvetica", "normal");
     d.setFontSize(8.5);
     d.setTextColor(...BRAND.silver);
@@ -133,10 +153,7 @@ export class BrandedPdf {
     d.setFillColor(...BRAND.bright);
     d.rect(0, 34, this.width, 2, "F");
     if (this.logo) d.addImage(this.logo, "PNG", this.margin, 7, 20, 20);
-    d.setTextColor(255, 255, 255);
-    d.setFont("helvetica", "bold");
-    d.setFontSize(10);
-    d.text("DataIsData", this.margin + 26, 21);
+    this.drawWordmark(this.margin + 26, 21, 7.5, 10);
     d.setFont("helvetica", "normal");
     d.setTextColor(...BRAND.silver);
     d.text(this.meta.title, this.width - this.margin, 21, { align: "right" });
@@ -268,7 +285,7 @@ export class BrandedPdf {
       },
       headStyles: { fillColor: BRAND.primary, textColor: [255, 255, 255], fontStyle: "bold", fontSize: (opts.fontSize || 8.5) - 0.5 },
       footStyles: { fillColor: BRAND.light, textColor: BRAND.ink, fontStyle: "bold" },
-      alternateRowStyles: { fillColor: [246, 248, 251] },
+      alternateRowStyles: { fillColor: [240, 244, 247] },
       columnStyles,
       didDrawPage: () => {
         // Continuation pages created by autotable need our branded header.

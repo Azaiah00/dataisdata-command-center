@@ -82,8 +82,8 @@ export default function EngagementsPage() {
             <Briefcase className="w-4 h-4 text-primary" />
           </div>
           <div className="flex flex-col min-w-0">
-            <span className="font-bold text-[#111827] text-sm truncate">{engagement.name}</span>
-            <span className="text-xs text-[#6B7280]">{engagement.engagement_type}</span>
+            <span className="font-bold text-[#1e2c40] text-sm truncate">{engagement.name}</span>
+            <span className="text-xs text-[#4f6178]">{engagement.engagement_type}</span>
           </div>
         </div>
       ),
@@ -92,7 +92,7 @@ export default function EngagementsPage() {
       header: "Account",
       accessorKey: "account_id",
       cell: (engagement: any) => (
-        <div className="flex items-center gap-1.5 text-[#6B7280] text-xs">
+        <div className="flex items-center gap-1.5 text-[#4f6178] text-xs">
           <Building2 className="w-3.5 h-3.5" />
           {engagement.accounts?.name || "No Account"}
         </div>
@@ -124,7 +124,7 @@ export default function EngagementsPage() {
       header: "Dates",
       accessorKey: "start_date",
       cell: (engagement: Engagement) => (
-        <div className="flex items-center gap-1.5 text-[#6B7280] text-xs">
+        <div className="flex items-center gap-1.5 text-[#4f6178] text-xs">
           <Calendar className="w-3.5 h-3.5" />
           {formatDate(engagement.start_date)} - {formatDate(engagement.end_date)}
         </div>
@@ -163,7 +163,7 @@ export default function EngagementsPage() {
       cell: (engagement: Engagement) => (
         <div className="flex justify-end">
           <Link href={`/engagements/${engagement.id}`}>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-white hover:bg-primary">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#4f6178] hover:text-white hover:bg-primary">
               <ArrowUpRight className="w-4 h-4" />
             </Button>
           </Link>

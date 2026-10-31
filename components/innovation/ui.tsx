@@ -216,8 +216,8 @@ export function PageTitle({ title, subtitle, actions }: { title: React.ReactNode
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0">
-        <h1 className="text-2xl font-bold text-[#111827]">{title}</h1>
-        {subtitle && <p className="mt-1 max-w-3xl text-[#6B7280]">{subtitle}</p>}
+        <h1 className="text-2xl font-bold text-[#1e2c40]">{title}</h1>
+        {subtitle && <p className="mt-1 max-w-3xl text-[#4f6178]">{subtitle}</p>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
     </div>

@@ -43,8 +43,8 @@ export default function AccountsPage() {
             <Building2 className="w-4 h-4 text-primary" />
           </div>
           <div className="flex flex-col min-w-0">
-            <span className="font-bold text-[#111827] text-sm truncate">{account.name}</span>
-            <span className="text-xs text-[#6B7280]">{account.account_type}</span>
+            <span className="font-bold text-[#1e2c40] text-sm truncate">{account.name}</span>
+            <span className="text-xs text-[#4f6178]">{account.account_type}</span>
           </div>
         </div>
       ),
@@ -53,7 +53,7 @@ export default function AccountsPage() {
       header: "Region",
       accessorKey: "region_locality",
       cell: (account: Account) => (
-        <div className="flex items-center gap-1.5 text-[#6B7280] text-xs">
+        <div className="flex items-center gap-1.5 text-[#4f6178] text-xs">
           <MapPin className="w-3.5 h-3.5" />
           {account.region_locality}, {account.region_state}
         </div>
@@ -63,7 +63,7 @@ export default function AccountsPage() {
       header: "Primary Focus",
       accessorKey: "primary_focus",
       cell: (account: Account) => (
-        <div className="flex items-center gap-1.5 text-[#6B7280] text-xs">
+        <div className="flex items-center gap-1.5 text-[#4f6178] text-xs">
           <Tag className="w-3.5 h-3.5" />
           {account.primary_focus || "Not specified"}
         </div>
@@ -87,7 +87,7 @@ export default function AccountsPage() {
       header: "Owner",
       accessorKey: "owner",
       cell: (account: Account) => (
-        <span className="text-xs font-medium text-[#111827]">{account.owner || "Unassigned"}</span>
+        <span className="text-xs font-medium text-[#1e2c40]">{account.owner || "Unassigned"}</span>
       ),
     },
     {
@@ -96,7 +96,7 @@ export default function AccountsPage() {
       cell: (account: Account) => (
         <div className="flex justify-end">
           <Link href={`/accounts/${account.id}`}>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-white hover:bg-primary">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#4f6178] hover:text-white hover:bg-primary">
               <ArrowUpRight className="w-4 h-4" />
             </Button>
           </Link>
@@ -109,8 +109,8 @@ export default function AccountsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#111827]">Accounts</h1>
-          <p className="text-[#6B7280]">Manage your public-sector clients and partners.</p>
+          <h1 className="text-2xl font-bold text-[#1e2c40]">Accounts</h1>
+          <p className="text-[#4f6178]">Manage your public-sector clients and partners.</p>
         </div>
         <Can module="accounts" action="create">
           <Link href="/accounts/new">

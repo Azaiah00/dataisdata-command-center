@@ -119,7 +119,7 @@ export default function VendorPipelinePage() {
                         href={`/innovation/vendor-pipeline/${i.id}`}
                         className="block rounded-2xl border border-transparent bg-white p-3.5 shadow-sm transition hover:border-primary/30 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
                       >
-                        <p className="text-[15px] font-semibold leading-snug text-[#111827]">{i.company_name}</p>
+                        <p className="text-[15px] font-semibold leading-snug text-[#1e2c40]">{i.company_name}</p>
                         <p className="mt-0.5 text-xs text-muted-foreground">
                           {i.primary_contact || "No contact"} · {when}
                         </p>

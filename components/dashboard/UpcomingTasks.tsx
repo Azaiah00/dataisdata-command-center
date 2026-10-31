@@ -25,7 +25,7 @@ export function UpcomingTasks({ tasks }: UpcomingTasksProps) {
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-lg font-semibold text-[#111827]">Upcoming Tasks</CardTitle>
+            <CardTitle className="text-lg font-semibold text-[#1e2c40]">Upcoming Tasks</CardTitle>
             <CardDescription>Next actions and follow-ups</CardDescription>
           </div>
           <Link href="/activities">
@@ -42,7 +42,7 @@ export function UpcomingTasks({ tasks }: UpcomingTasksProps) {
             {tasks.length === 0 ? (
               <div className="text-center py-12">
                 <CheckCircle2 className="w-12 h-12 text-green-500 mx-auto mb-3 opacity-20" />
-                <p className="text-[#6B7280] text-sm font-medium">No upcoming tasks</p>
+                <p className="text-[#4f6178] text-sm font-medium">No upcoming tasks</p>
               </div>
             ) : (
               tasks.map((task) => (
@@ -54,15 +54,15 @@ export function UpcomingTasks({ tasks }: UpcomingTasksProps) {
                     <Clock className="w-4 h-4" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-[#111827] leading-snug">
+                    <p className="text-sm font-semibold text-[#1e2c40] leading-snug">
                       {task.next_action}
                     </p>
                     <div className="flex items-center gap-2 mt-1.5">
-                      <span className="text-xs text-[#6B7280] truncate">
+                      <span className="text-xs text-[#4f6178] truncate">
                         {task.accounts?.name}
                       </span>
-                      <span className="text-[#6B7280] text-[10px]">•</span>
-                      <Badge variant="outline" className="text-[10px] h-4 px-1.5 border-slate-200 text-[#6B7280] font-normal">
+                      <span className="text-[#4f6178] text-[10px]">•</span>
+                      <Badge variant="outline" className="text-[10px] h-4 px-1.5 border-slate-200 text-[#4f6178] font-normal">
                         {formatDateRelative(task.next_action_due)}
                       </Badge>
                     </div>

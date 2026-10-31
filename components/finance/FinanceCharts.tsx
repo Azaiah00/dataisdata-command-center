@@ -19,12 +19,12 @@ import type { ForecastMonth } from "@/lib/finance/forecast";
 
 /** Validated categorical palette (light + dark pass): revenue / costs / pipeline; net uses ink. */
 export const CHART = {
-  revenue: "#4b5f86",
+  revenue: "#2f7f8c",
   cost: "#c2610c",
-  pipeline: "#8193b5",
-  net: "#263248",
-  grid: "#e6eaf1",
-  axis: "#687387",
+  pipeline: "#8aa9c4",
+  net: "#1e2c40",
+  grid: "#dde5ec",
+  axis: "#4f6178",
 };
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -122,8 +122,8 @@ export function CashLineChart({ months, height = 220 }: { months: ForecastMonth[
 /** Horizontal stacked bar for AR aging buckets. */
 export function AgingBar({ aging }: { aging: { current: number; d1_30: number; d31_60: number; d61_90: number; d90_plus: number } }) {
   const parts = [
-    { label: "Current", value: aging.current, color: "#4b5f86" },
-    { label: "1–30", value: aging.d1_30, color: "#a9b6cf" },
+    { label: "Current", value: aging.current, color: "#2f7f8c" },
+    { label: "1–30", value: aging.d1_30, color: "#a9b8e0" },
     { label: "31–60", value: aging.d31_60, color: "#d97706" },
     { label: "61–90", value: aging.d61_90, color: "#c2410c" },
     { label: "90+", value: aging.d90_plus, color: "#b91c1c" },

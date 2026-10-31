@@ -97,7 +97,7 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
   const healthColors: Record<string, string> = {
     Strong: "bg-[#dcf2e4] text-[#23774a]",
     Warm: "bg-[#fbf0d9] text-[#8a5a12]",
-    Cold: "bg-[#e6ebf3] text-[#3d4e70]",
+    Cold: "bg-[#eaf5f5] text-[#22566a]",
   };
   const logActivityHref = `/activities/new?account_id=${primary?.id || ""}&contact_id=${id}`;
 
@@ -161,7 +161,7 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
                 <span className="stat-label block mb-2">Influence</span>
                 <div className="flex items-center gap-1">
                   {[...Array(5)].map((_, i) => (
-                    <div key={i} className={cn("w-2.5 h-2.5 rounded-full", i < (contact.influence_level || 0) ? "bg-[#4b5f86]" : "bg-[#dfe4ec]")} />
+                    <div key={i} className={cn("w-2.5 h-2.5 rounded-full", i < (contact.influence_level || 0) ? "bg-[#2f7f8c]" : "bg-[#d3dce5]")} />
                   ))}
                   <span className="text-xs text-muted-foreground ml-2">{contact.influence_level ?? 0}/5</span>
                 </div>
@@ -278,9 +278,9 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
                   {activities.length > 0 ? (
                     activities.map((activity, idx) => (
                       <Link key={activity.id} href={`/activities/${activity.id}`} className="relative pl-8 block group">
-                        {idx !== activities.length - 1 && <div className="absolute left-[11px] top-7 -bottom-5 w-[2px] bg-[#e6eaf1]" />}
-                        <div className={cn("absolute left-0 top-0.5 w-6 h-6 rounded-full border-2 flex items-center justify-center bg-white", activity.tagged ? "border-[#4b5f86]" : "border-[#c3ccdb]")}>
-                          <MessageSquare className={cn("w-3 h-3", activity.tagged ? "text-[#4b5f86]" : "text-[#8b95a7]")} />
+                        {idx !== activities.length - 1 && <div className="absolute left-[11px] top-7 -bottom-5 w-[2px] bg-[#dde5ec]" />}
+                        <div className={cn("absolute left-0 top-0.5 w-6 h-6 rounded-full border-2 flex items-center justify-center bg-white", activity.tagged ? "border-[#2f7f8c]" : "border-[#c4cfdb]")}>
+                          <MessageSquare className={cn("w-3 h-3", activity.tagged ? "text-[#2f7f8c]" : "text-[#7f8fa3]")} />
                         </div>
                         <div className="flex flex-wrap justify-between items-center gap-2">
                           <span className="font-semibold text-foreground group-hover:text-primary">
@@ -291,7 +291,7 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
                         </div>
                         <p className="text-sm text-muted-foreground mt-1">{activity.summary}</p>
                         {activity.next_action && (
-                          <div className="mt-2 px-3 py-2 bg-[#f3f5f9] rounded-lg text-xs border border-[#e6eaf1]">
+                          <div className="mt-2 px-3 py-2 bg-[#e9eef3] rounded-lg text-xs border border-[#dde5ec]">
                             <span className="font-semibold text-primary mr-2">Next:</span>
                             {activity.next_action}
                           </div>

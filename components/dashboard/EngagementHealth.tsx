@@ -24,7 +24,7 @@ export function EngagementHealth({ healthData }: EngagementHealthProps) {
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-lg font-semibold text-[#111827]">Engagement Health</CardTitle>
+            <CardTitle className="text-lg font-semibold text-[#1e2c40]">Engagement Health</CardTitle>
             <CardDescription>Status overview of all engagements</CardDescription>
           </div>
           <Link href="/engagements">
@@ -40,14 +40,14 @@ export function EngagementHealth({ healthData }: EngagementHealthProps) {
           {healthData.map((item) => (
             <div key={item.status} className="p-3 rounded-lg bg-slate-50 border border-slate-100">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs font-medium text-[#6B7280]">{item.status}</span>
+                <span className="text-xs font-medium text-[#4f6178]">{item.status}</span>
                 {item.atRisk > 0 && (
                   <Badge variant="destructive" className="text-[10px] h-4 px-1 px-1.5 bg-red-100 text-red-700 border-none">
                     {item.atRisk} at risk
                   </Badge>
                 )}
               </div>
-              <p className="text-2xl font-bold text-[#111827]">{item.count}</p>
+              <p className="text-2xl font-bold text-[#1e2c40]">{item.count}</p>
             </div>
           ))}
         </div>

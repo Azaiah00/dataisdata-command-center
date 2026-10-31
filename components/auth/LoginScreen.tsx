@@ -9,6 +9,7 @@ import { BrandMark } from "@/components/brand/BrandMark";
 import { ROLE_LABELS } from "@/lib/access/types";
 import { cn } from "@/lib/utils";
 import { ArrowRight, Loader2, Mail, ShieldCheck, FlaskConical, AlertTriangle, Ban } from "lucide-react";
+import { Wordmark } from "@/components/brand/Wordmark";
 
 export function initials(name: string) {
   return name
@@ -55,7 +56,7 @@ function Shell({ children }: { children: React.ReactNode }) {
         <div className="absolute bottom-0 right-0 w-[26rem] h-[26rem] rounded-full bg-brand-green-bright/30 blur-3xl pointer-events-none" />
         <div className="relative flex items-center gap-3">
           <BrandMark size={44} rounded="rounded-xl" className="ring-white/20" />
-          <span className="wordmark text-2xl">Data<span className="wm-is">Is</span>Data</span>
+          <Wordmark onDark className="text-2xl" />
         </div>
         <div className="relative space-y-5 max-w-md">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -71,7 +72,7 @@ function Shell({ children }: { children: React.ReactNode }) {
         <div className="w-full min-w-0 max-w-md md:max-w-lg space-y-8">
           <div className="md:hidden flex items-center gap-3">
             <BrandMark size={40} rounded="rounded-xl" />
-            <span className="wordmark text-2xl">Data<span className="wm-is">Is</span>Data</span>
+            <Wordmark className="text-2xl" />
           </div>
           {children}
         </div>

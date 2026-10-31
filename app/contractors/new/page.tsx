@@ -69,7 +69,7 @@ export default function NewContractorPage() {
         <Link href="/contractors">
           <Button variant="ghost" size="icon"><ChevronLeft className="w-5 h-5" /></Button>
         </Link>
-        <h1 className="text-3xl font-bold tracking-tight text-[#111827]">New Contractor</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-[#1e2c40]">New Contractor</h1>
       </div>
 
       <Card className="border-none shadow-sm">

@@ -63,8 +63,8 @@ export default function VendorInquiryPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-[#111827]">Vendor Inquiries</h1>
-          <p className="text-[#6B7280]">Stage 1 of partner enrollment. Open a record to invite, score or decide, or use the <Link href="/innovation/vendor-pipeline" className="font-semibold text-primary">Vendor Pipeline</Link> board.</p>
+          <h1 className="text-2xl font-bold text-[#1e2c40]">Vendor Inquiries</h1>
+          <p className="text-[#4f6178]">Stage 1 of partner enrollment. Open a record to invite, score or decide, or use the <Link href="/innovation/vendor-pipeline" className="font-semibold text-primary">Vendor Pipeline</Link> board.</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <a href="/join/partner" target="_blank" rel="noopener noreferrer">
@@ -77,7 +77,7 @@ export default function VendorInquiryPage() {
           </Can>
         </div>
       </div>
-      {loading ? <p className="text-sm text-[#6B7280]">Loading...</p> : <DataTable columns={columns} data={data} />}
+      {loading ? <p className="text-sm text-[#4f6178]">Loading...</p> : <DataTable columns={columns} data={data} />}
     </div>
   );
 }

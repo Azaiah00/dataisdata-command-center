@@ -102,7 +102,7 @@ export default function EventsPage() {
                   <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground">{shortDate(e.event_date)}</p>
                   <StatusBadge status={isPastEvent(e) && e.status !== "Completed" ? "Completed" : e.status || "Planned"} />
                 </div>
-                <p className="text-lg font-bold leading-snug text-[#111827]">{e.name}</p>
+                <p className="text-lg font-bold leading-snug text-[#1e2c40]">{e.name}</p>
                 <p className="flex items-center gap-1.5 text-sm text-muted-foreground"><MapPin className="h-3.5 w-3.5" /> {e.location || "Location to be set"}{e.theme ? ` · ${e.theme}` : ""}</p>
                 <div className="flex flex-wrap items-center gap-1.5 pt-1 text-xs font-semibold">
                   <span className="rounded-full bg-white px-2.5 py-0.5 ring-1 ring-border">{ev.length} vendor{ev.length === 1 ? "" : "s"}</span>

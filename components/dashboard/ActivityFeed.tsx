@@ -40,7 +40,7 @@ export function ActivityFeed({ activities }: ActivityFeedProps) {
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-lg font-semibold text-[#111827]">Recent Activities</CardTitle>
+            <CardTitle className="text-lg font-semibold text-[#1e2c40]">Recent Activities</CardTitle>
             <CardDescription>Latest interactions and updates</CardDescription>
           </div>
           <Link href="/activities">
@@ -55,7 +55,7 @@ export function ActivityFeed({ activities }: ActivityFeedProps) {
         <ScrollArea className="h-[300px] pr-4">
           <div className="space-y-4">
             {activities.length === 0 ? (
-              <div className="py-8 text-center text-[#6B7280]">No recent activities</div>
+              <div className="py-8 text-center text-[#4f6178]">No recent activities</div>
             ) : (
               activities.map((activity) => (
                 <div
@@ -74,18 +74,18 @@ export function ActivityFeed({ activities }: ActivityFeedProps) {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-[#111827] text-sm">
+                      <span className="font-semibold text-[#1e2c40] text-sm">
                         {activity.activity_type}
                       </span>
-                      <span className="text-[#6B7280] text-xs">•</span>
-                      <span className="text-xs text-[#6B7280]">
+                      <span className="text-[#4f6178] text-xs">•</span>
+                      <span className="text-xs text-[#4f6178]">
                         {formatDateRelative(activity.date_time)}
                       </span>
                     </div>
-                    <p className="text-sm text-[#111827] font-medium truncate mt-0.5">
+                    <p className="text-sm text-[#1e2c40] font-medium truncate mt-0.5">
                       {activity.accounts?.name || "No Account"}
                     </p>
-                    <p className="text-xs text-[#6B7280] line-clamp-2 mt-1 leading-relaxed">
+                    <p className="text-xs text-[#4f6178] line-clamp-2 mt-1 leading-relaxed">
                       {activity.summary}
                     </p>
                   </div>

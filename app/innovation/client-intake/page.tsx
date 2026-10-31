@@ -81,7 +81,7 @@ export default function ClientIntakeListPage() {
           {sorted.map((c) => (
             <Link key={c.id} href={`/innovation/client-intake/${c.id}`} className="grid content-start gap-2.5 rounded-3xl bg-white p-5 shadow-md transition-shadow hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40">
               <div className="flex items-start justify-between gap-2">
-                <p className="text-lg font-bold leading-snug text-[#111827]">{c.organization_name}</p>
+                <p className="text-lg font-bold leading-snug text-[#1e2c40]">{c.organization_name}</p>
                 <StatusBadge status={c.status || "New"} />
               </div>
               <p className="text-sm text-muted-foreground">

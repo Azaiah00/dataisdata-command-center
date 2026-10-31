@@ -183,8 +183,8 @@ export default function ClientIntakeDetailPage() {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0">
           <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground">Innovation Assessment · {formatDate(intake.created_at)}{intake.source === "public" ? " · public form" : ""}</p>
-          <h1 className="mt-1 text-2xl font-bold text-[#111827] break-words">{intake.organization_name}</h1>
-          <p className="mt-1 text-[#6B7280] break-words">{[intake.contact_name, intake.contact_title, intake.contact_email].filter(Boolean).join(" · ") || "No contact"}</p>
+          <h1 className="mt-1 text-2xl font-bold text-[#1e2c40] break-words">{intake.organization_name}</h1>
+          <p className="mt-1 text-[#4f6178] break-words">{[intake.contact_name, intake.contact_title, intake.contact_email].filter(Boolean).join(" · ") || "No contact"}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <StatusBadge status={intake.status || "New"} className="text-sm" />
@@ -282,7 +282,7 @@ export default function ClientIntakeDetailPage() {
             {matches.map((p) => (
               <Link key={p.id} href={`/partners/${p.id}`} className="rounded-2xl border border-border p-4 transition hover:border-primary/30 hover:shadow-sm">
                 <div className="flex items-start justify-between gap-2">
-                  <p className="font-semibold text-[#111827]">{p.name}</p>
+                  <p className="font-semibold text-[#1e2c40]">{p.name}</p>
                   {p.vendor_score != null && <span className="inline-flex h-6 min-w-9 items-center justify-center rounded-full bg-primary px-2 text-xs font-bold text-white">{p.vendor_score}</span>}
                 </div>
                 <p className="mt-0.5 text-xs text-muted-foreground">{p.innovation_category} · {p.vendor_status}</p>
@@ -319,7 +319,7 @@ export default function ClientIntakeDetailPage() {
                 <li key={i.event_id} className="flex flex-wrap items-center gap-3 py-2.5">
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-muted text-primary"><CalendarDays className="h-4 w-4" /></span>
                   <Link href={`/innovation/events/${i.event_id}`} className="min-w-0 flex-1">
-                    <span className="block font-semibold text-[#111827]">{ev?.name || "Event"}</span>
+                    <span className="block font-semibold text-[#1e2c40]">{ev?.name || "Event"}</span>
                     <span className="block text-xs text-muted-foreground">{shortDate(ev?.event_date || null)}{ev?.location ? ` · ${ev.location}` : ""}</span>
                   </Link>
                   <StatusBadge status={i.rsvp === "yes" ? "Attending" : i.rsvp === "no" ? "Can't attend" : "Invited, no reply"} />

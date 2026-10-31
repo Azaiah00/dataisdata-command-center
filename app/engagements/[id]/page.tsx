@@ -276,12 +276,12 @@ export default function EngagementDetailPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2 text-xs font-medium text-[#6B7280] uppercase tracking-wider">
+      <div className="flex items-center gap-2 text-xs font-medium text-[#4f6178] uppercase tracking-wider">
         <Link href="/engagements" className="hover:text-blue-600 transition-colors">
           Engagements
         </Link>
         <span>/</span>
-        <span className="text-[#111827] truncate">{engagement.name}</span>
+        <span className="text-[#1e2c40] truncate">{engagement.name}</span>
       </div>
 
       <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
@@ -292,7 +292,7 @@ export default function EngagementDetailPage({
             </div>
             <div>
               <div className="flex items-center gap-3 flex-wrap">
-                <h1 className="text-2xl font-bold text-[#111827]">{engagement.name}</h1>
+                <h1 className="text-2xl font-bold text-[#1e2c40]">{engagement.name}</h1>
                 <span
                   className={cn(
                     "font-medium border-none text-xs px-2 py-1 rounded-md",
@@ -302,7 +302,7 @@ export default function EngagementDetailPage({
                   {engagement.status}
                 </span>
               </div>
-              <div className="flex items-center gap-4 mt-2 text-[#6B7280] text-sm">
+              <div className="flex items-center gap-4 mt-2 text-[#4f6178] text-sm">
                 <div className="flex items-center gap-1.5">
                   <Building2 className="w-4 h-4" />
                   <Link
@@ -370,7 +370,7 @@ export default function EngagementDetailPage({
       {isEditing && (
         <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-bold text-[#111827]">Edit project</CardTitle>
+            <CardTitle className="text-lg font-bold text-[#1e2c40]">Edit project</CardTitle>
             <CardDescription>Update engagement details and save.</CardDescription>
           </CardHeader>
           <CardContent>
@@ -587,7 +587,7 @@ export default function EngagementDetailPage({
                         ))}
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-[#6B7280]">Select multiple contractors to assign to this engagement.</p>
+                  <p className="text-xs text-[#4f6178]">Select multiple contractors to assign to this engagement.</p>
                 </div>
 
                 <div className="flex gap-2">
@@ -613,13 +613,13 @@ export default function EngagementDetailPage({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card className="border-none shadow-sm">
             <CardHeader>
-              <CardTitle className="text-lg font-bold text-[#111827]">Contract</CardTitle>
+              <CardTitle className="text-lg font-bold text-[#1e2c40]">Contract</CardTitle>
               <CardDescription>Contract value, budget and planned margin</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center py-2 border-b border-slate-100">
-                <span className="text-sm text-[#6B7280]">Contract value</span>
-                <span className="font-bold text-[#111827]">
+                <span className="text-sm text-[#4f6178]">Contract value</span>
+                <span className="font-bold text-[#1e2c40]">
                   {engagement.contract_value != null ? (
                     formatCurrency(engagement.contract_value)
                   ) : (
@@ -628,14 +628,14 @@ export default function EngagementDetailPage({
                 </span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-slate-100">
-                <span className="text-sm text-[#6B7280]">Budget</span>
-                <span className="font-bold text-[#111827]">
+                <span className="text-sm text-[#4f6178]">Budget</span>
+                <span className="font-bold text-[#1e2c40]">
                   {engagement.budget != null ? formatCurrency(engagement.budget) : "—"}
                 </span>
               </div>
               <div className="flex justify-between items-center py-2">
-                <span className="text-sm text-[#6B7280]">Margin</span>
-                <span className="font-bold text-[#111827]">
+                <span className="text-sm text-[#4f6178]">Margin</span>
+                <span className="font-bold text-[#1e2c40]">
                   {engagement.margin_pct != null ? `${engagement.margin_pct}%` : "—"}
                 </span>
               </div>
@@ -643,19 +643,19 @@ export default function EngagementDetailPage({
           </Card>
           <Card className="border-none shadow-sm">
             <CardHeader>
-              <CardTitle className="text-lg font-bold text-[#111827]">Timeline</CardTitle>
+              <CardTitle className="text-lg font-bold text-[#1e2c40]">Timeline</CardTitle>
               <CardDescription>Start and end dates</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center py-2 border-b border-slate-100">
-                <span className="text-sm text-[#6B7280]">Start</span>
-                <span className="font-bold text-[#111827]">
+                <span className="text-sm text-[#4f6178]">Start</span>
+                <span className="font-bold text-[#1e2c40]">
                   {engagement.start_date ? formatDate(engagement.start_date) : "—"}
                 </span>
               </div>
               <div className="flex justify-between items-center py-2">
-                <span className="text-sm text-[#6B7280]">End</span>
-                <span className="font-bold text-[#111827]">
+                <span className="text-sm text-[#4f6178]">End</span>
+                <span className="font-bold text-[#1e2c40]">
                   {engagement.end_date ? formatDate(engagement.end_date) : "—"}
                 </span>
               </div>
@@ -779,10 +779,10 @@ export default function EngagementDetailPage({
       {!isEditing && engagement.scope_summary && (
         <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-bold text-[#111827]">Scope</CardTitle>
+            <CardTitle className="text-lg font-bold text-[#1e2c40]">Scope</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-[#4B5563] whitespace-pre-wrap">{engagement.scope_summary}</p>
+            <p className="text-sm text-[#3b4d64] whitespace-pre-wrap">{engagement.scope_summary}</p>
           </CardContent>
         </Card>
       )}
@@ -790,7 +790,7 @@ export default function EngagementDetailPage({
       {!isEditing && engagement.attachments && engagement.attachments.length > 0 && (
         <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-bold text-[#111827]">Attachments</CardTitle>
+            <CardTitle className="text-lg font-bold text-[#1e2c40]">Attachments</CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">

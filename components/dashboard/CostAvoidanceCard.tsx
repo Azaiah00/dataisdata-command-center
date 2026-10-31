@@ -22,14 +22,14 @@ export function CostAvoidanceCard({ items }: CostAvoidanceCardProps) {
   return (
     <Card className="border-none shadow-sm">
       <CardHeader>
-        <CardTitle className="text-lg font-semibold text-[#111827]">Cost Avoidance Watchlist</CardTitle>
+        <CardTitle className="text-lg font-semibold text-[#1e2c40]">Cost Avoidance Watchlist</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        {items.length === 0 && <p className="text-sm text-[#6B7280]">No flagged initiatives yet.</p>}
+        {items.length === 0 && <p className="text-sm text-[#4f6178]">No flagged initiatives yet.</p>}
         {items.map((item) => (
           <div key={item.id} className="rounded-lg border border-slate-100 p-3">
             <div className="flex items-center justify-between gap-2">
-              <Link href={`/engagements/${item.id}`} className="text-sm font-semibold text-[#111827] hover:text-primary">
+              <Link href={`/engagements/${item.id}`} className="text-sm font-semibold text-[#1e2c40] hover:text-primary">
                 {item.name}
               </Link>
               <div className="flex items-center gap-1">
@@ -37,8 +37,8 @@ export function CostAvoidanceCard({ items }: CostAvoidanceCardProps) {
                 {item.redundant_purchase_risk && <Badge className="bg-red-100 text-red-700 border-none">Duplicate Risk</Badge>}
               </div>
             </div>
-            <div className="mt-2 grid grid-cols-2 gap-2 text-xs text-[#6B7280]">
-              <div>License Cost: <span className="font-medium text-[#111827]">{formatCurrency(item.annual_license_cost)}</span></div>
+            <div className="mt-2 grid grid-cols-2 gap-2 text-xs text-[#4f6178]">
+              <div>License Cost: <span className="font-medium text-[#1e2c40]">{formatCurrency(item.annual_license_cost)}</span></div>
               <div>Est. Savings: <span className="font-medium text-green-700">{formatCurrency(item.estimated_savings)}</span></div>
             </div>
           </div>

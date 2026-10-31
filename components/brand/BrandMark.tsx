@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { Wordmark } from "@/components/brand/Wordmark";
 
 /**
  * DataIsData brand mark — the official silver "D" monogram set on the portal's
@@ -52,7 +53,7 @@ export function BrandLockup({
     <span className={cn("flex items-center gap-2.5", className)}>
       <BrandMark size={size} />
       <span className="flex flex-col leading-none">
-        <span className={cn("wordmark text-xl text-foreground", textClassName)}>Data<span className="wm-is">Is</span>Data</span>
+        <Wordmark className={cn("text-xl text-foreground", textClassName)} />
         {subtitle && <span className="mt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">{subtitle}</span>}
       </span>
     </span>

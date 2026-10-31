@@ -111,13 +111,13 @@ export default function MaturityPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#111827]">Innovation Maturity Index</h1>
-        <p className="text-[#6B7280]">Track baseline, improvement, and score history by account.</p>
+        <h1 className="text-2xl font-bold text-[#1e2c40]">Innovation Maturity Index</h1>
+        <p className="text-[#4f6178]">Track baseline, improvement, and score history by account.</p>
       </div>
 
       <Card className="border-none shadow-sm">
         <CardContent className="p-4">
-          <Label className="text-xs text-[#6B7280]">Account</Label>
+          <Label className="text-xs text-[#4f6178]">Account</Label>
           <select
             value={selectedAccount}
             onChange={(e) => setSelectedAccount(e.target.value)}
@@ -133,7 +133,7 @@ export default function MaturityPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="border-none shadow-sm lg:col-span-2 overflow-hidden">
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-semibold text-[#111827]">Maturity Profile</CardTitle>
+            <CardTitle className="text-lg font-semibold text-[#1e2c40]">Maturity Profile</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-[350px] w-full flex items-center justify-center">
@@ -227,7 +227,7 @@ export default function MaturityPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {MATURITY_CATEGORIES.map((category) => (
               <div key={category}>
-                <Label className="text-xs text-[#6B7280] capitalize">{category.replaceAll("_", " ")}</Label>
+                <Label className="text-xs text-[#4f6178] capitalize">{category.replaceAll("_", " ")}</Label>
                 <Input
                   type="number"
                   min={0}
@@ -249,7 +249,7 @@ export default function MaturityPage() {
       <Card className="border-none shadow-sm">
         <CardHeader><CardTitle>Snapshot History</CardTitle></CardHeader>
         <CardContent className="space-y-2">
-          {snapshots.length === 0 && <p className="text-sm text-[#6B7280]">No snapshots recorded yet.</p>}
+          {snapshots.length === 0 && <p className="text-sm text-[#4f6178]">No snapshots recorded yet.</p>}
           {snapshots.map((item) => (
             <div key={item.id} className="flex items-center justify-between rounded-md border border-slate-100 p-3 text-sm">
               <span>{new Date(item.as_of_date).toLocaleDateString()}</span>

@@ -42,7 +42,7 @@ export default function PartnersPage() {
           <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
             <ShieldCheck className="w-4 h-4 text-primary" />
           </div>
-          <span className="font-bold text-[#111827] text-sm truncate">{partner.name}</span>
+          <span className="font-bold text-[#1e2c40] text-sm truncate">{partner.name}</span>
         </div>
       ),
     },
@@ -64,7 +64,7 @@ export default function PartnersPage() {
       header: "Capabilities",
       accessorKey: "capabilities",
       cell: (partner: Partner) => (
-        <div className="flex items-center gap-1.5 text-[#6B7280] text-xs max-w-xs truncate">
+        <div className="flex items-center gap-1.5 text-[#4f6178] text-xs max-w-xs truncate">
           <Tag className="w-3.5 h-3.5" />
           <span className="truncate">{partner.capabilities || "N/A"}</span>
         </div>
@@ -74,7 +74,7 @@ export default function PartnersPage() {
       header: "Contract Vehicles",
       accessorKey: "contract_vehicles",
       cell: (partner: Partner) => (
-        <div className="flex items-center gap-1.5 text-[#6B7280] text-xs truncate max-w-xs">
+        <div className="flex items-center gap-1.5 text-[#4f6178] text-xs truncate max-w-xs">
           <FileText className="w-3.5 h-3.5" />
           <span className="truncate">{partner.contract_vehicles || "None"}</span>
         </div>
@@ -87,13 +87,13 @@ export default function PartnersPage() {
         <div className="flex justify-end gap-2">
           <Can module="partners" action="edit">
             <Link href={`/partners/${partner.id}/edit`}>
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-primary hover:bg-primary/10">
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-[#4f6178] hover:text-primary hover:bg-primary/10">
                 <Pencil className="w-3.5 h-3.5" />
               </Button>
             </Link>
           </Can>
           <Link href={`/partners/${partner.id}`}>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#6B7280] hover:text-white hover:bg-primary">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#4f6178] hover:text-white hover:bg-primary">
               <ArrowUpRight className="w-4 h-4" />
             </Button>
           </Link>
@@ -106,8 +106,8 @@ export default function PartnersPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#111827]">Partners</h1>
-          <p className="text-[#6B7280]">Manage vendor, prime, sub, and university ecosystem.</p>
+          <h1 className="text-2xl font-bold text-[#1e2c40]">Partners</h1>
+          <p className="text-[#4f6178]">Manage vendor, prime, sub, and university ecosystem.</p>
         </div>
         <Can module="partners" action="create">
           <Link href="/partners/new">

@@ -160,7 +160,7 @@ export default function ActivityDetailPage({ params }: { params: Promise<{ id: s
           <CardContent className="space-y-5">
             <p className="text-sm text-foreground whitespace-pre-wrap">{activity.summary || "No notes."}</p>
             {(activity.next_action || activity.next_action_due) && (
-              <div className={cn("rounded-xl border p-4", overdue ? "border-amber-200 bg-amber-50/80" : "border-[#e2e7ef] bg-[#f6f8fb]")}>
+              <div className={cn("rounded-xl border p-4", overdue ? "border-amber-200 bg-amber-50/80" : "border-[#d3dce5] bg-[#f0f4f7]")}>
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="min-w-0">
                     <p className="stat-label flex items-center gap-1.5">

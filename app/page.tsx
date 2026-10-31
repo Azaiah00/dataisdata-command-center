@@ -257,8 +257,8 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-5">
-        <div className="min-w-0">
+      <div className="hero-banner flex flex-col md:flex-row md:items-end justify-between gap-5">
+        <div className="min-w-0 relative">
           <h1 className="page-title text-[1.9rem] leading-tight">
             {greeting()}
             {firstName ? `, ${firstName}` : ""}
@@ -286,7 +286,7 @@ export default function Dashboard() {
 
       <div className="pb-6">
         {kpis.length > 0 && (
-          <div className={`rise-in grid grid-cols-1 sm:grid-cols-2 gap-5 ${kpis.length % 3 === 0 ? "xl:grid-cols-3" : "xl:grid-cols-4"}`}>{kpis.slice(0, 8)}</div>
+          <div className={`rise-in kpi-grid grid grid-cols-1 sm:grid-cols-2 gap-5 ${kpis.length % 3 === 0 ? "xl:grid-cols-3" : "xl:grid-cols-4"}`}>{kpis.slice(0, 8)}</div>
         )}
 
         {kpis.length === 0 && (

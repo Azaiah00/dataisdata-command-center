@@ -55,8 +55,8 @@ export default function VendorApplicationListPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-[#111827]">Vendor Applications</h1>
-          <p className="text-[#6B7280]">Stage 2 and 3 of partner enrollment. Invited vendors now apply through their private link and show up here automatically.</p>
+          <h1 className="text-2xl font-bold text-[#1e2c40]">Vendor Applications</h1>
+          <p className="text-[#4f6178]">Stage 2 and 3 of partner enrollment. Invited vendors now apply through their private link and show up here automatically.</p>
         </div>
         <Can module="vendor_applications" action="create">
           <Link href="/innovation/vendor-application/new">
@@ -64,7 +64,7 @@ export default function VendorApplicationListPage() {
           </Link>
         </Can>
       </div>
-      {loading ? <p className="text-sm text-[#6B7280]">Loading...</p> : <DataTable columns={columns} data={data} />}
+      {loading ? <p className="text-sm text-[#4f6178]">Loading...</p> : <DataTable columns={columns} data={data} />}
     </div>
   );
 }
