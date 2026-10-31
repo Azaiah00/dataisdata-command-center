@@ -60,6 +60,7 @@ import { NotificationsMenu } from "./NotificationsMenu";
 import type { ModuleKey } from "@/lib/access/modules";
 import { ROLE_LABELS } from "@/lib/access/types";
 import { Wordmark } from "@/components/brand/Wordmark";
+import { Icon3D } from "@/components/ui/icon-3d";
 
 type SearchItem = {
   id: string;
@@ -132,7 +133,7 @@ function isActivePath(pathname: string | null, path: string) {
 function NavLink({ href, label, icon: Icon, active, onClick }: { href: string; label: string; icon?: React.ElementType; active?: boolean; onClick?: () => void }) {
   return (
     <Link href={href} onClick={onClick} aria-current={active ? "page" : undefined} className={cn("side-link", active && "is-active")}>
-      {Icon && <Icon />}
+      {Icon && <Icon3D icon={Icon} tone={active ? "teal" : "silver"} />}
       <span className="truncate">{label}</span>
     </Link>
   );

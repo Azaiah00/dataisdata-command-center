@@ -11,6 +11,7 @@ import { statusTone } from "@/lib/innovation/constants";
 import { moduleSchemaReady } from "@/lib/innovation/data";
 import { openTour } from "@/lib/innovation/tour";
 import { cn } from "@/lib/utils";
+import { Icon3D } from "@/components/ui/icon-3d";
 
 const TABS: { href: string; label: string; icon: React.ElementType; module: ModuleKey; match: string[] }[] = [
   { href: "/innovation/exchange", label: "Overview", icon: Layers, module: "innovation_exchange", match: ["/innovation/exchange"] },
@@ -232,8 +233,8 @@ export function Stat({ label, value, sub, tone, icon: Icon, href }: { label: str
         <p className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">{value}</p>
         {sub && <p className={cn("mt-1.5 text-xs font-semibold", tone === "ok" ? "text-green-700" : tone === "warn" ? "text-amber-700" : "text-muted-foreground")}>{sub}</p>}
       </div>
-      <span className="hidden shrink-0 rounded-2xl bg-muted p-3 text-primary min-[420px]:flex">
-        <Icon className="h-5 w-5" />
+      <span className="kpi-icon hidden shrink-0 min-[420px]:inline-flex">
+        <Icon3D icon={Icon} className="h-5 w-5" />
       </span>
     </div>
   );

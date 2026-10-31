@@ -47,6 +47,35 @@ function MoneyTooltip({ active, payload, label }: any) {
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
+/** Shade a hex colour toward white (amt > 0) or black (amt < 0). */
+function shade(hex: string, amt: number) {
+  const n = parseInt(hex.slice(1), 16);
+  const ch = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((c) => Math.round(amt > 0 ? c + (255 - c) * amt : c * (1 + amt)));
+  return `rgb(${ch.join(",")})`;
+}
+
+/**
+ * Soft 3D "clay pill" bars, as in the reference: each bar is lit from the left
+ * (lighter edge, darker right edge) with a glossy cap, plus a soft drop shadow.
+ */
+function ClayBarDefs({ ids }: { ids: Record<string, string> }) {
+  return (
+    <defs>
+      {Object.entries(ids).map(([id, color]) => (
+        <linearGradient key={id} id={id} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor={shade(color, 0.32)} />
+          <stop offset="38%" stopColor={shade(color, 0.12)} />
+          <stop offset="100%" stopColor={shade(color, -0.18)} />
+        </linearGradient>
+      ))}
+      <filter id="clayBarShadow" x="-30%" y="-10%" width="160%" height="130%">
+        <feDropShadow dx="1.5" dy="3" stdDeviation="2.2" floodColor="#1e2c40" floodOpacity="0.28" />
+      </filter>
+    </defs>
+  );
+}
+const CLAY = { revenue: "clayRevenue", cost: "clayCost", pipeline: "clayPipeline" };
+
 const axisProps = {
   tick: { fontSize: 11, fill: CHART.axis },
   axisLine: false,
@@ -57,15 +86,16 @@ export function CashHistoryChart({ history, height = 280 }: { history: MonthPoin
   return (
     <div style={{ width: "100%", height }} role="img" aria-label="Cash collected versus expenses for the last 12 months">
       <ResponsiveContainer>
-        <ComposedChart data={history} margin={{ top: 8, right: 8, left: 0, bottom: 0 }} barGap={2}>
+        <ComposedChart data={history} margin={{ top: 8, right: 8, left: 0, bottom: 0 }} barGap={3}>
+          <ClayBarDefs ids={{ [CLAY.revenue]: CHART.revenue, [CLAY.cost]: CHART.cost }} />
           <CartesianGrid stroke={CHART.grid} vertical={false} />
           <XAxis dataKey="key" tickFormatter={(k) => monthLabel(k)} {...axisProps} />
           <YAxis tickFormatter={(v) => formatCompactCurrency(v)} width={64} {...axisProps} />
           <Tooltip content={<MoneyTooltip />} cursor={{ fill: "rgba(20,70,35,0.05)" }} />
-          <Legend iconType="square" wrapperStyle={{ fontSize: 12 }} />
+          <Legend iconType="circle" iconSize={10} wrapperStyle={{ fontSize: 12 }} />
           <ReferenceLine y={0} stroke={CHART.axis} strokeOpacity={0.4} />
-          <Bar dataKey="collected" name="Collected" fill={CHART.revenue} radius={[4, 4, 0, 0]} maxBarSize={22} />
-          <Bar dataKey="expenses" name="Expenses" fill={CHART.cost} radius={[4, 4, 0, 0]} maxBarSize={22} />
+          <Bar dataKey="collected" name="Collected" fill={`url(#${CLAY.revenue})`} stroke="none" radius={[11, 11, 5, 5]} maxBarSize={22} filter="url(#clayBarShadow)" legendType="circle" />
+          <Bar dataKey="expenses" name="Expenses" fill={`url(#${CLAY.cost})`} stroke="none" radius={[11, 11, 5, 5]} maxBarSize={22} filter="url(#clayBarShadow)" legendType="circle" />
           <Line dataKey="net" name="Net" stroke={CHART.net} strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
         </ComposedChart>
       </ResponsiveContainer>
@@ -84,16 +114,17 @@ export function ForecastChart({ months, height = 300 }: { months: ForecastMonth[
   return (
     <div style={{ width: "100%", height }} role="img" aria-label="Revenue, cost and net profit forecast by month">
       <ResponsiveContainer>
-        <ComposedChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }} barGap={2}>
+        <ComposedChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }} barGap={3}>
+          <ClayBarDefs ids={{ [CLAY.revenue]: CHART.revenue, [CLAY.cost]: CHART.cost, [CLAY.pipeline]: CHART.pipeline }} />
           <CartesianGrid stroke={CHART.grid} vertical={false} />
           <XAxis dataKey="key" tickFormatter={(k) => monthLabel(k)} {...axisProps} />
           <YAxis tickFormatter={(v) => formatCompactCurrency(v)} width={64} {...axisProps} />
           <Tooltip content={<MoneyTooltip />} cursor={{ fill: "rgba(20,70,35,0.05)" }} />
-          <Legend iconType="square" wrapperStyle={{ fontSize: 12 }} />
+          <Legend iconType="circle" iconSize={10} wrapperStyle={{ fontSize: 12 }} />
           <ReferenceLine y={0} stroke={CHART.axis} strokeOpacity={0.4} />
-          <Bar dataKey="committed" name="Committed revenue" stackId="rev" fill={CHART.revenue} maxBarSize={26} />
-          <Bar dataKey="pipeline" name="Weighted pipeline" stackId="rev" fill={CHART.pipeline} radius={[4, 4, 0, 0]} maxBarSize={26} />
-          <Bar dataKey="cost" name="Total cost" fill={CHART.cost} radius={[4, 4, 0, 0]} maxBarSize={14} />
+          <Bar dataKey="committed" name="Committed revenue" stackId="rev" fill={`url(#${CLAY.revenue})`} stroke="none" radius={[0, 0, 6, 6]} maxBarSize={26} filter="url(#clayBarShadow)" legendType="circle" />
+          <Bar dataKey="pipeline" name="Weighted pipeline" stackId="rev" fill={`url(#${CLAY.pipeline})`} stroke="none" radius={[13, 13, 0, 0]} maxBarSize={26} filter="url(#clayBarShadow)" legendType="circle" />
+          <Bar dataKey="cost" name="Total cost" fill={`url(#${CLAY.cost})`} stroke="none" radius={[7, 7, 3, 3]} maxBarSize={14} filter="url(#clayBarShadow)" legendType="circle" />
           <Line dataKey="net" name="Net profit" stroke={CHART.net} strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
         </ComposedChart>
       </ResponsiveContainer>
@@ -131,12 +162,12 @@ export function AgingBar({ aging }: { aging: { current: number; d1_30: number; d
   const total = parts.reduce((t, p) => t + p.value, 0);
   return (
     <div className="space-y-3">
-      <div className="flex h-3 w-full overflow-hidden rounded-full bg-muted gap-[2px]">
+      <div className="clay-track flex h-3.5 w-full overflow-hidden rounded-full gap-[2px]">
         {total > 0 &&
           parts
             .filter((p) => p.value > 0)
             .map((p) => (
-              <div key={p.label} title={`${p.label}: ${formatCurrency(p.value)}`} style={{ width: `${(p.value / total) * 100}%`, background: p.color }} />
+              <div key={p.label} className="clay-segment" title={`${p.label}: ${formatCurrency(p.value)}`} style={{ width: `${(p.value / total) * 100}%`, backgroundColor: p.color }} />
             ))}
       </div>
       <div className="grid grid-cols-5 gap-2 text-xs">

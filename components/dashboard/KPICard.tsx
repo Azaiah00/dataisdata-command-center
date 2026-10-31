@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Sparkline } from "@/components/ui/page";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { Icon3D } from "@/components/ui/icon-3d";
 
 interface KPICardProps {
   title: string;
@@ -21,7 +22,7 @@ export function KPICard({ title, value, change, changeType = "neutral", icon: Ic
       <CardContent className="p-5 flex flex-col h-full">
         <div className="flex flex-wrap items-start justify-between gap-x-2 gap-y-1.5">
           <span className="kpi-icon" aria-hidden="true">
-            <Icon className="w-5 h-5" />
+            <Icon3D icon={Icon} className="w-5 h-5" />
           </span>
           {change && (
             <span className={cn("trend-chip shrink-0", changeType === "positive" ? "is-up" : changeType === "negative" ? "is-down" : "bg-[#e3e9ef] text-[#4f6178]")}>

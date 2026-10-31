@@ -151,7 +151,9 @@
   --elev-inset:
     inset 1px 1px 3px rgba(30, 44, 64, 0.16),
     inset -1px -1px 0 rgba(255, 255, 255, 0.7);
-  --glossy-teal: linear-gradient(180deg, #4aa5af 0%, #2f8794 50%, #276f7b 100%);
+  --glossy-teal:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.04) 46%, transparent 52%),
+    linear-gradient(180deg, #4fa9b2 0%, #2f8794 55%, #256b77 100%);
   --shadow-soft: var(--elev-1);
   --shadow-lift: var(--elev-2);
 }
@@ -204,18 +206,19 @@ html { scrollbar-color: #4a97a2 transparent; scrollbar-width: thin; }
   inset: 0;
   z-index: -2;
   background:
-    radial-gradient(70vmax 50vmax at 25% 0%, rgba(232, 238, 244, 0.85), transparent 60%),
-    radial-gradient(60vmax 50vmax at 100% 100%, rgba(140, 158, 180, 0.55), transparent 60%),
-    linear-gradient(165deg, #c7d2dd 0%, #b2c0cf 50%, #a3b2c3 100%);
+    radial-gradient(70vmax 50vmax at 22% 0%, rgba(236, 241, 246, 0.55), transparent 62%),
+    radial-gradient(65vmax 55vmax at 100% 100%, rgba(96, 116, 140, 0.32), transparent 62%),
+    url("/textures/plaster.jpg") 0 0 / 760px 760px repeat,
+    #b9c5d2;
 }
-/* Concrete grain */
+/* Fine sand grain over the plaster */
 .app-backdrop::after {
   content: "";
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  opacity: 0.9;
+  opacity: 0.55;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.12 0 0 0 0 0.17 0 0 0 0 0.25 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
@@ -223,7 +226,9 @@ html { scrollbar-color: #4a97a2 transparent; scrollbar-width: thin; }
   position: relative;
   margin: 0.5rem;
   border-radius: 1.75rem;
-  background: linear-gradient(160deg, rgba(222, 230, 238, 0.55) 0%, rgba(196, 208, 220, 0.42) 100%);
+  background:
+    url("/textures/frost-grain.webp") 0 0 / 384px 384px repeat,
+    linear-gradient(160deg, rgba(222, 230, 238, 0.5) 0%, rgba(190, 203, 216, 0.38) 100%);
   -webkit-backdrop-filter: blur(16px) saturate(120%);
   backdrop-filter: blur(16px) saturate(120%);
   border: 1px solid rgba(255, 255, 255, 0.55);
@@ -254,6 +259,7 @@ html { scrollbar-color: #4a97a2 transparent; scrollbar-width: thin; }
 /* ------------------------------------------------------------------ */
 .app-sidebar {
   background:
+    url("/textures/grain-dark.webp") 0 0 / 384px 384px repeat,
     radial-gradient(120% 60% at 0% 0%, rgba(255, 255, 255, 0.08), transparent 60%),
     linear-gradient(180deg, #2e425b 0%, #24364d 45%, #1e2c40 100%);
   color: #e4eaf0;
@@ -290,6 +296,10 @@ html { scrollbar-color: #4a97a2 transparent; scrollbar-width: thin; }
   transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
 }
 .side-link svg { color: rgba(214, 226, 236, 0.75); width: 1.15rem; height: 1.15rem; flex-shrink: 0; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35)); }
+/* Rendered 3D clay icons (components/ui/icon-3d.tsx) */
+.icon-3d { display: inline-block; object-fit: contain; flex-shrink: 0; pointer-events: none; user-select: none; }
+.side-link .icon-3d { width: 1.6rem; height: 1.6rem; margin: -0.2rem 0; filter: drop-shadow(0 2px 2px rgba(5, 12, 22, 0.55)); }
+.side-link.is-active .icon-3d { filter: drop-shadow(0 1px 1px rgba(30, 44, 64, 0.35)); }
 .side-link:hover { background: rgba(255, 255, 255, 0.07); color: #ffffff; }
 /* Active item: raised frosted pill with navy text, like the reference */
 .side-link.is-active {
@@ -348,7 +358,7 @@ html { scrollbar-color: #4a97a2 transparent; scrollbar-width: thin; }
 /* ------------------------------------------------------------------ */
 [data-slot="card"],
 [data-slot="card"]:hover {
-  background: var(--frost-panel);
+  background: url("/textures/frost-grain.webp") 0 0 / 384px 384px repeat, var(--frost-panel);
   -webkit-backdrop-filter: blur(14px) saturate(130%);
   backdrop-filter: blur(14px) saturate(130%);
   border: 1px solid rgba(255, 255, 255, 0.55);
@@ -368,16 +378,36 @@ a > [data-slot="card"]:hover { box-shadow: var(--elev-2); transform: translateY(
   overflow: hidden;
   padding: 1.75rem 1.75rem;
   border-radius: 1.6rem;
+  padding-bottom: calc(1.75rem + 16px);
   background:
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0 2px, transparent 2px 9px),
     radial-gradient(120% 140% at 0% 0%, rgba(255, 255, 255, 0.1), transparent 55%),
-    linear-gradient(180deg, #4a5d74 0%, #3a4d64 55%, #31435a 100%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(10, 18, 30, 0.18)),
+    url("/textures/slate-wood.jpg") center / cover no-repeat,
+    #3b4e64;
   box-shadow:
-    inset 1.5px 1.5px 0 rgba(255, 255, 255, 0.18),
+    inset 1.5px 1.5px 0 rgba(255, 255, 255, 0.2),
     inset -1px -2px 0 rgba(0, 0, 0, 0.25),
     0 3px 0 #2a3a4f,
     0 22px 40px -18px rgba(20, 30, 45, 0.7);
 }
+/* Shelf ledge */
+.hero-banner::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 16px;
+  pointer-events: none;
+  background:
+    url("/textures/grain-dark.webp") 0 0 / 384px 384px repeat,
+    linear-gradient(180deg, #55697f 0%, #44576d 45%, #354759 100%);
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 -8px 14px -6px rgba(5, 12, 22, 0.55);
+}
+@media (max-width: 639px) { .hero-banner { padding-bottom: calc(1.25rem + 14px); } .hero-banner::after { height: 14px; } }
 .hero-banner .page-title { color: #f4f7fa; text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35); }
 .hero-banner .page-subtitle { color: rgba(228, 236, 243, 0.82); }
 .hero-banner [data-slot="button"][data-variant="outline"] {
@@ -391,31 +421,40 @@ a > [data-slot="card"]:hover { box-shadow: var(--elev-2); transform: translateY(
 
 /* KPI tiles: pastel tints in rotation (teal · mist · ice · lavender) */
 .kpi-card { border-radius: 1.4rem !important; }
-.kpi-grid > :nth-child(4n + 1) [data-slot="card"] { background: linear-gradient(160deg, #a7dcd6 0%, #79c1bd 100%); }
-.kpi-grid > :nth-child(4n + 2) [data-slot="card"] { background: linear-gradient(160deg, #dbe4ed 0%, #c3d0dd 100%); }
+.kpi-grid > :nth-child(4n + 1) [data-slot="card"] { background: url("/textures/frost-grain.webp") 0 0 / 384px 384px repeat, linear-gradient(160deg, #a7dcd6 0%, #79c1bd 100%); }
+.kpi-grid > :nth-child(4n + 2) [data-slot="card"] { background: url("/textures/frost-grain.webp") 0 0 / 384px 384px repeat, linear-gradient(160deg, #dbe4ed 0%, #c3d0dd 100%); }
 .kpi-grid > :nth-child(4n + 3) [data-slot="card"] {
   background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.018' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.55 -0.1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E"),
-    linear-gradient(160deg, #eef6fb 0%, #c9dfec 100%);
+    linear-gradient(160deg, rgba(255, 255, 255, 0.28) 0%, rgba(201, 223, 236, 0.18) 100%),
+    url("/textures/frost-ice.jpg") center / cover no-repeat,
+    #e3eef6;
 }
-.kpi-grid > :nth-child(4n + 4) [data-slot="card"] { background: linear-gradient(160deg, #c3bfe8 0%, #9d98d6 100%); }
+.kpi-grid > :nth-child(4n + 4) [data-slot="card"] { background: url("/textures/frost-grain.webp") 0 0 / 384px 384px repeat, linear-gradient(160deg, #c3bfe8 0%, #9d98d6 100%); }
 .kpi-grid .stat-hint { color: rgba(30, 44, 64, 0.72); }
 .kpi-grid > :nth-child(4n + 1) .stat-hint { color: #1f5a5f; }
 .kpi-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.6rem;
-  height: 2.6rem;
-  border-radius: 0.95rem;
+  width: 3.1rem;
+  height: 3.1rem;
+  border-radius: 1rem;
   color: var(--navy-2);
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.35));
+  /* a deeper tint of whatever tile it sits on, so the pearl icon reads (reference icon squares) */
+  background:
+    radial-gradient(120% 90% at 30% 12%, rgba(255, 255, 255, 0.32), transparent 58%),
+    linear-gradient(160deg, rgba(30, 44, 64, 0.1), rgba(30, 44, 64, 0.24));
+  border: 1px solid rgba(255, 255, 255, 0.4);
   box-shadow:
-    inset 1.5px 1.5px 0 rgba(255, 255, 255, 0.95),
-    inset -1px -1.5px 0 rgba(30, 44, 64, 0.12),
-    0 6px 12px -6px rgba(30, 44, 64, 0.45);
+    inset 1.5px 1.5px 0 rgba(255, 255, 255, 0.75),
+    inset -1.5px -2px 0 rgba(30, 44, 64, 0.16),
+    0 2px 3px rgba(30, 44, 64, 0.16),
+    0 10px 18px -8px rgba(30, 44, 64, 0.5);
 }
 .kpi-icon svg { filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.8)); }
+.kpi-icon .icon-3d { width: 2.05rem; height: 2.05rem; filter: drop-shadow(0 2px 2px rgba(30, 44, 64, 0.35)); }
+.kpi-icon-sm { width: 2.2rem; height: 2.2rem; border-radius: 0.75rem; }
+.kpi-icon-sm .icon-3d { width: 1.45rem; height: 1.45rem; }
 
 .stat-tile {
   position: relative;
@@ -649,6 +688,10 @@ a > [data-slot="card"]:hover { box-shadow: var(--elev-2); transform: translateY(
   background: linear-gradient(90deg, #5fb3b3, #2f7f8c) !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
+
+/* Clay progress tracks (AR aging etc.) */
+.clay-track { background: rgba(196, 208, 220, 0.55); box-shadow: var(--elev-inset); padding: 1px; }
+.clay-segment { border-radius: 999px; background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0) 55%, rgba(0, 0, 0, 0.14)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35); }
 
 .spinner { width: 2rem; height: 2rem; border-radius: 999px; border: 2px solid #c4d7e2; border-top-color: var(--teal); animation: spin 0.8s linear infinite; }
 

@@ -9,13 +9,16 @@ import type { Insight } from "@/lib/finance/insights";
 import { cn, formatCompactCurrency, formatCurrency, formatDate } from "@/lib/utils";
 import { InsightCard } from "./InsightsTab";
 import { CheckCircle2, Circle, Target, Users, Wallet, Receipt, TrendingUp, Landmark, PiggyBank, Timer } from "lucide-react";
+import { Icon3D } from "@/components/ui/icon-3d";
 
 function Stat({ label, value, sub, icon: Icon, tone }: { label: string; value: string; sub?: string; icon: React.ElementType; tone?: "good" | "bad" | "warn" }) {
   return (
     <div className="rounded-2xl bg-white p-4 shadow-sm border border-border/60">
       <div className="flex items-start justify-between gap-2">
         <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{label}</p>
-        <Icon className="w-4 h-4 text-primary shrink-0" />
+        <span className="kpi-icon kpi-icon-sm shrink-0" aria-hidden="true">
+          <Icon3D icon={Icon} className="w-4 h-4" />
+        </span>
       </div>
       <p className={cn("mt-2 text-2xl font-bold tracking-tight", tone === "bad" ? "text-red-600" : tone === "warn" ? "text-amber-600" : "text-foreground")}>{value}</p>
       {sub && <p className="mt-1 text-xs text-muted-foreground">{sub}</p>}
