@@ -10,6 +10,7 @@ import { Empty, HowItWorks, ModuleNav, PageTitle, SampleBadge, SetupNotice, Stat
 import { SPONSORSHIP } from "@/lib/innovation/constants";
 import { isPastEvent, money, shortDate, toNum } from "@/lib/innovation/data";
 import type { EventAttendee, EventRow, EventVendor } from "@/lib/innovation/types";
+import { securityTerm } from "@/lib/terms";
 
 type Row = EventRow & { is_sample?: boolean | null };
 
@@ -103,7 +104,7 @@ export default function EventsPage() {
                   <StatusBadge status={isPastEvent(e) && e.status !== "Completed" ? "Completed" : e.status || "Planned"} />
                 </div>
                 <p className="text-lg font-bold leading-snug text-[#1e2c40]">{e.name}</p>
-                <p className="flex items-center gap-1.5 text-sm text-muted-foreground"><MapPin className="h-3.5 w-3.5" /> {e.location || "Location to be set"}{e.theme ? ` · ${e.theme}` : ""}</p>
+                <p className="flex items-center gap-1.5 text-sm text-muted-foreground"><MapPin className="h-3.5 w-3.5" /> {e.location || "Location to be set"}{e.theme ? ` · ${securityTerm(e.theme)}` : ""}</p>
                 <div className="flex flex-wrap items-center gap-1.5 pt-1 text-xs font-semibold">
                   <span className="rounded-full bg-white px-2.5 py-0.5 ring-1 ring-border">{ev.length} vendor{ev.length === 1 ? "" : "s"}</span>
                   <span className="rounded-full bg-white px-2.5 py-0.5 ring-1 ring-border">{going} attending</span>

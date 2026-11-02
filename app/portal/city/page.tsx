@@ -10,6 +10,7 @@ import { Chips, Empty, KV, PageTitle, Panel, Stat, selectClass } from "@/compone
 import { TIER_DESCRIPTIONS } from "@/lib/innovation/constants";
 import { errorText, money, shortDate, toNum } from "@/lib/innovation/data";
 import { formatDate } from "@/lib/utils";
+import { securityTerms } from "@/lib/terms";
 
 type CityData = {
   account: { id: string; name: string; innovation_tier: string | null; readiness_score: number | null } | null;
@@ -183,7 +184,7 @@ export default function CityPortalPage() {
           {intake && intake.status !== "New" && (
             <Panel title="Partners matched to your priorities">
               <p className="-mt-2 mb-3 text-xs text-muted-foreground">
-                Approved by DataIsData for {(intake.top_challenges || []).join(", ") || "your priorities"}.
+                Approved by DataIsData for {securityTerms(intake.top_challenges).join(", ") || "your priorities"}.
                 {intake.advisory_engagement ? " Because DataIsData advises you, it takes no revenue share on any deal with these vendors and recommends at least two options for every need." : ""}
               </p>
               {data?.matches.length ? (
@@ -206,7 +207,7 @@ export default function CityPortalPage() {
               {intake ? (
                 <KV
                   rows={[
-                    ["Top challenges", (intake.top_challenges || []).map((x, i) => `${i + 1}. ${x}`).join("\n") || null],
+                    ["Top challenges", securityTerms(intake.top_challenges).map((x, i) => `${i + 1}. ${x}`).join("\n") || null],
                     ["Initiatives", intake.current_initiatives],
                     ["Interested in", <Chips key="c" items={intake.interested_in} />],
                     ["Submitted", formatDate(intake.created_at)],

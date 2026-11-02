@@ -307,7 +307,7 @@ export default function EditAccountPage({ params }: { params: Promise<{ id: stri
                   <FormItem>
                     <FormLabel>Primary Focus</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. Broadband, Cyber, Innovation" {...field} />
+                      <Input placeholder="e.g. Broadband, AI, Innovation" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

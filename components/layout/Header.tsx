@@ -51,6 +51,7 @@ import {
   Layers,
   SquareKanban,
   Landmark,
+  BookOpen,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAccess } from "@/components/auth/AccessProvider";
@@ -70,7 +71,8 @@ type SearchItem = {
   type: "Account" | "Contact" | "Opportunity" | "Engagement" | "Partner" | "Contractor" | "Invoice";
 };
 
-type NavItem = { path: string; label: string; icon: React.ElementType; module: ModuleKey };
+/** module omitted = every signed-in seat (e.g. the Glossary). */
+type NavItem = { path: string; label: string; icon: React.ElementType; module?: ModuleKey };
 
 const crmItems: NavItem[] = [
   { path: "/accounts", label: "Accounts", icon: Building2, module: "accounts" },
@@ -108,6 +110,7 @@ const innovationItems: NavItem[] = [
 const insightItems: NavItem[] = [
   { path: "/reports", label: "Reports", icon: BarChart3, module: "reports" },
   { path: "/documents", label: "Documents", icon: FolderOpen, module: "documents" },
+  { path: "/glossary", label: "Glossary", icon: BookOpen },
 ];
 
 const portalItems: NavItem[] = [
@@ -120,7 +123,7 @@ const SECTIONS: { label: string; items: NavItem[]; prefixes: string[] }[] = [
   { label: "Work", items: workItems, prefixes: ["/engagements", "/activities", "/pipeline"] },
   { label: "Finance", items: financeItems, prefixes: ["/finance"] },
   { label: "Innovation", items: innovationItems, prefixes: ["/innovation"] },
-  { label: "Insights", items: insightItems, prefixes: ["/reports", "/documents"] },
+  { label: "Insights", items: insightItems, prefixes: ["/reports", "/documents", "/glossary"] },
   { label: "My Portal", items: portalItems, prefixes: ["/portal"] },
 ];
 
@@ -165,7 +168,7 @@ export function Header() {
   const searchContainerRef = useRef<HTMLDivElement | null>(null);
 
   // "My Portal" is for outside city / vendor logins; the team reaches portals through Preview.
-  const sections = SECTIONS.map((s) => ({ ...s, items: s.items.filter((i) => canSee(i.module)) }))
+  const sections = SECTIONS.map((s) => ({ ...s, items: s.items.filter((i) => !i.module || canSee(i.module)) }))
     .filter((s) => s.items.length)
     .filter((s) => s.label !== "My Portal" || user?.seat_role === "guest");
   const showDashboard = canSee("dashboard");

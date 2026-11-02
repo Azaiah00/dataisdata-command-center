@@ -124,7 +124,7 @@ const STEPS: Step[] = [
   },
   {
     title: "The Classification card",
-    body: "Each engagement page has a Classification card with all four fields and a short description of what each choice means. Anything not filled in yet shows as Not set.",
+    body: "Each engagement page has a Classification card with all four fields. Anything not filled in yet shows as Not set. The link under the title opens the Glossary, which defines every choice.",
     path: (c) => (c.engagementId ? `/engagements/${c.engagementId}` : null),
     target: "eng-classification",
     module: "engagements",
@@ -167,6 +167,12 @@ const STEPS: Step[] = [
     path: () => "/reports",
     target: "report-classification",
     module: "reports",
+  },
+  {
+    title: "The Glossary",
+    body: "A new Glossary page (in the sidebar under Insights) defines every Engagement Type, Service / Practice, Revenue Model and status, plus pipeline stages, innovation tiers and vendor scoring terms. Search it or jump to a section.",
+    path: () => "/glossary",
+    target: "glossary",
   },
 ];
 
@@ -345,11 +351,12 @@ export function WhatsNewTour() {
         </div>
         <ul className="space-y-2 p-5 text-sm text-foreground max-h-[34vh] sm:max-h-none overflow-y-auto">
           {[
-            "Engagement Type: how DataIsData is engaged (15 types)",
+            "Engagement Type: how DataIsData is engaged (9 types)",
             "Service / Practice: what DataIsData delivers",
             "Revenue / Pricing Model: how the engagement gets paid",
             "Engagement Status: Identified through Closed, separate from delivery status",
             "Filters, account cards, opportunity conversion and Reports all use them",
+            "A new Glossary page defines every term in one place",
           ].map((t) => (
             <li key={t} className="flex gap-2">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-green-bright" />

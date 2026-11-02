@@ -190,7 +190,7 @@ export default function EditPartnerPage({ params }: { params: Promise<{ id: stri
                     <FormItem className="md:col-span-2">
                       <FormLabel>Capabilities / Expertise</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g. Cloud Infrastructure, Cybersecurity, Staffing" {...field} />
+                        <Input placeholder="e.g. Cloud Infrastructure, Data & Analytics, Staffing" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

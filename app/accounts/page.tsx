@@ -10,6 +10,7 @@ import { Plus, Building2, MapPin, Tag, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { cn, getStatusColor } from "@/lib/utils";
+import { securityTerm } from "@/lib/terms";
 
 export default function AccountsPage() {
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -65,7 +66,7 @@ export default function AccountsPage() {
       cell: (account: Account) => (
         <div className="flex items-center gap-1.5 text-[#4f6178] text-xs">
           <Tag className="w-3.5 h-3.5" />
-          {account.primary_focus || "Not specified"}
+          {securityTerm(account.primary_focus) || "Not specified"}
         </div>
       ),
     },

@@ -12,6 +12,7 @@ import { PIPELINE_COLUMNS, isApprovedStatus } from "@/lib/innovation/constants";
 import { publicUrl, stageOf, timeAgo } from "@/lib/innovation/data";
 import type { VendorApplication, VendorInquiry } from "@/lib/innovation/types";
 import { cn } from "@/lib/utils";
+import { securityTerm } from "@/lib/terms";
 
 type AppLite = Pick<VendorApplication, "id" | "inquiry_id" | "status" | "score" | "created_at" | "decided_at">;
 
@@ -124,7 +125,7 @@ export default function VendorPipelinePage() {
                           {i.primary_contact || "No contact"} · {when}
                         </p>
                         <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-                          {i.core_service_category && <span className="rounded-full bg-white px-2 py-0.5 text-xs font-semibold ring-1 ring-border">{i.core_service_category}</span>}
+                          {i.core_service_category && <span className="rounded-full bg-white px-2 py-0.5 text-xs font-semibold ring-1 ring-border">{securityTerm(i.core_service_category)}</span>}
                           {(col.key === "approved" || col.key === "other") && <StatusBadge status={a?.status || i.status} className="text-[11px]" />}
                           <SampleBadge show={i.is_sample} />
                           {a?.score != null && (isApprovedStatus(a.status) || col.key === "other") && (

@@ -17,6 +17,7 @@ import { APPROVED, CHALLENGES, INNOVATION_TIERS, TIER_DESCRIPTIONS } from "@/lib
 import { errorText, isPastEvent, logActivity, money, shortDate, toNum } from "@/lib/innovation/data";
 import type { ClientIntake, EventAttendee, EventRow, PartnerLite } from "@/lib/innovation/types";
 import { cn, formatDate } from "@/lib/utils";
+import { securityTerm, securityTerms } from "@/lib/terms";
 
 const STATUSES = ["New", "Reviewing", "Qualified", "Converted"];
 
@@ -200,7 +201,7 @@ export default function ClientIntakeDetailPage() {
               ["Type", intake.organization_type],
               ["Population", intake.population_size ? intake.population_size.toLocaleString("en-US") : null],
               ["Annual IT budget", intake.annual_it_budget != null ? money(intake.annual_it_budget) : null],
-              ["Top challenges", (intake.top_challenges || []).map((x, i) => `${i + 1}. ${x}`).join("\n") || null],
+              ["Top challenges", securityTerms(intake.top_challenges).map((x, i) => `${i + 1}. ${x}`).join("\n") || null],
               ["Current initiatives", intake.current_initiatives],
               ["Grant funding", intake.grant_funding_interest ? "Interested" : "Not indicated"],
               ["Strategic plan", intake.strategic_plan_link],
@@ -276,7 +277,7 @@ export default function ClientIntakeDetailPage() {
           </p>
         )}
         {matches.length === 0 ? (
-          <Empty>No approved partners in {challenges.join(", ") || "these categories"} yet. That’s a recruiting signal: invite vendors in these categories.</Empty>
+          <Empty>No approved partners in {securityTerms(challenges).join(", ") || "these categories"} yet. That’s a recruiting signal: invite vendors in these categories.</Empty>
         ) : (
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {matches.map((p) => (
@@ -285,7 +286,7 @@ export default function ClientIntakeDetailPage() {
                   <p className="font-semibold text-[#1e2c40]">{p.name}</p>
                   {p.vendor_score != null && <span className="inline-flex h-6 min-w-9 items-center justify-center rounded-full bg-primary px-2 text-xs font-bold text-white">{p.vendor_score}</span>}
                 </div>
-                <p className="mt-0.5 text-xs text-muted-foreground">{p.innovation_category} · {p.vendor_status}</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">{securityTerm(p.innovation_category)} · {p.vendor_status}</p>
                 {(p.public_description || p.capabilities) && <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">{p.public_description || p.capabilities}</p>}
               </Link>
             ))}

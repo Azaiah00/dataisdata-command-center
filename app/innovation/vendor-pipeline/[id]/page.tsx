@@ -16,6 +16,7 @@ import { DECISIONS, INQUIRY_STATUS, isApprovedStatus } from "@/lib/innovation/co
 import { errorText, inviteEmail, inviteUrl, logActivity, money, newInviteToken, shortDate, timeAgo } from "@/lib/innovation/data";
 import type { EventRow, EventVendor, VendorApplication, VendorInquiry } from "@/lib/innovation/types";
 import { formatDate } from "@/lib/utils";
+import { securityTerm } from "@/lib/terms";
 
 type EventLink = EventVendor & { events: Pick<EventRow, "id" | "name" | "event_date" | "status"> | null };
 
@@ -136,7 +137,7 @@ export default function VendorRecordPage() {
       </Link>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
-          <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">{inq.core_service_category || "Vendor"}</p>
+          <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">{securityTerm(inq.core_service_category) || "Vendor"}</p>
           <h1 className="mt-1 text-2xl font-bold text-[#1e2c40] break-words">{inq.company_name}</h1>
           <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
             <StatusBadge status={status} />

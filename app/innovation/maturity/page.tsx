@@ -26,7 +26,6 @@ type SnapshotRow = {
   as_of_date: string;
   overall_score: number | null;
   governance: number | null;
-  cyber_resilience: number | null;
   broadband_readiness: number | null;
   data_maturity: number | null;
   ai_readiness: number | null;
@@ -37,7 +36,6 @@ type SnapshotRow = {
 
 const EMPTY_FORM: Record<(typeof MATURITY_CATEGORIES)[number], number> = {
   governance: 50,
-  cyber_resilience: 50,
   broadband_readiness: 50,
   data_maturity: 50,
   ai_readiness: 50,

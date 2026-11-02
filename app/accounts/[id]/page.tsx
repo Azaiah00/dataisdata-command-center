@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { ActivityFeed } from "@/components/dashboard/ActivityFeed";
+import { securityTerm } from "@/lib/terms";
 
 export default function AccountDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -244,7 +245,7 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
                 {account.primary_focus && (
                   <div className="flex items-center gap-1.5">
                     <Tag className="w-4 h-4" />
-                    {account.primary_focus}
+                    {securityTerm(account.primary_focus)}
                   </div>
                 )}
               </div>
@@ -634,7 +635,7 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
                           <h4 className="font-bold text-[#1e2c40] group-hover:text-blue-600 transition-colors leading-tight">
                             {opp.name}
                           </h4>
-                          <p className="text-xs text-[#4f6178]">{opp.service_line}</p>
+                          <p className="text-xs text-[#4f6178]">{securityTerm(opp.service_line)}</p>
                         </div>
                       </div>
                       <Badge className={cn("text-[10px] h-5 px-2 border-none font-medium", getStatusColor(opp.stage))}>

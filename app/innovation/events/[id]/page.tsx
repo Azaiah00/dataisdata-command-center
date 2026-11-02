@@ -14,6 +14,7 @@ import { APPROVED, EVENT_STATUSES, SPONSORSHIP, defaultFee } from "@/lib/innovat
 import { errorText, logActivity, money, shortDate, syncEventRevenue, timeAgo, toNum } from "@/lib/innovation/data";
 import type { EventAttendee, EventRequest, EventRow, EventTask, EventVendor, PartnerLite } from "@/lib/innovation/types";
 import { cn } from "@/lib/utils";
+import { securityTerm } from "@/lib/terms";
 
 type AccountLite = { id: string; name: string; account_type: string | null };
 
@@ -378,7 +379,7 @@ export default function EventDetailPage() {
         <Panel title="Details">
           <KV
             rows={[
-              ["Theme", event.theme],
+              ["Theme", securityTerm(event.theme)],
               ["Capacity", event.capacity],
               ["Registration link", event.registration_link],
               ["Cost to attendees", event.cost_to_attendees == null || toNum(event.cost_to_attendees) === 0 ? "Free" : money(event.cost_to_attendees)],

@@ -20,7 +20,7 @@ export function InnovationHeatMap({ data }: InnovationHeatMapProps) {
         <CardTitle className="text-lg font-semibold text-[#1e2c40]">Innovation Heat Map</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {data.map((item) => (
             <div key={item.theme} className="rounded-xl border border-slate-100 bg-slate-50 p-4">
               <p className="text-xs font-semibold uppercase tracking-wide text-[#4f6178]">{item.theme}</p>

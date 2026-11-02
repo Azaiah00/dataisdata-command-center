@@ -110,7 +110,7 @@ function VendorApplicationForm() {
             <div><Label>Technology Stack</Label><Textarea value={form.technology_stack} onChange={(e) => setForm({ ...form, technology_stack: e.target.value })} /></div>
             <div><Label>Integration Capabilities</Label><Textarea value={form.integration_capabilities} onChange={(e) => setForm({ ...form, integration_capabilities: e.target.value })} /></div>
             <div><Label>Cost Reduction for Municipalities</Label><Textarea value={form.cost_reduction_explanation} onChange={(e) => setForm({ ...form, cost_reduction_explanation: e.target.value })} /></div>
-            <div><Label>Strategic Alignment (Cyber/Broadband/AI/Resiliency)</Label><Textarea value={form.strategic_alignment} onChange={(e) => setForm({ ...form, strategic_alignment: e.target.value })} /></div>
+            <div><Label>Strategic Alignment (Broadband/AI/Workforce)</Label><Textarea value={form.strategic_alignment} onChange={(e) => setForm({ ...form, strategic_alignment: e.target.value })} /></div>
             <div><Label>Security Certifications</Label><Textarea value={form.security_certifications} onChange={(e) => setForm({ ...form, security_certifications: e.target.value })} /></div>
             <div><Label>Data Handling Practices</Label><Textarea value={form.data_handling_practices} onChange={(e) => setForm({ ...form, data_handling_practices: e.target.value })} /></div>
             <div><Label>Compliance Standards</Label><Textarea value={form.compliance_standards} onChange={(e) => setForm({ ...form, compliance_standards: e.target.value })} /></div>

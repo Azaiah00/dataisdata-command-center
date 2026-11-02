@@ -178,6 +178,7 @@ export interface InnovationMaturitySnapshot {
     as_of_date: string;
     overall_score: number | null;
     governance: number | null;
+    /** No longer shown or collected in the portal (Nov 2026); kept because existing snapshots may hold a value. */
     cyber_resilience: number | null;
     broadband_readiness: number | null;
     data_maturity: number | null;

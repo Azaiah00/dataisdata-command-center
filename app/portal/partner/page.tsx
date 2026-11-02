@@ -10,6 +10,7 @@ import { Empty, KV, PageTitle, Panel, Stat, StageTracker, StatusBadge, selectCla
 import { APPROVED, DECISIONS, SPONSORSHIP } from "@/lib/innovation/constants";
 import { errorText, money, shortDate, toNum } from "@/lib/innovation/data";
 import { formatDate } from "@/lib/utils";
+import { securityTerm } from "@/lib/terms";
 
 type PartnerData = {
   partner: { id: string; name: string; vendor_status: string | null; category: string | null } | null;
@@ -213,7 +214,7 @@ export default function PartnerPortalPage() {
                       <span className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-muted text-primary sm:flex"><CalendarDays className="h-4 w-4" /></span>
                       <div className="min-w-0 flex-1">
                         <p className="font-semibold text-[#1e2c40]">{e.name}</p>
-                        <p className="text-sm text-muted-foreground">{shortDate(e.event_date)}{e.location ? ` · ${e.location}` : ""}{e.theme ? ` · ${e.theme}` : ""}</p>
+                        <p className="text-sm text-muted-foreground">{shortDate(e.event_date)}{e.location ? ` · ${e.location}` : ""}{e.theme ? ` · ${securityTerm(e.theme)}` : ""}</p>
                       </div>
                       {e.requested_tier ? (
                         <StatusBadge status={`Requested: ${e.requested_tier}`} className="bg-amber-50 text-amber-700" />

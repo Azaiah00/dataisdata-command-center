@@ -24,6 +24,7 @@ import {
   type ClassificationKey,
   classificationLine,
   displayType,
+  displayValue,
   phaseOf,
   useClassificationColumns,
 } from "@/lib/engagementClassification";
@@ -43,7 +44,7 @@ export default function EngagementsPage() {
   const [classFilter, setClassFilter] = useState<Partial<Record<ClassificationKey, string>>>({});
   const classFields = CLASSIFICATION_FIELDS.filter((f) => f.key === "engagement_type" || (columnsReady && NEW_COLUMNS.includes(f.key)));
   /** Compare on the display name so "Staff Aug" and "Staff Augmentation" filter together. */
-  const classValue = (e: any, key: ClassificationKey): string => (key === "engagement_type" ? displayType(e[key]) : e[key]) || "";
+  const classValue = (e: any, key: ClassificationKey): string => displayValue(key, e[key]) || "";
 
   useEffect(() => {
     async function fetchEngagements() {
@@ -83,7 +84,7 @@ export default function EngagementsPage() {
       .filter((e) =>
         !q
           ? true
-          : [e.name, e.accounts?.name, e.engagement_type, displayType(e.engagement_type), e.service_practice, e.revenue_model, e.engagement_status, ...(byEng[e.id] || []).map((c) => c.full_name)]
+          : [e.name, e.accounts?.name, e.engagement_type, displayType(e.engagement_type), e.service_practice, e.revenue_model, displayValue("service_practice", e.service_practice), e.engagement_status, ...(byEng[e.id] || []).map((c) => c.full_name)]
               .filter(Boolean)
               .some((v: string) => v.toLowerCase().includes(q))
       );

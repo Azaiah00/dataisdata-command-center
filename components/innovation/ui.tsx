@@ -12,6 +12,7 @@ import { moduleSchemaReady } from "@/lib/innovation/data";
 import { openTour } from "@/lib/innovation/tour";
 import { cn } from "@/lib/utils";
 import { Icon3D } from "@/components/ui/icon-3d";
+import { securityTerms } from "@/lib/terms";
 
 const TABS: { href: string; label: string; icon: React.ElementType; module: ModuleKey; match: string[] }[] = [
   { href: "/innovation/exchange", label: "Overview", icon: Layers, module: "innovation_exchange", match: ["/innovation/exchange"] },
@@ -281,7 +282,8 @@ export const selectClass =
   "h-10 w-full rounded-xl border border-input bg-white px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 md:text-sm max-md:text-base max-md:h-11";
 
 export function Chips({ items, tone = "outline" }: { items: (string | null | undefined)[] | null | undefined; tone?: "outline" | "green" }) {
-  const list = (items || []).filter(Boolean) as string[];
+  // Older values that say "Cyber" read as "Security" (display only).
+  const list = securityTerms(items);
   if (!list.length) return <span className="text-muted-foreground">–</span>;
   return (
     <span className="flex flex-wrap gap-1.5">

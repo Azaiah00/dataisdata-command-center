@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { supabase } from "@/lib/supabase";
+import { securityTerm } from "@/lib/terms";
 
 /**
  * Engagement classification, from Tony's CRM design notes ("Suggested CRM field structure").
@@ -30,15 +31,9 @@ export const ENGAGEMENT_TYPE_OPTIONS: Option[] = [
   { value: "Consulting", description: "Defined professional services: assessments, recommendations, planning or business transformation." },
   { value: "Project-Based", description: "A specific project with defined deliverables, milestones and completion dates." },
   { value: "Managed Services", description: "Ongoing responsibility for managing a client's technology, innovation programs or operations." },
-  { value: "Platform Development", description: "Designing and building websites, portals, CRM systems, applications and digital platforms." },
-  { value: "Platform Subscription / Licensing", description: "Recurring revenue from clients using DataIsData-owned platforms or technology." },
-  { value: "Innovation as a Service (IaaS)", description: "Ongoing innovation programs, pilot development, technology discovery and implementation support." },
-  { value: "Pilot / Proof of Concept", description: "Limited-scope engagements to test new technologies or demonstrate business value." },
   { value: "Strategic Partnership", description: "Collaborations with companies, universities, municipalities or other organizations to pursue opportunities." },
   { value: "Joint Venture", description: "Formal arrangements where DataIsData and another organization jointly pursue or deliver work." },
-  { value: "Revenue Sharing", description: "DataIsData earns a percentage of revenue generated through a solution or partnership." },
-  { value: "Program Management", description: "Managing multi-project initiatives, resources, deliverables, budgets and outcomes." },
-  { value: "Training / Workforce Development", description: "Technology training, workforce programs, internships and career pathway initiatives." },
+  { value: "Pilot / Proof of Concept", description: "Limited-scope engagements to test new technologies or demonstrate business value." },
   { value: "Assessment / Discovery", description: "Initial paid engagements to evaluate client needs, identify opportunities or develop a roadmap." },
 ];
 
@@ -99,14 +94,18 @@ const TYPE_ALIASES: Record<string, string> = {
   "staff aug": "Staff Augmentation",
   "staff aug.": "Staff Augmentation",
   "staff augmentation": "Staff Augmentation",
-  iaas: "Innovation as a Service (IaaS)",
-  "innovation as a service": "Innovation as a Service (IaaS)",
   poc: "Pilot / Proof of Concept",
 };
 
 export function displayType(value: string | null | undefined): string | null {
   if (!value) return null;
-  return TYPE_ALIASES[value.trim().toLowerCase()] || value;
+  return securityTerm(TYPE_ALIASES[value.trim().toLowerCase()] || value);
+}
+
+/** How a stored classification value is shown (aliases and the Cyber → Security wording). Display only. */
+export function displayValue(key: ClassificationKey, value: string | null | undefined): string | null {
+  if (!value) return null;
+  return key === "engagement_type" ? displayType(value) : securityTerm(value);
 }
 
 export function describe(key: ClassificationKey, value: string | null | undefined): string | null {
@@ -141,7 +140,7 @@ export function phaseOf(engagementStatus: string | null | undefined): Phase {
 
 /** One line such as "Project-Based · Platform Development · Fixed Fee", skipping blanks. */
 export function classificationLine(e: { engagement_type?: string | null; service_practice?: string | null; revenue_model?: string | null }) {
-  return [displayType(e.engagement_type), e.service_practice, e.revenue_model].filter(Boolean).join(" · ");
+  return [displayType(e.engagement_type), securityTerm(e.service_practice), securityTerm(e.revenue_model)].filter(Boolean).join(" · ");
 }
 
 /**

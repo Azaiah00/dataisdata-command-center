@@ -36,7 +36,7 @@ export const ORG_TYPES = ["City", "County", "Town", "State Agency", "University"
 export const CRITERIA = [
   { key: "public_sector_experience", label: "Public sector experience", weight: 20, hint: "Government clients, references, contract vehicles" },
   { key: "financial_stability", label: "Financial stability", weight: 15, hint: "Revenue range, growth, years in business, insurance" },
-  { key: "strategic_fit", label: "Strategic fit", weight: 20, hint: "Cuts cost for localities; Cyber, Broadband, AI or Resiliency alignment" },
+  { key: "strategic_fit", label: "Strategic fit", weight: 20, hint: "Cuts cost for localities; Broadband, AI or Workforce alignment" },
   { key: "innovation_value", label: "Innovation value", weight: 15, hint: "Differentiator, technology, integration" },
   { key: "compliance_security", label: "Compliance & security", weight: 15, hint: "Certifications, data handling, standards" },
   { key: "ecosystem_complement", label: "Ecosystem complement", weight: 15, hint: "Fills a gap in the current partner network" },

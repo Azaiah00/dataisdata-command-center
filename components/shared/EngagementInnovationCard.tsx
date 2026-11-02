@@ -13,6 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { COMPLIANCE_FRAMEWORKS, FUNDING_SOURCES, FUNDING_STAGES, INNOVATION_THEMES, LIFECYCLE_STAGES } from "@/lib/constants";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { securityTerm } from "@/lib/terms";
 
 const NONE = "__none";
 
@@ -124,7 +125,7 @@ export function EngagementInnovationCard({ engagementId, canEdit, onSaved }: { e
           <SelectItem value={NONE}>Not set</SelectItem>
           {Array.from(new Set([...options, ...(draft[k] ? [draft[k] as string] : [])])).map((o) => (
             <SelectItem key={o} value={o}>
-              {o}
+              {securityTerm(o)}
             </SelectItem>
           ))}
         </SelectContent>
@@ -211,7 +212,7 @@ export function EngagementInnovationCard({ engagementId, canEdit, onSaved }: { e
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
             <div>
-              {row("Theme", data.innovation_theme)}
+              {row("Theme", securityTerm(data.innovation_theme))}
               {row("Lifecycle stage", data.lifecycle_stage)}
               {row("Strategic plan goal", data.strategic_plan_goal)}
               {row("Council priority", data.council_priority)}

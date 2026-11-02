@@ -1,5 +1,6 @@
 import {
   Banknote,
+  BookOpen,
   BarChart3,
   Bell,
   Briefcase,
@@ -72,6 +73,8 @@ const SLUGS = new Map<React.ElementType, string>([
   [Globe, "globe"],
   [Settings, "settings"],
   [Bell, "bell"],
+  // No dedicated 3D book yet: the Glossary uses the clay checklist.
+  [BookOpen, "clipboard-list"],
 ]);
 
 export function has3DIcon(icon: React.ElementType) {

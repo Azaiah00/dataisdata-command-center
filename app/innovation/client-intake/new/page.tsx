@@ -91,7 +91,7 @@ export default function ClientIntakeNewPage() {
             <div className="space-y-2">
               <Label>Interested In</Label>
               <div className="flex flex-wrap gap-3 text-sm">
-                {["Innovation Dashboard", "Advisory Services", "Managed IaaS", "Broadband Strategy", "Cyber Assessment"].map((opt) => (
+                {["Innovation Dashboard", "Advisory Services", "Managed IaaS", "Broadband Strategy"].map((opt) => (
                   <label key={opt} className="flex items-center gap-2">
                     <input type="checkbox" checked={form.interested_in.includes(opt)} onChange={() => toggleInterest(opt)} />
                     {opt}

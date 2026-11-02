@@ -157,7 +157,7 @@ export default function VendorApplicationPublicPage() {
               <legend className="mb-2 text-sm font-medium">Certifications</legend>
               <OptionChips name="certifications" options={CERTIFICATIONS} value={form.certifications} onChange={(v) => setForm((f) => ({ ...f, certifications: v }))} />
             </fieldset>
-            <Field label="Insurance coverage"><Input name="insurance_coverage" placeholder="General liability, cyber liability" value={form.insurance_coverage} onChange={set("insurance_coverage")} /></Field>
+            <Field label="Insurance coverage"><Input name="insurance_coverage" placeholder="General liability, professional liability" value={form.insurance_coverage} onChange={set("insurance_coverage")} /></Field>
             <Field label="Contract vehicles"><Input name="contract_vehicles" placeholder="State contracts, GSA, cooperatives" value={form.contract_vehicles} onChange={set("contract_vehicles")} /></Field>
             <Field label="Public sector references" hint="Three, with what you delivered" className="sm:col-span-2"><Textarea name="public_sector_references" rows={3} value={form.public_sector_references} onChange={set("public_sector_references")} /></Field>
           </>
@@ -186,7 +186,7 @@ export default function VendorApplicationPublicPage() {
         {section(4, "Strategic alignment", (
           <>
             <Field label="How does your service cut cost for municipalities?" className="sm:col-span-2"><Textarea name="cost_reduction_explanation" rows={3} value={form.cost_reduction_explanation} onChange={set("cost_reduction_explanation")} aria-invalid={inv("cost_reduction_explanation")} /></Field>
-            <Field label="How does it align with Cyber, Broadband, AI or Resiliency?" className="sm:col-span-2"><Textarea name="strategic_alignment" rows={3} value={form.strategic_alignment} onChange={set("strategic_alignment")} /></Field>
+            <Field label="How does it align with Broadband, AI or Workforce?" className="sm:col-span-2"><Textarea name="strategic_alignment" rows={3} value={form.strategic_alignment} onChange={set("strategic_alignment")} /></Field>
             <Field label="Open to revenue share models?">
               <select name="open_to_revenue_share" className={selectClass} value={form.open_to_revenue_share} onChange={set("open_to_revenue_share")}>
                 <option value="yes">Yes</option>

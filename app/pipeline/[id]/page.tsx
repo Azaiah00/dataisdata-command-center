@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { ENGAGEMENT_TYPE_OPTIONS, displayType } from "@/lib/engagementClassification";
+import { securityTerm } from "@/lib/terms";
 
 /**
  * Classification for an engagement created from an awarded opportunity.
@@ -233,7 +234,7 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
                 {opportunity.service_line && (
                   <>
                     <span className="text-slate-300">|</span>
-                    <span>{opportunity.service_line}</span>
+                    <span>{securityTerm(opportunity.service_line)}</span>
                   </>
                 )}
               </div>

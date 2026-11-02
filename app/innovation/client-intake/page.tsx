@@ -10,6 +10,7 @@ import { Empty, HowItWorks, ModuleNav, PageTitle, SampleBadge, SetupNotice, Stat
 import { APPROVED } from "@/lib/innovation/constants";
 import { publicUrl, timeAgo } from "@/lib/innovation/data";
 import type { ClientIntake, PartnerLite } from "@/lib/innovation/types";
+import { securityTerms } from "@/lib/terms";
 
 type Row = ClientIntake & { is_sample?: boolean | null };
 
@@ -88,7 +89,7 @@ export default function ClientIntakeListPage() {
                 {[c.organization_type, c.population_size ? `Pop. ${c.population_size.toLocaleString("en-US")}` : null, c.contact_name].filter(Boolean).join(" · ") || "No details"}
               </p>
               <div className="flex flex-wrap gap-1.5">
-                {(c.top_challenges || []).map((x) => <span key={x} className="rounded-full bg-white px-2.5 py-0.5 text-xs font-semibold ring-1 ring-border">{x}</span>)}
+                {securityTerms(c.top_challenges).map((x) => <span key={x} className="rounded-full bg-white px-2.5 py-0.5 text-xs font-semibold ring-1 ring-border">{x}</span>)}
               </div>
               <div className="flex flex-wrap items-center gap-1.5 text-xs font-semibold">
                 <span className="rounded-full bg-secondary px-2.5 py-0.5 text-primary">{matches(c)} match{matches(c) === 1 ? "" : "es"}</span>

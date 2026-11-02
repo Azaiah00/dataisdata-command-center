@@ -1,6 +1,7 @@
 "use client";
 
-import { Sparkles, Tags } from "lucide-react";
+import Link from "next/link";
+import { BookOpen, Sparkles, Tags } from "lucide-react";
 import type { Control } from "react-hook-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -10,12 +11,20 @@ import {
   CLASSIFICATION_FIELDS,
   NEW_COLUMNS,
   type ClassificationKey,
-  describe,
   displayType,
+  displayValue,
   useIsNew,
 } from "@/lib/engagementClassification";
 
 const NONE = "__none__";
+
+/** Where each field's definitions live in the Glossary. */
+const GLOSSARY_ANCHOR: Record<ClassificationKey, string> = {
+  engagement_type: "engagement-type",
+  service_practice: "service-practice",
+  revenue_model: "revenue-model",
+  engagement_status: "engagement-status",
+};
 
 /** Small "New" pill. Renders nothing once the release window (48 hours) has passed. */
 export function NewBadge({ className, until }: { className?: string; until?: string }) {
@@ -61,6 +70,10 @@ export function ClassificationFields({
           <span className="text-sm font-semibold text-[#1e2c40]">Engagement classification</span>
           <NewBadge />
         </div>
+        {/* New tab, so unsaved form changes are never lost. */}
+        <Link href="/glossary#engagement-type" target="_blank" className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline shrink-0">
+          <BookOpen className="w-3.5 h-3.5" aria-hidden="true" /> Definitions
+        </Link>
       </div>
       <p className="text-xs text-[#4f6178] mb-4">
         Type, service and revenue model are kept separate so the CRM never confuses what DataIsData is doing with how it gets paid.
@@ -74,7 +87,6 @@ export function ClassificationFields({
             render={({ field }) => {
               const current: string = field.value || "";
               const known = f.options.some((o) => o.value === current);
-              const help = current ? describe(f.key, current) : null;
               return (
                 <FormItem className="min-w-0">
                   <FormLabel>{f.label}</FormLabel>
@@ -88,7 +100,7 @@ export function ClassificationFields({
                       <SelectItem value={NONE}>Not set</SelectItem>
                       {current && !known && (
                         <SelectItem value={current}>
-                          {current} (current)
+                          {displayValue(f.key, current) === current ? current : `${current}, shown as ${displayValue(f.key, current)}`} (current)
                         </SelectItem>
                       )}
                       {f.options.map((o) => (
@@ -100,7 +112,7 @@ export function ClassificationFields({
                   </Select>
                   <p className="text-xs text-[#4f6178]">
                     {f.key === "engagement_type" && current && displayType(current) !== current && <>Shown as {displayType(current)}. </>}
-                    {help || f.hint}
+                    {f.hint}
                   </p>
                   <FormMessage />
                 </FormItem>
@@ -124,7 +136,7 @@ type Classified = Partial<Record<ClassificationKey, string | null>>;
 /** Read-only classification card for the engagement page. */
 export function ClassificationCard({ engagement, columnsReady }: { engagement: Classified; columnsReady: boolean | null }) {
   const rows = CLASSIFICATION_FIELDS.filter((f) => f.key === "engagement_type" || (columnsReady && NEW_COLUMNS.includes(f.key)));
-  const chips = [displayType(engagement.engagement_type), engagement.service_practice, engagement.revenue_model].filter(Boolean) as string[];
+  const chips = [displayType(engagement.engagement_type), displayValue("service_practice", engagement.service_practice), displayValue("revenue_model", engagement.revenue_model)].filter(Boolean) as string[];
   return (
     <NewHighlight className="rounded-[1.125rem]" tour="eng-classification">
       <Card className="border-none shadow-sm h-full">
@@ -133,11 +145,14 @@ export function ClassificationCard({ engagement, columnsReady }: { engagement: C
             Classification <NewBadge />
           </CardTitle>
           <CardDescription>How DataIsData is engaged, what it delivers and how it gets paid</CardDescription>
+          <Link href={`/glossary#${GLOSSARY_ANCHOR.engagement_type}`} className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline w-fit">
+            <BookOpen className="w-3.5 h-3.5" aria-hidden="true" /> What these mean (Glossary)
+          </Link>
         </CardHeader>
         <CardContent className="space-y-1">
           {rows.map((f, i) => {
             const raw = engagement[f.key] ?? null;
-            const shown = f.key === "engagement_type" ? displayType(raw) : raw;
+            const shown = displayValue(f.key, raw);
             return (
               <div key={f.key} className={cn("flex justify-between items-start gap-4 py-2", i < rows.length - 1 && "border-b border-slate-100")}>
                 <span className="text-sm text-[#4f6178] shrink-0">{f.label}</span>
@@ -151,7 +166,6 @@ export function ClassificationCard({ engagement, columnsReady }: { engagement: C
                   ) : (
                     <span className="text-sm text-muted-foreground">Not set</span>
                   )}
-                  {shown && describe(f.key, raw) && <span className="block text-xs text-[#4f6178] mt-0.5">{describe(f.key, raw)}</span>}
                 </span>
               </div>
             );

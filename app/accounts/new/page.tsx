@@ -316,7 +316,7 @@ export default function NewAccountPage() {
                   <FormItem>
                     <FormLabel>Primary Focus</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. Broadband, Cyber, Innovation" {...field} />
+                      <Input placeholder="e.g. Broadband, AI, Innovation" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

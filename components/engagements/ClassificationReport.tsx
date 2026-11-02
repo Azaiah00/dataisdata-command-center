@@ -5,7 +5,7 @@ import { Tags } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn, formatCurrency } from "@/lib/utils";
 import { NewBadge, NewHighlight } from "@/components/engagements/Classification";
-import { CLASSIFICATION_FIELDS, NEW_COLUMNS, PHASES, type ClassificationKey, displayType, phaseOf } from "@/lib/engagementClassification";
+import { CLASSIFICATION_FIELDS, NEW_COLUMNS, PHASES, type ClassificationKey, displayValue, phaseOf } from "@/lib/engagementClassification";
 
 export type ClassifiableEngagement = {
   engagement_type?: string | null;
@@ -25,7 +25,7 @@ export function breakdown(engs: ClassifiableEngagement[], key: ClassificationKey
   const map = new Map<string, { count: number; value: number; marginSum: number; marginN: number }>();
   for (const e of engs) {
     const raw = e[key] ?? null;
-    const label = (key === "engagement_type" ? displayType(raw) : raw) || "Not set";
+    const label = displayValue(key, raw) || "Not set";
     const row = map.get(label) || { count: 0, value: 0, marginSum: 0, marginN: 0 };
     row.count++;
     row.value += num(e.contract_value) ?? 0;

@@ -348,7 +348,7 @@ function OpportunityForm() {
                     <FormItem>
                       <FormLabel>Service Line</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g. Cyber, Broadband" {...field} />
+                        <Input placeholder="e.g. Broadband, AI" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

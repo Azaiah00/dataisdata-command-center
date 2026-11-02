@@ -8,6 +8,7 @@ import { DataTable } from "@/components/data-table/DataTable";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatDateTime } from "@/lib/utils";
+import { securityTerm } from "@/lib/terms";
 
 type Inquiry = {
   id: string;
@@ -39,7 +40,7 @@ export default function VendorInquiryPage() {
   const columns = [
     { header: "Company", accessorKey: "company_name" },
     { header: "Primary Contact", accessorKey: "primary_contact" },
-    { header: "Category", accessorKey: "core_service_category" },
+    { header: "Category", accessorKey: "core_service_category", cell: (r: { core_service_category: string | null }) => securityTerm(r.core_service_category) },
     {
       header: "Status",
       accessorKey: "status",
