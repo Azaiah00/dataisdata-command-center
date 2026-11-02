@@ -58,6 +58,10 @@ export interface Engagement {
     name: string;
     account_id: string;
     engagement_type: string | null;
+    /** Added Nov 2026 (supabase/2026-11-engagement-classification.sql); absent until that file is run. */
+    service_practice?: string | null;
+    revenue_model?: string | null;
+    engagement_status?: string | null;
     start_date: string | null;
     end_date: string | null;
     status: EngagementStatus;

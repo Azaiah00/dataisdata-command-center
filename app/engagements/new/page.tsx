@@ -31,11 +31,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileAttachments } from "@/components/ui/FileAttachments";
 import { ChevronLeft } from "lucide-react";
+import { ClassificationFields } from "@/components/engagements/Classification";
+import { classificationPayload, useClassificationColumns } from "@/lib/engagementClassification";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
   account_id: z.string().uuid("Please select an account."),
   engagement_type: z.string().optional(),
+  service_practice: z.string().optional(),
+  revenue_model: z.string().optional(),
+  engagement_status: z.string().optional(),
   start_date: z.string().optional(),
   end_date: z.string().optional(),
   status: z.enum(ENGAGEMENT_STATUSES),
@@ -53,6 +58,7 @@ function EngagementForm() {
   
   const [accounts, setAccounts] = useState<Pick<Account, "id" | "name">[]>([]);
   const [loadingAccounts, setLoadingAccounts] = useState(true);
+  const columnsReady = useClassificationColumns();
 
   const form = useForm<any>({
     resolver: zodResolver(formSchema),
@@ -60,6 +66,9 @@ function EngagementForm() {
       name: "",
       account_id: preselectedAccountId || "",
       engagement_type: "",
+      service_practice: "",
+      revenue_model: "",
+      engagement_status: "",
       start_date: "",
       end_date: "",
       status: "Planned",
@@ -81,12 +90,14 @@ function EngagementForm() {
   }, []);
 
   async function onSubmit(values: any) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- classification keys are re-added below only when their columns exist
+    const { service_practice, revenue_model, engagement_status, ...rest } = values;
     const payload = {
-      ...values,
+      ...rest,
+      ...classificationPayload(values, columnsReady),
       budget: parseAmount(values.budget),
       contract_value: parseAmount(values.contract_value),
       margin_pct: parseAmount(values.margin_pct),
-      engagement_type: values.engagement_type || null,
       start_date: values.start_date || null,
       end_date: values.end_date || null,
       scope_summary: values.scope_summary || null,
@@ -173,20 +184,6 @@ function EngagementForm() {
 
                 <FormField
                   control={form.control}
-                  name="engagement_type"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Type</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g. Advisory, Delivery" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
                   name="start_date"
                   render={({ field }) => (
                     <FormItem>
@@ -218,7 +215,7 @@ function EngagementForm() {
                   name="status"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Status</FormLabel>
+                      <FormLabel>Delivery Status</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
@@ -237,6 +234,8 @@ function EngagementForm() {
                     </FormItem>
                   )}
                 />
+
+                <ClassificationFields control={form.control} columnsReady={columnsReady} />
 
                 <FormField
                   control={form.control}

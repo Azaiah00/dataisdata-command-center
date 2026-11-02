@@ -13,6 +13,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { isPublicPath } from "@/lib/access/modules";
 import { ModuleTour } from "@/components/innovation/ModuleTour";
+import { WhatsNewTour } from "@/components/whats-new/WhatsNewTour";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -88,6 +89,8 @@ function Shell({ children }: DashboardLayoutProps) {
         </div>
       </main>
       <ModuleTour />
+      {/* Temporary: Nov 2026 engagement classification walkthrough. */}
+      <WhatsNewTour />
     </div>
   );
 }

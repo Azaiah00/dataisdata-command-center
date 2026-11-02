@@ -24,6 +24,25 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { ENGAGEMENT_TYPE_OPTIONS, displayType } from "@/lib/engagementClassification";
+
+/**
+ * Classification for an engagement created from an awarded opportunity.
+ * If the service line is itself an engagement type (e.g. "Advisory") it stays the type, as before;
+ * otherwise it becomes the Service / Practice. Engagement Status starts at "Awarded".
+ * The new columns are only sent once the database has them.
+ */
+async function convertedClassification(serviceLine: string | null) {
+  const { error } = await supabase.from("engagements").select("service_practice, engagement_status").limit(1);
+  const ready = !error;
+  const isType = !!serviceLine && ENGAGEMENT_TYPE_OPTIONS.some((o) => o.value === displayType(serviceLine));
+  if (!ready) return { engagement_type: serviceLine || "Advisory" };
+  return {
+    engagement_type: isType ? serviceLine : null,
+    service_practice: isType ? null : serviceLine || null,
+    engagement_status: "Awarded",
+  };
+}
 
 export default function PipelineDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -94,7 +113,9 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
       .insert({
         name: opportunity.name,
         account_id: opportunity.account_id,
-        engagement_type: opportunity.service_line || "Advisory",
+        // Type, service and pricing are separate fields: the opportunity's service line is what
+        // DataIsData delivers, so it becomes the Service / Practice (type is set on the engagement).
+        ...(await convertedClassification(opportunity.service_line)),
         status: "Planned",
         start_date: opportunity.expected_start || null,
         end_date: opportunity.expected_end || null,

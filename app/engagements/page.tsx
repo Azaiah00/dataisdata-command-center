@@ -15,6 +15,21 @@ import { useMemo } from "react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { cn, formatCurrency, formatDate, getStatusColor } from "@/lib/utils";
+import { NewBadge, NewHighlight } from "@/components/engagements/Classification";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  CLASSIFICATION_FIELDS,
+  NEW_COLUMNS,
+  PHASES,
+  type ClassificationKey,
+  classificationLine,
+  displayType,
+  phaseOf,
+  useClassificationColumns,
+} from "@/lib/engagementClassification";
+
+const ANY = "__any__";
+const UNSET = "__unset__";
 
 export default function EngagementsPage() {
   const [engagements, setEngagements] = useState<any[]>([]);
@@ -24,6 +39,11 @@ export default function EngagementsPage() {
   const [byEng, setByEng] = useState<Record<string, { id: string; full_name: string }[]>>({});
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<"all" | "missing" | "open">("all");
+  const columnsReady = useClassificationColumns();
+  const [classFilter, setClassFilter] = useState<Partial<Record<ClassificationKey, string>>>({});
+  const classFields = CLASSIFICATION_FIELDS.filter((f) => f.key === "engagement_type" || (columnsReady && NEW_COLUMNS.includes(f.key)));
+  /** Compare on the display name so "Staff Aug" and "Staff Augmentation" filter together. */
+  const classValue = (e: any, key: ClassificationKey): string => (key === "engagement_type" ? displayType(e[key]) : e[key]) || "";
 
   useEffect(() => {
     async function fetchEngagements() {
@@ -54,13 +74,39 @@ export default function EngagementsPage() {
     return engagements
       .filter((e) => (filter === "missing" ? e.contract_value == null : filter === "open" ? e.status !== "Complete" : true))
       .filter((e) =>
+        Object.entries(classFilter).every(([k, want]) => {
+          if (!want || want === ANY) return true;
+          const have = classValue(e, k as ClassificationKey);
+          return want === UNSET ? !have : have === want;
+        })
+      )
+      .filter((e) =>
         !q
           ? true
-          : [e.name, e.accounts?.name, e.engagement_type, ...(byEng[e.id] || []).map((c) => c.full_name)]
+          : [e.name, e.accounts?.name, e.engagement_type, displayType(e.engagement_type), e.service_practice, e.revenue_model, e.engagement_status, ...(byEng[e.id] || []).map((c) => c.full_name)]
               .filter(Boolean)
               .some((v: string) => v.toLowerCase().includes(q))
       );
-  }, [engagements, byEng, query, filter]);
+  }, [engagements, byEng, query, filter, classFilter]);
+
+  /** Options for each filter: the standard list plus any other value already in the data. */
+  const filterOptions = useMemo(() => {
+    const out: Partial<Record<ClassificationKey, string[]>> = {};
+    for (const f of classFields) {
+      const seen = new Set(f.options.map((o) => o.value));
+      const extra = Array.from(new Set(engagements.map((e) => classValue(e, f.key)).filter((v) => v && !seen.has(v)))).sort();
+      out[f.key] = [...f.options.map((o) => o.value), ...extra];
+    }
+    return out;
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- classFields derives from columnsReady
+  }, [engagements, columnsReady]);
+
+  const phaseCounts = useMemo(() => {
+    const counts = Object.fromEntries(PHASES.map((p) => [p, 0])) as Record<(typeof PHASES)[number], number>;
+    engagements.forEach((e) => counts[phaseOf(e.engagement_status)]++);
+    return counts;
+  }, [engagements]);
+  const activeClassFilters = Object.values(classFilter).filter((v) => v && v !== ANY).length;
 
   const totals = useMemo(
     () => ({
@@ -83,7 +129,7 @@ export default function EngagementsPage() {
           </div>
           <div className="flex flex-col min-w-0">
             <span className="font-bold text-[#1e2c40] text-sm truncate">{engagement.name}</span>
-            <span className="text-xs text-[#4f6178]">{engagement.engagement_type}</span>
+            <span className="text-xs text-[#4f6178] truncate">{classificationLine(engagement)}</span>
           </div>
         </div>
       ),
@@ -144,19 +190,37 @@ export default function EngagementsPage() {
       ),
     },
     {
-      header: "Status",
+      header: columnsReady ? (
+        <span className="inline-flex items-center gap-1.5">
+          Status <NewBadge />
+        </span>
+      ) : (
+        "Status"
+      ),
       accessorKey: "status",
-      cell: (engagement: Engagement) => (
-        <Badge
-          className={cn(
-            "font-medium border-none text-[10px] h-5 px-2",
-            getStatusColor(engagement.status)
-          )}
-        >
-          {engagement.status}
-        </Badge>
+      cell: (engagement: any) => (
+        <div className="flex flex-col items-start gap-1">
+          <Badge
+            className={cn(
+              "font-medium border-none text-[10px] h-5 px-2",
+              getStatusColor(engagement.status)
+            )}
+            title="Delivery Status"
+          >
+            {engagement.status}
+          </Badge>
+          {columnsReady &&
+            (engagement.engagement_status ? (
+              <Badge className={cn("font-medium border-none text-[10px] h-5 px-2", getStatusColor(engagement.engagement_status))} title="Engagement Status">
+                {engagement.engagement_status}
+              </Badge>
+            ) : (
+              <span className="text-[10px] text-muted-foreground" title="Engagement Status">Engagement status not set</span>
+            ))}
+        </div>
       ),
     },
+
     {
       header: "",
       accessorKey: "actions",
@@ -215,11 +279,58 @@ export default function EngagementsPage() {
         </div>
       </div>
 
+      {!loading && (
+        <NewHighlight className="classification-block" tour="eng-filters">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-semibold text-[#1e2c40]">Filter by classification</span>
+              <NewBadge />
+            </div>
+            {activeClassFilters > 0 && (
+              <button type="button" className="filter-pill" onClick={() => setClassFilter({})}>
+                Clear {activeClassFilters} filter{activeClassFilters === 1 ? "" : "s"}
+              </button>
+            )}
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+            {classFields.map((f) => (
+              <label key={f.key} className="flex flex-col gap-1 min-w-0">
+                <span className="text-xs font-medium text-[#4f6178]">{f.label}</span>
+                <Select value={classFilter[f.key] || ANY} onValueChange={(v) => setClassFilter((prev) => ({ ...prev, [f.key]: v }))}>
+                  <SelectTrigger className="w-full" aria-label={`Filter by ${f.label}`}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={ANY}>All</SelectItem>
+                    <SelectItem value={UNSET}>Not set</SelectItem>
+                    {(filterOptions[f.key] || []).map((v) => (
+                      <SelectItem key={v} value={v}>
+                        {v}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </label>
+            ))}
+          </div>
+          {columnsReady && (
+            <div className="flex flex-wrap gap-2 mt-3 text-xs">
+              {PHASES.map((p) => (
+                <span key={p} className="classification-chip">
+                  {p}: <strong className="ml-1 tabular-nums">{phaseCounts[p]}</strong>
+                </span>
+              ))}
+            </div>
+          )}
+        </NewHighlight>
+      )}
+
       {loading ? (
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
       ) : (
+        <div data-tour="eng-table">
         <DataTable
           columns={columns}
           data={visible}
@@ -227,6 +338,7 @@ export default function EngagementsPage() {
             window.location.href = `/engagements/${engagement.id}`;
           }}
         />
+        </div>
       )}
     </div>
   );

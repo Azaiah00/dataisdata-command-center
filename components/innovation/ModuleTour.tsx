@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useOptionalAccess } from "@/components/auth/AccessProvider";
 import { TOUR_STEPS, onStep, useTour } from "@/lib/innovation/tour";
 import { cn } from "@/lib/utils";
+import { useWhatsNewBusy } from "@/components/whats-new/WhatsNewTour";
 
 const MODULE_PATHS = ["/innovation/exchange", "/innovation/vendor-pipeline", "/innovation/events", "/innovation/client-intake", "/innovation/vendor-inquiry", "/innovation/vendor-application", "/portal", "/join"];
 
@@ -20,6 +21,8 @@ export function ModuleTour() {
   const access = useOptionalAccess();
   const { state, ready, update } = useTour();
   const [collapsed, setCollapsed] = useState(false);
+  // The "What's new" walkthrough takes the same corner; keep this one's card out of its way.
+  const whatsNewBusy = useWhatsNewBusy();
   if (!ready) return null;
 
   const isTeam = !!access && access.status === "ready" && access.can("innovation_exchange");
@@ -108,7 +111,7 @@ export function ModuleTour() {
   }
 
   // One-time "What's new" card for the team, on the dashboard and Innovation pages.
-  if (!state.seen && isTeam && !access?.isPreviewing && (pathname === "/" || pathname?.startsWith("/innovation"))) {
+  if (!state.seen && !whatsNewBusy && isTeam && !access?.isPreviewing && (pathname === "/" || pathname?.startsWith("/innovation"))) {
     return (
       <aside
         aria-label="What's new"

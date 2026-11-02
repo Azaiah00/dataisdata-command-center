@@ -11,7 +11,7 @@ import {
 import { cn } from "@/lib/utils";
 
 interface Column<T> {
-  header: string;
+  header: React.ReactNode;
   accessorKey: keyof T | string;
   cell?: (item: T) => React.ReactNode;
 }

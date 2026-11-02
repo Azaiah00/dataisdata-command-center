@@ -48,6 +48,9 @@ CREATE TABLE engagements (
     name TEXT NOT NULL,
     account_id UUID REFERENCES accounts(id) ON DELETE CASCADE,
     engagement_type TEXT,
+    service_practice TEXT,   -- added Nov 2026 (2026-11-engagement-classification.sql)
+    revenue_model TEXT,      -- added Nov 2026
+    engagement_status TEXT,  -- added Nov 2026; separate from status (delivery)
     start_date DATE,
     end_date DATE,
     status engagement_status DEFAULT 'Planned',

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn, formatCurrency, formatDate, getStatusColor } from "@/lib/utils";
+import { classificationLine } from "@/lib/engagementClassification";
 import {
   Building2,
   MapPin,
@@ -280,6 +281,7 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
             <Can module="engagements" action="view">
               <TabsTrigger 
                 value="engagements" 
+                data-tour="account-engagements-tab"
                 className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#4f6178] data-[state=active]:text-blue-600 px-0 h-12 text-sm font-semibold"
               >
                 Engagements ({engagements.length})
@@ -548,7 +550,7 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
                           <h4 className="font-bold text-[#1e2c40] group-hover:text-blue-600 transition-colors leading-tight">
                             {eng.name}
                           </h4>
-                          <p className="text-xs text-[#4f6178]">{eng.engagement_type}</p>
+                          <p className="text-xs text-[#4f6178]">{classificationLine(eng)}</p>
                         </div>
                       </div>
                       <Badge className={cn("text-[10px] h-5 px-2 border-none font-medium", getStatusColor(eng.status))}>

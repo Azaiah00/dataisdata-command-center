@@ -795,3 +795,77 @@ a > [data-slot="card"]:hover { box-shadow: var(--elev-2); transform: translateY(
   .app-backdrop::before, .app-backdrop::after, .slab-mark { display: none !important; }
   .app-slab { margin: 0 !important; box-shadow: none !important; background: #fff !important; backdrop-filter: none !important; border: 0 !important; }
 }
+
+/* ---------- Engagement classification (Nov 2026) ---------- */
+.classification-block {
+  border-radius: 1.125rem;
+  padding: 1rem 1.1rem 1.1rem;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--card-border, #d9e2ea);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+.classification-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: var(--teal-50);
+  color: var(--teal-600);
+  font-weight: 500;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 1px 2px rgba(30, 44, 64, 0.08);
+}
+
+/* "New" marker for recently added features. The components stop rendering it on their own
+   once the release window passes, so nothing here needs removing later. */
+.new-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.12rem 0.5rem 0.12rem 0.42rem;
+  border-radius: 999px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  color: #fff;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 60%), linear-gradient(135deg, #3a95a3, var(--teal-600));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 2px 6px -2px rgba(39, 106, 118, 0.6);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.new-highlight {
+  position: relative;
+  border-radius: 1.125rem;
+  box-shadow: 0 0 0 2px rgba(47, 127, 140, 0.55), 0 0 0 6px rgba(47, 127, 140, 0.12), 0 10px 28px -14px rgba(47, 127, 140, 0.55);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .new-highlight { animation: new-glow 2.4s ease-in-out infinite; }
+}
+@keyframes new-glow {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(47, 127, 140, 0.55), 0 0 0 6px rgba(47, 127, 140, 0.12), 0 10px 28px -14px rgba(47, 127, 140, 0.55); }
+  50% { box-shadow: 0 0 0 2px rgba(47, 127, 140, 0.75), 0 0 0 9px rgba(47, 127, 140, 0.07), 0 10px 28px -14px rgba(47, 127, 140, 0.55); }
+}
+@media print {
+  .new-badge { display: none; }
+  .new-highlight { box-shadow: none; animation: none; }
+}
+
+/* "What's new" walkthrough: outlines the part of the page the current step is about. */
+.tour-spotlight {
+  position: relative;
+  z-index: 5;
+  border-radius: 1rem;
+  outline: 3px solid var(--teal);
+  outline-offset: 5px;
+  box-shadow: 0 0 0 10px rgba(47, 127, 140, 0.14);
+  scroll-margin: 120px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .tour-spotlight { animation: tour-pulse 1.8s ease-in-out infinite; }
+}
+@keyframes tour-pulse {
+  0%, 100% { outline-color: var(--teal); box-shadow: 0 0 0 10px rgba(47, 127, 140, 0.14); }
+  50% { outline-color: var(--teal-300); box-shadow: 0 0 0 16px rgba(47, 127, 140, 0.06); }
+}
+@media print { .tour-spotlight { outline: none; box-shadow: none; animation: none; } }

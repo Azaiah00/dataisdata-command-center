@@ -10,6 +10,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Wordmark } from "@/components/brand/Wordmark";
+import { ClassificationReport, breakdown, phaseBreakdown, type ClassifiableEngagement } from "@/components/engagements/ClassificationReport";
+import { CLASSIFICATION_FIELDS, NEW_COLUMNS, useClassificationColumns } from "@/lib/engagementClassification";
 import {
   DollarSign,
   TrendingUp,
@@ -59,6 +61,8 @@ export default function ReportsPage() {
   const [pipelineByStage, setPipelineByStage] = useState<PipelineByStage[]>([]);
   const [engagementsByStatus, setEngagementsByStatus] = useState<EngagementsByStatus[]>([]);
   const [topAccounts, setTopAccounts] = useState<TopAccount[]>([]);
+  const [classified, setClassified] = useState<ClassifiableEngagement[]>([]);
+  const columnsReady = useClassificationColumns();
 
   useEffect(() => {
     async function fetchReports() {
@@ -84,10 +88,11 @@ export default function ReportsPage() {
       }
 
       // Fetch engagements for breakdown
-      const { data: engs } = can("engagements") ? await supabase.from("engagements").select("status, contract_value, budget") : none;
+      const { data: engs } = can("engagements") ? await supabase.from("engagements").select("*") : none;
       if (engs) {
         const totalCV = engs.reduce((sum, e) => sum + (e.contract_value || 0), 0);
         setTotalEngagementValue(totalCV);
+        setClassified(engs as ClassifiableEngagement[]);
         setActiveEngagements(engs.filter((e) => e.status === "In Progress").length);
 
         const statusMap: Record<string, { count: number; total_budget: number }> = {};
@@ -158,6 +163,18 @@ export default function ReportsPage() {
     if (can("engagements")) {
       pdf.heading("Engagements by status");
       pdf.table({ head: ["Status", "Engagements", "Contract value"], body: engagementsByStatus.map((e) => [e.status, String(e.count), formatCurrency(e.total_budget)]), alignRight: [1, 2] });
+      if (columnsReady) {
+        pdf.heading("Engagements by engagement status");
+        pdf.table({ head: ["Phase", "Engagements", "Contract value"], body: phaseBreakdown(classified).map((p) => [p.label, String(p.count), formatCurrency(p.value)]), alignRight: [1, 2] });
+      }
+      for (const f of CLASSIFICATION_FIELDS.filter((x) => x.key !== "engagement_status" && (x.key === "engagement_type" || (columnsReady && NEW_COLUMNS.includes(x.key))))) {
+        pdf.heading(`Engagements by ${f.label.toLowerCase()}`);
+        pdf.table({
+          head: [f.label, "Engagements", "Contract value", "Avg margin"],
+          body: breakdown(classified, f.key).map((r) => [r.label, String(r.count), formatCurrency(r.value), r.avgMargin != null ? `${r.avgMargin.toFixed(1)}%` : "—"]),
+          alignRight: [1, 2, 3],
+        });
+      }
     }
     if (can("accounts")) {
       pdf.heading("Top accounts by contract value");
@@ -356,6 +373,10 @@ export default function ReportsPage() {
           </Card>
         </Can>
       </div>
+
+      <Can module="engagements" action="view">
+        <ClassificationReport engagements={classified} columnsReady={columnsReady} />
+      </Can>
 
       {/* Top Accounts by Revenue */}
       <Can module="accounts" action="view">

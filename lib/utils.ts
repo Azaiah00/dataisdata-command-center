@@ -65,8 +65,8 @@ export function getStatusColor(status: string) {
   const s = status?.toLowerCase();
   // Soft pills, matching the reference: green = done/good, slate-blue = early/planned,
   // violet = moving, amber = waiting, red = problem, grey = neutral.
-  if (s === 'active' || s === 'awarded' || s === 'good' || s === 'complete' || s === 'on-track' || s === 'paid' || s === 'approved' || s === 'reimbursed') return 'bg-[#dcf2e4] text-[#23774a] border-transparent';
-  if (s === 'prospect' || s === 'proposal' || s === 'lead' || s === 'planned' || s === 'discovery' || s === 'draft' || s === 'pending') return 'bg-[#eaf5f5] text-[#22566a] border-transparent';
+  if (s === 'active' || s === 'awarded' || s === 'good' || s === 'complete' || s === 'completed' || s === 'on-track' || s === 'paid' || s === 'approved' || s === 'reimbursed') return 'bg-[#dcf2e4] text-[#23774a] border-transparent';
+  if (s === 'prospect' || s === 'proposal' || s === 'proposed' || s === 'identified' || s === 'lead' || s === 'planned' || s === 'discovery' || s === 'draft' || s === 'pending') return 'bg-[#eaf5f5] text-[#22566a] border-transparent';
   if (s === 'negotiation' || s === 'in progress' || s === 'warm' || s === 'sent') return 'bg-[#ecebf7] text-[#5a52a8] border-transparent';
   if (s === 'on hold' || s === 'neutral' || s === 'cancelled') return 'bg-[#fbf0d9] text-[#8a5a12] border-transparent';
   if (s === 'lost' || s === 'dormant' || s === 'bad' || s === 'at-risk' || s === 'overdue' || s === 'suspended' || s === 'ended') return 'bg-[#fbe1df] text-[#b4372f] border-transparent';

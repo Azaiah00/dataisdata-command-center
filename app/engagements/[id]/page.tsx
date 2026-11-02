@@ -61,11 +61,16 @@ import { EngagementInnovationCard } from "@/components/shared/EngagementInnovati
 import { LinkedRecordsCard, contractorOptions, contactOptions, partnerOptions } from "@/components/shared/LinkedRecordsCard";
 import { Users, Handshake, CalendarDays, TrendingUp, Plus } from "lucide-react";
 import { toast } from "sonner";
+import { ClassificationCard, ClassificationFields } from "@/components/engagements/Classification";
+import { classificationPayload, displayType, useClassificationColumns } from "@/lib/engagementClassification";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
   account_id: z.string().uuid("Please select an account."),
   engagement_type: z.string().optional(),
+  service_practice: z.string().optional(),
+  revenue_model: z.string().optional(),
+  engagement_status: z.string().optional(),
   start_date: z.string().optional(),
   end_date: z.string().optional(),
   status: z.enum(ENGAGEMENT_STATUSES),
@@ -94,6 +99,7 @@ export default function EngagementDetailPage({
   const [allContractors, setAllContractors] = useState<Pick<Contractor, "id" | "full_name" | "title_role">[]>([]);
   const [selectedContractorIds, setSelectedContractorIds] = useState<string[]>([]);
   const { can } = useAccess();
+  const columnsReady = useClassificationColumns();
   const [linkedContacts, setLinkedContacts] = useState<{ id: string; full_name: string; title_role: string | null }[]>([]);
   const [linkedPartners, setLinkedPartners] = useState<{ id: string; name: string; partner_type: string | null }[]>([]);
   const [engActivities, setEngActivities] = useState<{ id: string; activity_type: string; date_time: string; summary: string | null; outcome: string }[]>([]);
@@ -105,6 +111,9 @@ export default function EngagementDetailPage({
       name: "",
       account_id: "",
       engagement_type: "",
+      service_practice: "",
+      revenue_model: "",
+      engagement_status: "",
       start_date: "",
       end_date: "",
       status: "Planned",
@@ -160,6 +169,9 @@ export default function EngagementDetailPage({
       name: data.name,
       account_id: data.account_id,
       engagement_type: data.engagement_type ?? "",
+      service_practice: data.service_practice ?? "",
+      revenue_model: data.revenue_model ?? "",
+      engagement_status: data.engagement_status ?? "",
       start_date: data.start_date ?? "",
       end_date: data.end_date ?? "",
       status: data.status,
@@ -193,7 +205,7 @@ export default function EngagementDetailPage({
     const payload = {
       name: values.name,
       account_id: values.account_id,
-      engagement_type: values.engagement_type || null,
+      ...classificationPayload(values, columnsReady),
       start_date: values.start_date || null,
       end_date: values.end_date || null,
       status: values.status,
@@ -301,6 +313,14 @@ export default function EngagementDetailPage({
                 >
                   {engagement.status}
                 </span>
+                {engagement.engagement_status && (
+                  <span
+                    className={cn("font-medium border-none text-xs px-2 py-1 rounded-md", getStatusColor(engagement.engagement_status))}
+                    title="Engagement Status"
+                  >
+                    {engagement.engagement_status}
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-4 mt-2 text-[#4f6178] text-sm">
                 <div className="flex items-center gap-1.5">
@@ -315,7 +335,13 @@ export default function EngagementDetailPage({
                 {engagement.engagement_type && (
                   <>
                     <span className="text-slate-400">•</span>
-                    <span>{engagement.engagement_type}</span>
+                    <span>{displayType(engagement.engagement_type)}</span>
+                  </>
+                )}
+                {engagement.service_practice && (
+                  <>
+                    <span className="text-slate-400">•</span>
+                    <span>{engagement.service_practice}</span>
                   </>
                 )}
               </div>
@@ -327,6 +353,7 @@ export default function EngagementDetailPage({
                   variant="outline"
                   size="sm"
                   className="border-slate-200"
+                  data-tour="eng-edit"
                   onClick={() => setIsEditing(!isEditing)}
                 >
                   <Pencil className="w-4 h-4 mr-2" />
@@ -416,19 +443,6 @@ export default function EngagementDetailPage({
                   />
                   <FormField
                     control={form.control}
-                    name="engagement_type"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Type</FormLabel>
-                        <FormControl>
-                          <Input placeholder="e.g. Advisory" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
                     name="start_date"
                     render={({ field }) => (
                       <FormItem>
@@ -458,7 +472,7 @@ export default function EngagementDetailPage({
                     name="status"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Status</FormLabel>
+                        <FormLabel>Delivery Status</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger>
@@ -477,6 +491,7 @@ export default function EngagementDetailPage({
                       </FormItem>
                     )}
                   />
+                  <ClassificationFields control={form.control} columnsReady={columnsReady} />
                   <FormField
                     control={form.control}
                     name="contract_value"
@@ -610,7 +625,8 @@ export default function EngagementDetailPage({
       )}
 
       {!isEditing && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <ClassificationCard engagement={engagement} columnsReady={columnsReady} />
           <Card className="border-none shadow-sm">
             <CardHeader>
               <CardTitle className="text-lg font-bold text-[#1e2c40]">Contract</CardTitle>
