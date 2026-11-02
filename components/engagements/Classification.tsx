@@ -11,8 +11,10 @@ import {
   CLASSIFICATION_FIELDS,
   NEW_COLUMNS,
   type ClassificationKey,
+  activeOptions,
   displayType,
   displayValue,
+  useFieldOptions,
   useIsNew,
 } from "@/lib/engagementClassification";
 
@@ -61,6 +63,7 @@ export function ClassificationFields({
   control: Control<any>;
   columnsReady: boolean | null;
 }) {
+  const live = useFieldOptions();
   const fields = CLASSIFICATION_FIELDS.filter((f) => f.key === "engagement_type" || (columnsReady && NEW_COLUMNS.includes(f.key)));
   return (
     <NewHighlight className="classification-block md:col-span-2 min-w-0" tour="eng-class-fields">
@@ -86,7 +89,8 @@ export function ClassificationFields({
             name={f.key}
             render={({ field }) => {
               const current: string = field.value || "";
-              const known = f.options.some((o) => o.value === current);
+              const options = activeOptions(f.key, live);
+              const known = options.some((o) => o.value === current);
               return (
                 <FormItem className="min-w-0">
                   <FormLabel>{f.label}</FormLabel>
@@ -103,7 +107,7 @@ export function ClassificationFields({
                           {displayValue(f.key, current) === current ? current : `${current}, shown as ${displayValue(f.key, current)}`} (current)
                         </SelectItem>
                       )}
-                      {f.options.map((o) => (
+                      {options.map((o) => (
                         <SelectItem key={o.value} value={o.value}>
                           {o.value}
                         </SelectItem>

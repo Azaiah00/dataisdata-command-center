@@ -19,6 +19,8 @@ import { NewBadge, NewHighlight } from "@/components/engagements/Classification"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   CLASSIFICATION_FIELDS,
+  activeOptions,
+  useFieldOptions,
   NEW_COLUMNS,
   PHASES,
   type ClassificationKey,
@@ -41,6 +43,7 @@ export default function EngagementsPage() {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<"all" | "missing" | "open">("all");
   const columnsReady = useClassificationColumns();
+  const live = useFieldOptions();
   const [classFilter, setClassFilter] = useState<Partial<Record<ClassificationKey, string>>>({});
   const classFields = CLASSIFICATION_FIELDS.filter((f) => f.key === "engagement_type" || (columnsReady && NEW_COLUMNS.includes(f.key)));
   /** Compare on the display name so "Staff Aug" and "Staff Augmentation" filter together. */
@@ -94,19 +97,21 @@ export default function EngagementsPage() {
   const filterOptions = useMemo(() => {
     const out: Partial<Record<ClassificationKey, string[]>> = {};
     for (const f of classFields) {
-      const seen = new Set(f.options.map((o) => o.value));
+      const listed = activeOptions(f.key, live).map((o) => o.value);
+      const seen = new Set(listed);
       const extra = Array.from(new Set(engagements.map((e) => classValue(e, f.key)).filter((v) => v && !seen.has(v)))).sort();
-      out[f.key] = [...f.options.map((o) => o.value), ...extra];
+      out[f.key] = [...listed, ...extra];
     }
     return out;
     // eslint-disable-next-line react-hooks/exhaustive-deps -- classFields derives from columnsReady
-  }, [engagements, columnsReady]);
+  }, [engagements, columnsReady, live]);
 
   const phaseCounts = useMemo(() => {
     const counts = Object.fromEntries(PHASES.map((p) => [p, 0])) as Record<(typeof PHASES)[number], number>;
     engagements.forEach((e) => counts[phaseOf(e.engagement_status)]++);
     return counts;
-  }, [engagements]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- phaseOf reads the live lists in `live`
+  }, [engagements, live]);
   const activeClassFilters = Object.values(classFilter).filter((v) => v && v !== ANY).length;
 
   const totals = useMemo(

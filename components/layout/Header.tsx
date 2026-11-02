@@ -45,6 +45,7 @@ import {
   BarChart3,
   FolderOpen,
   ShieldCheck,
+  ListChecks,
   Eye,
   Repeat,
   X,
@@ -149,6 +150,7 @@ function currentTitle(pathname: string | null, sections: { items: NavItem[] }[])
     for (const it of sec.items)
       if ((pathname === it.path || pathname.startsWith(it.path + "/")) && (!best || it.path.length > best.path.length)) best = it;
   if (best) return best.label;
+  if (pathname.startsWith("/admin/field-options")) return "Field Options";
   if (pathname.startsWith("/admin")) return "Users & Permissions";
   if (pathname.startsWith("/settings")) return "Profile & My View";
   return "DataIsData";
@@ -310,7 +312,8 @@ export function Header() {
       {isAdmin && (
         <div>
           <p className="side-section">Admin</p>
-          <NavLink href="/admin/users" label="Users & Permissions" icon={ShieldCheck} active={pathname?.startsWith("/admin")} onClick={close} />
+          <NavLink href="/admin/users" label="Users & Permissions" icon={ShieldCheck} active={pathname?.startsWith("/admin/users")} onClick={close} />
+          <NavLink href="/admin/field-options" label="Field Options" icon={ListChecks} active={pathname?.startsWith("/admin/field-options")} onClick={close} />
           <NavLink href="/settings" label="Settings" icon={Settings} active={pathname?.startsWith("/settings")} onClick={close} />
         </div>
       )}
@@ -420,6 +423,13 @@ export function Header() {
                   <DropdownMenuItem asChild>
                     <Link href="/admin/users" className="flex items-center">
                       <ShieldCheck className="w-4 h-4 mr-2" /> Users & Permissions
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+                {isAdmin && (
+                  <DropdownMenuItem asChild>
+                    <Link href="/admin/field-options" className="flex items-center">
+                      <ListChecks className="w-4 h-4 mr-2" /> Field Options
                     </Link>
                   </DropdownMenuItem>
                 )}

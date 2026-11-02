@@ -5,7 +5,7 @@ import { Tags } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn, formatCurrency } from "@/lib/utils";
 import { NewBadge, NewHighlight } from "@/components/engagements/Classification";
-import { CLASSIFICATION_FIELDS, NEW_COLUMNS, PHASES, type ClassificationKey, displayValue, phaseOf } from "@/lib/engagementClassification";
+import { CLASSIFICATION_FIELDS, NEW_COLUMNS, PHASES, type ClassificationKey, displayValue, phaseOf, useFieldOptions } from "@/lib/engagementClassification";
 
 export type ClassifiableEngagement = {
   engagement_type?: string | null;
@@ -56,7 +56,9 @@ export function ClassificationReport({ engagements, columnsReady }: { engagement
   const fields = CLASSIFICATION_FIELDS.filter((f) => f.key === "engagement_type" || (columnsReady && NEW_COLUMNS.includes(f.key)));
   const [tab, setTab] = useState<ClassificationKey>("engagement_type");
   const rows = useMemo(() => breakdown(engagements, tab), [engagements, tab]);
-  const phases = useMemo(() => phaseBreakdown(engagements), [engagements]);
+  const live = useFieldOptions();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- phaseOf reads the live lists in `live`
+  const phases = useMemo(() => phaseBreakdown(engagements), [engagements, live]);
   const max = Math.max(...rows.map((r) => r.value), 1);
 
   return (

@@ -76,13 +76,21 @@ export const ENGAGEMENT_STATUS_OPTIONS: Option[] = [
 
 /** The four classification fields, in the order they appear on forms and reports. */
 export const CLASSIFICATION_FIELDS = [
-  { key: "engagement_type", label: "Engagement Type", hint: "How DataIsData is engaged by the client", options: ENGAGEMENT_TYPE_OPTIONS },
-  { key: "service_practice", label: "Service / Practice", hint: "What DataIsData is delivering", options: SERVICE_PRACTICE_OPTIONS },
-  { key: "revenue_model", label: "Revenue / Pricing Model", hint: "How the engagement generates revenue", options: REVENUE_MODEL_OPTIONS },
-  { key: "engagement_status", label: "Engagement Status", hint: "Where the engagement is, from identified to closed", options: ENGAGEMENT_STATUS_OPTIONS },
+  { key: "engagement_type", label: "Engagement Type", hint: "How DataIsData is engaged by the client" },
+  { key: "service_practice", label: "Service / Practice", hint: "What DataIsData is delivering" },
+  { key: "revenue_model", label: "Revenue / Pricing Model", hint: "How the engagement generates revenue" },
+  { key: "engagement_status", label: "Engagement Status", hint: "Where the engagement is, from identified to closed" },
 ] as const;
 
 export type ClassificationKey = (typeof CLASSIFICATION_FIELDS)[number]["key"];
+
+/** The built-in lists, used until the Field Options table exists (and to seed it). */
+export const DEFAULT_OPTIONS: Record<ClassificationKey, Option[]> = {
+  engagement_type: ENGAGEMENT_TYPE_OPTIONS,
+  service_practice: SERVICE_PRACTICE_OPTIONS,
+  revenue_model: REVENUE_MODEL_OPTIONS,
+  engagement_status: ENGAGEMENT_STATUS_OPTIONS,
+};
 /** The fields that need the new database columns (engagement_type already exists). */
 export const NEW_COLUMNS: ClassificationKey[] = ["service_practice", "revenue_model", "engagement_status"];
 
@@ -110,15 +118,28 @@ export function displayValue(key: ClassificationKey, value: string | null | unde
 
 export function describe(key: ClassificationKey, value: string | null | undefined): string | null {
   if (!value) return null;
-  const field = CLASSIFICATION_FIELDS.find((f) => f.key === key);
-  const v = key === "engagement_type" ? displayType(value) : value;
-  return field?.options.find((o) => o.value === v)?.description ?? null;
+  const v = displayValue(key, value);
+  return store.rows[key].find((o) => o.value === v)?.description || null;
 }
 
 /** Engagement Status rolled up for reporting: in development vs generating revenue vs done. */
 export type Phase = "In development" | "Generating revenue" | "On hold" | "Closed out" | "Not set";
 export const PHASES: Phase[] = ["In development", "Generating revenue", "On hold", "Closed out", "Not set"];
+/** Phases a status can be reported under (everything except "Not set"). */
+export const STATUS_PHASES: Exclude<Phase, "Not set">[] = ["In development", "Generating revenue", "On hold", "Closed out"];
+
+/**
+ * The reporting phase of an Engagement Status. Uses the phase set for that status in
+ * Admin > Field Options, falling back to the built-in mapping.
+ */
 export function phaseOf(engagementStatus: string | null | undefined): Phase {
+  if (!engagementStatus) return "Not set";
+  const live = store.rows.engagement_status.find((o) => o.value === engagementStatus);
+  if (live?.phase) return live.phase;
+  return defaultPhase(engagementStatus);
+}
+
+function defaultPhase(engagementStatus: string | null | undefined): Phase {
   switch (engagementStatus) {
     case "Identified":
     case "Discovery":
@@ -198,4 +219,118 @@ export function useIsNew(until: string = CLASSIFICATION_NEW_UNTIL): boolean {
     () => Date.now() < new Date(until).getTime(),
     () => false
   );
+}
+
+/* ---------------- Live option lists (Admin > Field Options) ---------------- */
+
+/**
+ * The dropdown choices for the four classification fields live in the
+ * `portal_field_options` table (supabase/2026-11-field-options.sql), so Owner and Admin seats
+ * can add, rename, reorder, hide or remove them in Admin > Field Options. Every form, filter,
+ * report and the Glossary read the same list from here.
+ *
+ * Until that table exists (or for a field with no rows yet), the built-in lists above are used.
+ * Hiding or removing a choice never touches engagements: a record that already holds it keeps
+ * it, shown as "(current)" in its dropdown.
+ */
+export type FieldOption = {
+  id: string | null;
+  field_key: ClassificationKey;
+  value: string;
+  description: string;
+  sort_order: number;
+  active: boolean;
+  /** Engagement Status only: which reporting phase the status rolls up to. */
+  phase: Exclude<Phase, "Not set"> | null;
+};
+
+export const FIELD_OPTIONS_TABLE = "portal_field_options";
+
+export type FieldStore = {
+  /** "database": loaded from the table · "defaults": table not created yet · "loading": first load pending */
+  source: "loading" | "database" | "defaults";
+  rows: Record<ClassificationKey, FieldOption[]>;
+  loadedAt: number;
+};
+
+function defaultRows(key: ClassificationKey): FieldOption[] {
+  return DEFAULT_OPTIONS[key].map((o, i) => ({
+    id: null,
+    field_key: key,
+    value: o.value,
+    description: o.description,
+    sort_order: (i + 1) * 10,
+    active: true,
+    phase: key === "engagement_status" ? (defaultPhase(o.value) as Exclude<Phase, "Not set">) : null,
+  }));
+}
+
+const DEFAULT_ROWS = Object.fromEntries(CLASSIFICATION_FIELDS.map((f) => [f.key, defaultRows(f.key)])) as Record<ClassificationKey, FieldOption[]>;
+
+let store: FieldStore = { source: "loading", rows: DEFAULT_ROWS, loadedAt: 0 };
+const listeners = new Set<() => void>();
+function emit(next: Partial<FieldStore>) {
+  store = { ...store, ...next };
+  listeners.forEach((l) => l());
+}
+function subscribeStore(l: () => void) {
+  listeners.add(l);
+  return () => listeners.delete(l);
+}
+
+const isMissingTable = (msg: string) => /does not exist|schema cache|relation|not find the table/i.test(msg);
+const PHASE_SET = new Set<string>(STATUS_PHASES);
+
+let inflight: Promise<void> | null = null;
+/** Load (or refresh) the lists. Re-reads at most once a minute unless `force` is set. */
+export function loadFieldOptions(force = false): Promise<void> {
+  if (!force && store.source !== "loading" && Date.now() - store.loadedAt < 60_000) return Promise.resolve();
+  if (inflight) return inflight;
+  inflight = (async () => {
+    const { data, error } = await supabase
+      .from(FIELD_OPTIONS_TABLE)
+      .select("id, field_key, value, description, sort_order, active, phase")
+      .order("sort_order", { ascending: true })
+      .order("value", { ascending: true });
+    if (error) {
+      // Table not created yet: keep the built-in lists. Other errors (offline): keep what we have.
+      emit({ source: isMissingTable(error.message) ? "defaults" : store.source === "loading" ? "defaults" : store.source, loadedAt: Date.now() });
+      return;
+    }
+    const rows = Object.fromEntries(CLASSIFICATION_FIELDS.map((f) => [f.key, [] as FieldOption[]])) as Record<ClassificationKey, FieldOption[]>;
+    for (const r of (data || []) as FieldOption[]) {
+      if (!(r.field_key in rows)) continue;
+      rows[r.field_key].push({
+        ...r,
+        description: r.description || "",
+        phase: r.phase && PHASE_SET.has(r.phase) ? r.phase : null,
+      });
+    }
+    // A field with no rows at all falls back to its built-in list.
+    for (const f of CLASSIFICATION_FIELDS) if (!rows[f.key].length) rows[f.key] = DEFAULT_ROWS[f.key];
+    emit({ source: "database", rows, loadedAt: Date.now() });
+  })().finally(() => {
+    inflight = null;
+  });
+  return inflight;
+}
+
+/** Live lists for the four fields; components re-render when an admin changes them. */
+export function useFieldOptions() {
+  const s = useSyncExternalStore(subscribeStore, () => store, () => store);
+  useEffect(() => {
+    void loadFieldOptions();
+  }, []);
+  return s;
+}
+
+/** The choices shown in a dropdown right now (visible ones, in order). */
+export function activeOptions(key: ClassificationKey, s: FieldStore = store): Option[] {
+  return s.rows[key].filter((r) => r.active).map((r) => ({ value: r.value, description: r.description }));
+}
+
+/** Current options for a field outside React (e.g. while converting an opportunity). */
+export async function currentOptions(key: ClassificationKey): Promise<Option[]> {
+  await loadFieldOptions();
+  return activeOptions(key);
 }

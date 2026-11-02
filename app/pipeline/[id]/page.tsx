@@ -24,7 +24,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { ENGAGEMENT_TYPE_OPTIONS, displayType } from "@/lib/engagementClassification";
+import { currentOptions, displayType } from "@/lib/engagementClassification";
 import { securityTerm } from "@/lib/terms";
 
 /**
@@ -36,12 +36,15 @@ import { securityTerm } from "@/lib/terms";
 async function convertedClassification(serviceLine: string | null) {
   const { error } = await supabase.from("engagements").select("service_practice, engagement_status").limit(1);
   const ready = !error;
-  const isType = !!serviceLine && ENGAGEMENT_TYPE_OPTIONS.some((o) => o.value === displayType(serviceLine));
   if (!ready) return { engagement_type: serviceLine || "Advisory" };
+  // Uses the lists as currently set in Admin > Field Options.
+  const [types, statuses] = await Promise.all([currentOptions("engagement_type"), currentOptions("engagement_status")]);
+  const isType = !!serviceLine && types.some((o) => o.value === displayType(serviceLine));
   return {
     engagement_type: isType ? serviceLine : null,
     service_practice: isType ? null : serviceLine || null,
-    engagement_status: "Awarded",
+    // Starts at "Awarded" while that status exists; otherwise left for the team to set.
+    engagement_status: statuses.some((o) => o.value === "Awarded") ? "Awarded" : null,
   };
 }
 

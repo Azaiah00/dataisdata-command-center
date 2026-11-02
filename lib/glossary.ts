@@ -4,12 +4,7 @@
  * dropdowns and the glossary can never disagree.
  */
 import type { ModuleKey } from "@/lib/access/modules";
-import {
-  ENGAGEMENT_STATUS_OPTIONS,
-  ENGAGEMENT_TYPE_OPTIONS,
-  REVENUE_MODEL_OPTIONS,
-  SERVICE_PRACTICE_OPTIONS,
-} from "@/lib/engagementClassification";
+import { activeOptions, CLASSIFICATION_FIELDS, type ClassificationKey, type FieldStore, STATUS_PHASES } from "@/lib/engagementClassification";
 import { CRITERIA, SPONSORSHIP, TIER_DESCRIPTIONS } from "@/lib/innovation/constants";
 
 export type GlossaryTerm = { term: string; definition: string };
@@ -21,9 +16,6 @@ export type GlossarySection = {
   modules: ModuleKey[];
   terms: GlossaryTerm[];
 };
-
-const fromOptions = (opts: { value: string; description: string }[]): GlossaryTerm[] =>
-  opts.map((o) => ({ term: o.value, definition: o.description }));
 
 const INNOVATION_MODULES: ModuleKey[] = [
   "innovation_portfolio",
@@ -37,48 +29,45 @@ const INNOVATION_MODULES: ModuleKey[] = [
 
 const fmt = (n: number) => `$${n.toLocaleString("en-US")}`;
 
-export const GLOSSARY: GlossarySection[] = [
-  {
-    id: "engagement-type",
-    title: "Engagement Type",
-    intro: "How DataIsData is engaged by the client: the business relationship or delivery model, not the service itself.",
+const INTROS: Record<ClassificationKey, { id: string; intro: string }> = {
+  engagement_type: { id: "engagement-type", intro: "How DataIsData is engaged by the client: the business relationship or delivery model, not the service itself." },
+  service_practice: { id: "service-practice", intro: "What DataIsData is delivering on the engagement." },
+  revenue_model: { id: "revenue-model", intro: "How the engagement generates revenue." },
+  engagement_status: { id: "engagement-status", intro: "Where the engagement is, from first identified to closed. Kept separate from Engagement Type and from Delivery Status." },
+};
+
+/**
+ * The classification sections, built from the live lists in Admin > Field Options, so the
+ * Glossary always matches the dropdowns. Choices without a definition are listed as such.
+ */
+export function classificationGlossary(live: FieldStore): GlossarySection[] {
+  const sections: GlossarySection[] = CLASSIFICATION_FIELDS.map((f) => ({
+    id: INTROS[f.key].id,
+    title: f.label,
+    intro: INTROS[f.key].intro,
     modules: ["engagements"],
-    terms: fromOptions(ENGAGEMENT_TYPE_OPTIONS),
-  },
-  {
-    id: "service-practice",
-    title: "Service / Practice",
-    intro: "What DataIsData is delivering on the engagement.",
-    modules: ["engagements"],
-    terms: fromOptions(SERVICE_PRACTICE_OPTIONS),
-  },
-  {
-    id: "revenue-model",
-    title: "Revenue / Pricing Model",
-    intro: "How the engagement generates revenue.",
-    modules: ["engagements"],
-    terms: fromOptions(REVENUE_MODEL_OPTIONS),
-  },
-  {
-    id: "engagement-status",
-    title: "Engagement Status",
-    intro: "Where the engagement is, from first identified to closed. Kept separate from Engagement Type and from Delivery Status.",
-    modules: ["engagements"],
-    terms: fromOptions(ENGAGEMENT_STATUS_OPTIONS),
-  },
-  {
+    terms: activeOptions(f.key, live).map((o) => ({ term: o.value, definition: o.description || "No definition added yet." })),
+  }));
+  const statuses = live.rows.engagement_status.filter((r) => r.active);
+  const list = (phase: string) => statuses.filter((r) => r.phase === phase).map((r) => r.value).join(", ") || "No statuses";
+  sections.push({
     id: "engagement-phases",
     title: "Engagement phases (reporting)",
     intro: "How Engagement Status is grouped on the Engagements list and in Reports.",
     modules: ["engagements", "reports"],
     terms: [
-      { term: "In development", definition: "Identified, Discovery, Proposed or Negotiation: being pursued, not yet won." },
-      { term: "Generating revenue", definition: "Awarded or Active: won work." },
-      { term: "On hold", definition: "Paused engagements." },
-      { term: "Closed out", definition: "Completed or Closed." },
+      ...STATUS_PHASES.map((p) => ({
+        term: p,
+        definition: `${list(p)}.${p === "In development" ? " Being pursued, not yet won." : p === "Generating revenue" ? " Won work." : ""}`,
+      })),
       { term: "Not set", definition: "No Engagement Status chosen yet." },
     ],
-  },
+  });
+  return sections;
+}
+
+/** Everything else in the Glossary (fixed terms). */
+export const GLOSSARY: GlossarySection[] = [
   {
     id: "delivery-status",
     title: "Delivery Status",

@@ -1,21 +1,28 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { BookOpen, Search } from "lucide-react";
+import Link from "next/link";
+import { BookOpen, ListChecks, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useAccess } from "@/components/auth/AccessProvider";
 import { NewBadge, NewHighlight } from "@/components/engagements/Classification";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page";
-import { GLOSSARY } from "@/lib/glossary";
+import { classificationGlossary, GLOSSARY } from "@/lib/glossary";
+import { useFieldOptions } from "@/lib/engagementClassification";
 import { cn } from "@/lib/utils";
 
 /** Portal glossary: definitions for every classification, status and scoring term, searchable. */
 export default function GlossaryPage() {
-  const { can } = useAccess();
+  const { can, isAdmin } = useAccess();
   const [query, setQuery] = useState("");
 
   // Only the sections for modules this seat can open.
-  const sections = useMemo(() => GLOSSARY.filter((s) => s.modules.some((m) => can(m))), [can]);
+  const live = useFieldOptions();
+  const sections = useMemo(
+    () => [...classificationGlossary(live), ...GLOSSARY].filter((s) => s.modules.some((m) => can(m))),
+    [can, live]
+  );
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -49,6 +56,15 @@ export default function GlossaryPage() {
           </span>
         }
         description={`What each classification, status and scoring term in the Command Center means. ${total} terms.`}
+        actions={
+          isAdmin ? (
+            <Link href="/admin/field-options">
+              <Button variant="outline">
+                <ListChecks className="w-4 h-4" /> Edit classification choices
+              </Button>
+            </Link>
+          ) : undefined
+        }
       />
 
       <NewHighlight className="classification-block" tour="glossary">

@@ -68,7 +68,7 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
 
   if (req.kind === "admin") {
     if (isAdmin) return <>{children}</>;
-    return <NoAccess title="Admins only" body="Seat and permission management is limited to Owner and Admin seats." />;
+    return <NoAccess title="Admins only" body="This page is limited to Owner and Admin seats." />;
   }
 
   if (dashboardBlocked) {

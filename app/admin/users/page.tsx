@@ -41,6 +41,7 @@ const AUDIT_LABELS: Record<string, string> = {
   seat_removed: "removed the seat for",
   preview_started: "previewed the portal as",
   settings_updated: "changed portal settings",
+  field_options_updated: "changed the dropdown choices for",
 };
 
 export default function UsersPage() {
@@ -300,6 +301,9 @@ export default function UsersPage() {
                         {a.target_name && a.action !== "signed_in" && a.action !== "settings_updated" ? <strong>{a.target_name}</strong> : null}
                         {a.details && a.action === "access_updated" && Array.isArray((a.details as { changes?: string[] }).changes) && (
                           <span className="block text-xs text-muted-foreground mt-0.5">{((a.details as { changes: string[] }).changes || []).join(" · ")}</span>
+                        )}
+                        {a.details && a.action === "field_options_updated" && typeof (a.details as { change?: string }).change === "string" && (
+                          <span className="block text-xs text-muted-foreground mt-0.5">{(a.details as { change: string }).change}</span>
                         )}
                       </span>
                       <span className="text-xs text-muted-foreground whitespace-nowrap">{formatDateTime(a.created_at)}</span>

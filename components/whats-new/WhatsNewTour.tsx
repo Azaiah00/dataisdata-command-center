@@ -104,6 +104,8 @@ type Step = {
   clickTarget?: boolean;
   module?: ModuleKey;
   action?: "view" | "create" | "edit";
+  /** Only Owner and Admin seats see this step. */
+  adminOnly?: boolean;
 };
 
 const STEPS: Step[] = [
@@ -174,6 +176,13 @@ const STEPS: Step[] = [
     path: () => "/glossary",
     target: "glossary",
   },
+  {
+    title: "Edit the choices yourself",
+    body: "Admin > Field Options lets Owner and Admin seats add, rename, reorder, hide or remove the choices in all four classification dropdowns, and edit their Glossary definitions. Changes apply to every form, filter, report and the Glossary at once. Renaming a choice can also update the engagements that use it; hiding or removing one never changes an engagement.",
+    path: () => "/admin/field-options",
+    target: "field-options",
+    adminOnly: true,
+  },
 ];
 
 /* ---------------- component ---------------- */
@@ -191,7 +200,7 @@ export function WhatsNewTour() {
 
   // Only the steps this seat can actually open.
   const steps = useMemo(
-    () => (access ? STEPS.filter((s) => !s.module || access.can(s.module, s.action || "view")) : []),
+    () => (access ? STEPS.filter((s) => (!s.module || access.can(s.module, s.action || "view")) && (!s.adminOnly || access.isAdmin)) : []),
     [access]
   );
   const idx = Math.max(0, Math.min(steps.length - 1, state.step));

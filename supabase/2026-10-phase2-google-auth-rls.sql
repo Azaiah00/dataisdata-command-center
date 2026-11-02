@@ -730,4 +730,19 @@ DO $$ BEGIN
   END IF;
 END $$;
 
+-- -----------------------------------------------------------------------------
+-- Field Options (added Nov 2026, supabase/2026-11-field-options.sql):
+-- every signed-in seat can read the dropdown choices; only Owner/Admin can change them.
+-- -----------------------------------------------------------------------------
+DO $$
+BEGIN
+  IF to_regclass('public.portal_field_options') IS NOT NULL THEN
+    EXECUTE 'ALTER TABLE public.portal_field_options ENABLE ROW LEVEL SECURITY';
+    EXECUTE $p$CREATE POLICY portal_select ON public.portal_field_options FOR SELECT TO authenticated USING (public.portal_me_id() IS NOT NULL)$p$;
+    EXECUTE $p$CREATE POLICY portal_write ON public.portal_field_options FOR ALL TO authenticated USING (public.portal_is_admin()) WITH CHECK (public.portal_is_admin())$p$;
+    EXECUTE 'GRANT SELECT, INSERT, UPDATE, DELETE ON public.portal_field_options TO authenticated';
+    EXECUTE 'REVOKE ALL ON public.portal_field_options FROM anon';
+  END IF;
+END $$;
+
 NOTIFY pgrst, 'reload schema';
