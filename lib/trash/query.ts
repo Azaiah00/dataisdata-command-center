@@ -1,5 +1,3 @@
-import type { PostgrestFilterBuilder } from "@supabase/postgrest-js";
-
 /** True when the trash migration has not been applied yet. */
 export function isMissingDeletedAtColumn(error: { message?: string } | null) {
   return !!error && /deleted_at/i.test(error.message || "");
@@ -20,6 +18,6 @@ export async function withActiveRowsOnly<T extends Record<string, unknown>>(
 }
 
 /** Attach .is('deleted_at', null) when the migration is present. */
-export function filterActive<T>(q: PostgrestFilterBuilder<any, any, any>, apply: boolean) {
+export function filterActive<T extends { is(column: string, value: null): T }>(q: T, apply: boolean): T {
   return apply ? q.is("deleted_at", null) : q;
 }
