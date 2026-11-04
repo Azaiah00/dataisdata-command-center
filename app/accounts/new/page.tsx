@@ -32,6 +32,8 @@ import { ChevronLeft, Plus, Trash2, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import { useAccess } from "@/components/auth/AccessProvider";
+import { OwnerSelect, ownerToSave } from "@/components/accounts/OwnerSelect";
 
 const contactSchema = z.object({
   full_name: z.string().min(2, "Name must be at least 2 characters."),
@@ -60,6 +62,8 @@ export default function NewAccountPage() {
   const [contacts, setContacts] = useState<Pick<Contact, "id" | "full_name">[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // The person signed in (not a previewed seat). They own the account by default.
+  const { realUser } = useAccess();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -70,7 +74,9 @@ export default function NewAccountPage() {
       region_locality: "",
       primary_focus: "",
       status: "Prospect",
-      owner: "Tony Wood",
+      // Filled with the creator's name once their seat loads (see effect below).
+      // Previously hard-coded to "Tony Wood".
+      owner: "",
       notes: "",
       parent_account_id: "",
       existing_contact_ids: [],
@@ -96,6 +102,12 @@ export default function NewAccountPage() {
     fetchData();
   }, []);
 
+  // Default owner = whoever is creating the account. Only fills an empty field,
+  // so it never overwrites a choice the person already made.
+  useEffect(() => {
+    if (realUser?.full_name && !form.getValues("owner")) form.setValue("owner", realUser.full_name);
+  }, [realUser, form]);
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
@@ -109,7 +121,7 @@ export default function NewAccountPage() {
           region_locality: values.region_locality,
           primary_focus: values.primary_focus,
           status: values.status,
-          owner: values.owner,
+          owner: ownerToSave(values.owner),
           notes: values.notes,
           parent_account_id: values.parent_account_id && values.parent_account_id !== "none" ? values.parent_account_id : null,
         }])
@@ -275,6 +287,20 @@ export default function NewAccountPage() {
                           ))}
                         </SelectContent>
                       </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Owner: defaults to the creator, can be handed to someone else. */}
+                <FormField
+                  control={form.control}
+                  name="owner"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Owner</FormLabel>
+                      <OwnerSelect value={field.value} onChange={field.onChange} />
+                      <FormDescription>Defaults to you. Pick someone else to give them this account.</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}

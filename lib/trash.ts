@@ -26,16 +26,28 @@ export type TrashItem = {
 
 const TRASH_TABLE = "portal_trash";
 
+/**
+ * True only when the trash table or deleted_at column is really missing.
+ * A permission (row-level security, code 42501) error is NOT a missing schema; it used to be
+ * mistaken for one because its message mentions "portal_trash", which showed the wrong hint.
+ */
 function isMissingTrashSchema(error: { message?: string; code?: string } | null) {
-  if (!error) return false;
+  if (!error || error.code === "42501") return false;
   const msg = (error.message || "").toLowerCase();
   return (
-    error.code === "PGRST205" ||
-    error.code === "42703" ||
-    msg.includes("portal_trash") ||
-    msg.includes("deleted_at") ||
-    msg.includes("does not exist")
+    error.code === "PGRST205" || // table not found
+    error.code === "42P01" || // relation does not exist
+    error.code === "42703" || // column does not exist
+    (msg.includes("does not exist") && (msg.includes("portal_trash") || msg.includes("deleted_at")))
   );
+}
+
+/** Permission errors get a plain-English message instead of the raw database text. */
+function friendlyError(error: { message?: string; code?: string }) {
+  if (error.code === "42501" || /row-level security/i.test(error.message || "")) {
+    return "The database blocked this. Run supabase/2026-11-portal-trash-demo-access.sql in the Supabase SQL Editor, then reload.";
+  }
+  return error.message || "Something went wrong.";
 }
 
 export function trashSchemaHint() {
@@ -90,7 +102,7 @@ export async function moveToTrash(entityType: TrashEntityType, entityId: string,
   const { data: row, error: loadErr } = await supabase.from(def.table).select("*").eq("id", entityId).maybeSingle();
   if (loadErr) {
     if (isMissingTrashSchema(loadErr)) return { ok: false as const, error: trashSchemaHint() };
-    return { ok: false as const, error: loadErr.message };
+    return { ok: false as const, error: friendlyError(loadErr) };
   }
   if (!row) return { ok: false as const, error: `${def.label} not found.` };
 
@@ -114,7 +126,7 @@ export async function moveToTrash(entityType: TrashEntityType, entityId: string,
 
   if (trashErr) {
     if (isMissingTrashSchema(trashErr)) return { ok: false as const, error: trashSchemaHint() };
-    return { ok: false as const, error: trashErr.message };
+    return { ok: false as const, error: friendlyError(trashErr) };
   }
 
   const { error: softErr } = await supabase
@@ -124,7 +136,7 @@ export async function moveToTrash(entityType: TrashEntityType, entityId: string,
 
   if (softErr) {
     if (isMissingTrashSchema(softErr)) return { ok: false as const, error: trashSchemaHint() };
-    return { ok: false as const, error: softErr.message };
+    return { ok: false as const, error: friendlyError(softErr) };
   }
 
   return { ok: true as const, error: null };
@@ -145,7 +157,7 @@ export async function listTrash(): Promise<{ items: TrashItem[]; error: string |
 
   if (error) {
     if (isMissingTrashSchema(error)) return { items: [], error: trashSchemaHint() };
-    return { items: [], error: error.message };
+    return { items: [], error: friendlyError(error) };
   }
   return { items: (data || []) as TrashItem[], error: null };
 }
@@ -162,10 +174,10 @@ export async function restoreTrashItem(trashId: string) {
     .from(def.table)
     .update({ deleted_at: null, deleted_by: null })
     .eq("id", item.entity_id);
-  if (error) return { ok: false as const, error: error.message };
+  if (error) return { ok: false as const, error: friendlyError(error) };
 
   const { error: markErr } = await supabase.from(TRASH_TABLE).update({ restored_at: new Date().toISOString() }).eq("id", trashId);
-  if (markErr) return { ok: false as const, error: markErr.message };
+  if (markErr) return { ok: false as const, error: friendlyError(markErr) };
 
   return { ok: true as const, error: null };
 }
@@ -179,10 +191,10 @@ export async function purgeTrashItem(trashId: string) {
   if (!def) return { ok: false as const, error: "Unknown item type." };
 
   const { error } = await supabase.from(def.table).delete().eq("id", item.entity_id);
-  if (error) return { ok: false as const, error: error.message };
+  if (error) return { ok: false as const, error: friendlyError(error) };
 
   const { error: markErr } = await supabase.from(TRASH_TABLE).update({ purged_at: new Date().toISOString() }).eq("id", trashId);
-  if (markErr) return { ok: false as const, error: markErr.message };
+  if (markErr) return { ok: false as const, error: friendlyError(markErr) };
 
   return { ok: true as const, error: null };
 }

@@ -33,6 +33,7 @@ import { ChevronLeft, Trash2, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { EditDangerZone } from "@/components/trash/EditDangerZone";
 import { Badge } from "@/components/ui/badge";
+import { OwnerSelect, ownerToSave } from "@/components/accounts/OwnerSelect";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
@@ -64,7 +65,8 @@ export default function EditAccountPage({ params }: { params: Promise<{ id: stri
       region_locality: "",
       primary_focus: "",
       status: "Prospect",
-      owner: "Tony Wood",
+      // Replaced by the account's saved owner once it loads (form.reset below).
+      owner: "",
       notes: "",
       parent_account_id: "",
       existing_contact_ids: [],
@@ -135,7 +137,7 @@ export default function EditAccountPage({ params }: { params: Promise<{ id: stri
           region_locality: values.region_locality,
           primary_focus: values.primary_focus,
           status: values.status,
-          owner: values.owner,
+          owner: ownerToSave(values.owner),
           notes: values.notes,
           parent_account_id: values.parent_account_id === "none" ? null : (values.parent_account_id || null),
           updated_at: new Date().toISOString(),
@@ -267,6 +269,19 @@ export default function EditAccountPage({ params }: { params: Promise<{ id: stri
                           ))}
                         </SelectContent>
                       </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Owner: hand the account to another team member. Shows everywhere on save. */}
+                <FormField
+                  control={form.control}
+                  name="owner"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Owner</FormLabel>
+                      <OwnerSelect value={field.value} onChange={field.onChange} />
                       <FormMessage />
                     </FormItem>
                   )}
