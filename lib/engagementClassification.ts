@@ -35,6 +35,8 @@ export const ENGAGEMENT_TYPE_OPTIONS: Option[] = [
   { value: "Joint Venture", description: "Formal arrangements where DataIsData and another organization jointly pursue or deliver work." },
   { value: "Pilot / Proof of Concept", description: "Limited-scope engagements to test new technologies or demonstrate business value." },
   { value: "Assessment / Discovery", description: "Initial paid engagements to evaluate client needs, identify opportunities or develop a roadmap." },
+  // Added Nov 2026 for DataIsData's own in-house work (no outside client).
+  { value: "Internal", description: "DataIsData's own in-house work, such as building internal tools or company initiatives." },
 ];
 
 export const SERVICE_PRACTICE_OPTIONS: Option[] = [

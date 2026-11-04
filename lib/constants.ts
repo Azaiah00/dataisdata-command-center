@@ -1,4 +1,6 @@
-export const ACCOUNT_TYPES = ['City', 'County', 'State', 'State Agency', 'University', 'Nonprofit', 'Private'] as const;
+// "Internal Development" = DataIsData's own in-house accounts. Named this way so it is not
+// confused with the "Internal" engagement type. Needs supabase/2026-11-internal-types.sql.
+export const ACCOUNT_TYPES = ['City', 'County', 'State', 'State Agency', 'University', 'Nonprofit', 'Private', 'Internal Development'] as const;
 export const ACCOUNT_STATUSES = ['Active', 'Prospect', 'Dormant'] as const;
 export const RELATIONSHIP_HEALTHS = ['Cold', 'Warm', 'Strong'] as const;
 export const ENGAGEMENT_STATUSES = ['Planned', 'In Progress', 'On Hold', 'Complete'] as const;
