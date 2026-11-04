@@ -51,7 +51,7 @@ FROM (VALUES
   ('engagement_type', 'Managed Services', 'Ongoing responsibility for managing a client''s technology, innovation programs or operations.', 50, NULL),
   ('engagement_type', 'Strategic Partnership', 'Collaborations with companies, universities, municipalities or other organizations to pursue opportunities.', 60, NULL),
   ('engagement_type', 'Joint Venture', 'Formal arrangements where DataIsData and another organization jointly pursue or deliver work.', 70, NULL),
-  ('engagement_type', 'Pilot / Proof of Concept', 'Limited-scope engagements to test new technologies or demonstrate business value.', 80, NULL),
+  ('engagement_type', 'Proof of Technology', 'Limited-scope engagements to test new technologies or demonstrate business value.', 80, NULL),
   ('engagement_type', 'Assessment / Discovery', 'Initial paid engagements to evaluate client needs, identify opportunities or develop a roadmap.', 90, NULL),
   ('engagement_type', 'Internal', 'DataIsData''s own in-house work, such as building internal tools or company initiatives.', 100, NULL),
   -- Service / Practice

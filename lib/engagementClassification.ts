@@ -33,7 +33,8 @@ export const ENGAGEMENT_TYPE_OPTIONS: Option[] = [
   { value: "Managed Services", description: "Ongoing responsibility for managing a client's technology, innovation programs or operations." },
   { value: "Strategic Partnership", description: "Collaborations with companies, universities, municipalities or other organizations to pursue opportunities." },
   { value: "Joint Venture", description: "Formal arrangements where DataIsData and another organization jointly pursue or deliver work." },
-  { value: "Pilot / Proof of Concept", description: "Limited-scope engagements to test new technologies or demonstrate business value." },
+  // Renamed Nov 2026 from "Pilot / Proof of Concept" (same spot in the list).
+  { value: "Proof of Technology", description: "Limited-scope engagements to test new technologies or demonstrate business value." },
   { value: "Assessment / Discovery", description: "Initial paid engagements to evaluate client needs, identify opportunities or develop a roadmap." },
   // Added Nov 2026 for DataIsData's own in-house work (no outside client).
   { value: "Internal", description: "DataIsData's own in-house work, such as building internal tools or company initiatives." },
@@ -104,7 +105,9 @@ const TYPE_ALIASES: Record<string, string> = {
   "staff aug": "Staff Augmentation",
   "staff aug.": "Staff Augmentation",
   "staff augmentation": "Staff Augmentation",
-  poc: "Pilot / Proof of Concept",
+  // Old names still display as the new one.
+  poc: "Proof of Technology",
+  "pilot / proof of concept": "Proof of Technology",
 };
 
 export function displayType(value: string | null | undefined): string | null {
