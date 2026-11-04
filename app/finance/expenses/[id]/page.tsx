@@ -15,6 +15,7 @@ import { CustomFieldValues } from "@/components/finance/CustomFields";
 import { cn, formatCurrency, formatDate, getStatusColor, num } from "@/lib/utils";
 import { RECURRENCES, type CustomField } from "@/lib/finance/types";
 import { toast } from "sonner";
+import { EditDangerZone } from "@/components/trash/EditDangerZone";
 import { CreditCard, Pencil, Trash2, ExternalLink, Repeat } from "lucide-react";
 
 type ExpenseFull = Expense & { vendor?: string | null; notes?: string | null; recurrence?: string | null; custom_fields?: Record<string, unknown> | null };
@@ -47,8 +48,6 @@ export default function ExpenseDetailPage({ params }: { params: Promise<{ id: st
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [fromTimesheet, setFromTimesheet] = useState(false);
 
   const fetchExpense = useCallback(async () => {
@@ -83,15 +82,6 @@ export default function ExpenseDetailPage({ params }: { params: Promise<{ id: st
     toast.success("Expense updated");
     setIsEditing(false);
     await fetchExpense();
-  }
-
-  async function onDelete() {
-    setDeleting(true);
-    const { error } = await supabase.from("expenses").delete().eq("id", id);
-    setDeleting(false);
-    if (error) return toast.error(error.message);
-    toast.success("Expense deleted");
-    router.push("/finance/expenses");
   }
 
   if (loading)
@@ -149,32 +139,6 @@ export default function ExpenseDetailPage({ params }: { params: Promise<{ id: st
                 {isEditing ? "Cancel" : "Edit"}
               </Button>
             </Can>
-            <Can module="expenses" action="delete">
-              <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="border-red-200 text-red-600 hover:bg-red-50">
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Delete
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Delete Expense?</DialogTitle>
-                    <DialogDescription>
-                      This cannot be undone.{fromTimesheet ? " The linked timesheet will show contractor pay as not recorded." : ""}
-                    </DialogDescription>
-                  </DialogHeader>
-                  <DialogFooter>
-                    <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
-                      Cancel
-                    </Button>
-                    <Button variant="destructive" disabled={deleting} onClick={onDelete}>
-                      {deleting ? "Deleting..." : "Delete"}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </Can>
           </div>
         </div>
       </div>
@@ -200,6 +164,12 @@ export default function ExpenseDetailPage({ params }: { params: Promise<{ id: st
                 Cancel
               </Button>
             </div>
+            <EditDangerZone
+              entityType="expenses"
+              entityId={expense.id}
+              entityLabel={expense.description}
+              redirectAfter="/finance/expenses"
+            />
           </CardContent>
         </Card>
       ) : (

@@ -19,6 +19,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChevronLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
+import { EditDangerZone } from "@/components/trash/EditDangerZone";
 
 const formSchema = z.object({
   full_name: z.string().min(2, "Name must be at least 2 characters."),
@@ -163,6 +164,13 @@ export default function EditContractorPage({ params }: { params: Promise<{ id: s
                   {isSubmitting ? "Saving..." : "Save Changes"}
                 </Button>
               </div>
+
+              <EditDangerZone
+                entityType="contractors"
+                entityId={id}
+                entityLabel={form.watch("full_name") || "this contractor"}
+                redirectAfter="/contractors"
+              />
             </form>
           </Form>
         </CardContent>

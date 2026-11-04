@@ -2,6 +2,7 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { toast } from "sonner";
+import { EditDangerZone } from "@/components/trash/EditDangerZone";
 import { parseAmount, loadAccountContacts } from "@/lib/links";
 import { FUNDING_SOURCES } from "@/lib/constants";
 import { useRouter, useParams } from "next/navigation";
@@ -500,6 +501,15 @@ function EditOpportunityForm() {
                   Save Changes
                 </Button>
               </div>
+
+              {typeof id === "string" && (
+                <EditDangerZone
+                  entityType="opportunities"
+                  entityId={id}
+                  entityLabel={form.watch("name") || "this opportunity"}
+                  redirectAfter="/pipeline"
+                />
+              )}
             </form>
           </Form>
         </CardContent>

@@ -30,6 +30,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChevronLeft, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { EditDangerZone } from "@/components/trash/EditDangerZone";
 import { Badge } from "@/components/ui/badge";
 
 const formSchema = z.object({
@@ -349,6 +350,13 @@ export default function EditContactPage({ params }: { params: Promise<{ id: stri
               {isSubmitting ? "Saving..." : "Save Changes"}
             </Button>
           </div>
+
+          <EditDangerZone
+            entityType="contacts"
+            entityId={id}
+            entityLabel={form.watch("full_name") || "this contact"}
+            redirectAfter="/contacts"
+          />
         </form>
       </Form>
     </div>

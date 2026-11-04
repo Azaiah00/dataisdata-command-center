@@ -15,7 +15,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabaseRaw } from "@/lib/supabase";
 import { deleteUser, loadPermissions, loadScopes, logAudit, replacePermissions, replaceScopes, updateUser } from "@/lib/access/repo";
-import { mapToRows, PERMISSION_TEMPLATES, rowsToMap } from "@/lib/access/permissions";
+import {
+  applyDeleteGrantPolicy,
+  canGrantDeletePermission,
+  mapToRows,
+  PERMISSION_TEMPLATES,
+  rowsToMap,
+} from "@/lib/access/permissions";
 import { MODULES } from "@/lib/access/modules";
 import { ROLE_DESCRIPTIONS, ROLE_LABELS, type PermissionMap, type PortalUser, type ScopeMode, type SeatRole } from "@/lib/access/types";
 import { cn } from "@/lib/utils";
@@ -56,6 +62,7 @@ export default function ManageAccessPage({ params }: { params: Promise<{ id: str
   // Owners can edit anyone; admins can edit anyone except the owner. Nobody changes their own role/status.
   const canEditRole = !!target && !targetIsOwner && !isSelf && (isRealOwner || realUser?.seat_role === "admin");
   const canEditProfile = !!target && (!targetIsOwner || isRealOwner);
+  const grantDelete = canGrantDeletePermission(realUser);
 
   const load = useCallback(async () => {
     if (!target) return;
@@ -120,7 +127,8 @@ export default function ManageAccessPage({ params }: { params: Promise<{ id: str
       // A new sign-in email must not keep the old Google login linked to this seat.
       if ((original.profile.email || "").trim().toLowerCase() !== profile.email.trim().toLowerCase()) patch.auth_user_id = null;
       await updateUser(target.id, patch);
-      await replacePermissions(target.id, mapToRows(target.id, perms));
+      const savedPerms = applyDeleteGrantPolicy(perms, original.perms, grantDelete);
+      await replacePermissions(target.id, mapToRows(target.id, savedPerms));
       await replaceScopes(target.id, scopeMode === "accounts" && !fullAccess ? scopeIds : []);
       const summary = [...changes];
       if (original.role !== role) summary.unshift(`Role: ${ROLE_LABELS[original.role]} → ${ROLE_LABELS[role]}`);
@@ -136,7 +144,8 @@ export default function ManageAccessPage({ params }: { params: Promise<{ id: str
         details: { changes: summary.slice(0, 25) },
       });
       toast.success("Access saved — it applies immediately");
-      setOriginal({ perms, scopeIds, scopeMode: fullAccess ? "all" : scopeMode, role: canEditRole ? role : original.role, profile });
+      setPerms(savedPerms);
+      setOriginal({ perms: savedPerms, scopeIds, scopeMode: fullAccess ? "all" : scopeMode, role: canEditRole ? role : original.role, profile });
       if (fullAccess) setScopeMode("all");
       if (!canEditRole) setRole(original.role);
       await refresh();
@@ -246,6 +255,7 @@ export default function ManageAccessPage({ params }: { params: Promise<{ id: str
                   value={perms}
                   onChange={setPerms}
                   scoped={scopeMode === "accounts"}
+                  canGrantDelete={grantDelete}
                   lockedReason={fullAccess ? `${ROLE_LABELS[role]} seats always have every permission. Change the role to Team Member or Guest to limit access.` : undefined}
                 />
               </CardContent>

@@ -2,7 +2,6 @@
 
 import { Can } from "@/components/auth/AccessProvider";
 import { useEffect, useState, use } from "react";
-import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { Partner, Engagement, Opportunity } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
@@ -17,29 +16,15 @@ import {
   Briefcase,
   TrendingUp,
   Pencil,
-  Trash2,
 } from "lucide-react";
 import Link from "next/link";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { toast } from "sonner";
 
 export default function PartnerDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const router = useRouter();
   const [partner, setPartner] = useState<Partner | null>(null);
   const [engagements, setEngagements] = useState<(Engagement & { accounts?: { name: string } })[]>([]);
   const [opportunities, setOpportunities] = useState<(Opportunity & { accounts?: { name: string } })[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deleting, setDeleting] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -78,20 +63,6 @@ export default function PartnerDetailPage({ params }: { params: Promise<{ id: st
     }
     fetchData();
   }, [id]);
-
-  async function onDelete() {
-    setDeleting(true);
-    const { error } = await supabase.from("partners").delete().eq("id", id);
-    setDeleting(false);
-    setDeleteDialogOpen(false);
-    if (error) {
-      toast.error("Failed to delete partner");
-      return;
-    }
-    toast.success("Partner deleted");
-    router.push("/partners");
-    router.refresh();
-  }
 
   if (loading) {
     return (
@@ -150,29 +121,6 @@ export default function PartnerDetailPage({ params }: { params: Promise<{ id: st
                   <Pencil className="w-4 h-4 mr-2" /> Edit
                 </Button>
               </Link>
-            </Can>
-            <Can module="partners" action="delete">
-              <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="border-red-200 text-red-600 hover:bg-red-50">
-                    <Trash2 className="w-4 h-4 mr-2" /> Delete
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Delete Partner</DialogTitle>
-                    <DialogDescription>
-                      Are you sure you want to delete &quot;{partner.name}&quot;? This cannot be undone.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <DialogFooter>
-                    <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} disabled={deleting}>Cancel</Button>
-                    <Button variant="destructive" onClick={onDelete} disabled={deleting}>
-                      {deleting ? "Deleting..." : "Delete"}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
             </Can>
           </div>
         </div>

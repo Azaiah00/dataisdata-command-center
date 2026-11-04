@@ -2,7 +2,6 @@
 
 import { use, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { Can, useAccess } from "@/components/auth/AccessProvider";
 import { ActivityForm } from "@/components/activities/ActivityForm";
@@ -12,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn, formatDate, formatDateTime, getStatusColor } from "@/lib/utils";
 import { toast } from "sonner";
+import { EditDangerZone } from "@/components/trash/EditDangerZone";
 import { Building2, Briefcase, TrendingUp, Users, ChevronLeft, Pencil, Trash2, CheckCircle2, Paperclip, CalendarClock } from "lucide-react";
 import type { Activity } from "@/lib/types";
 
@@ -24,12 +24,10 @@ type Loaded = Activity & {
 
 export default function ActivityDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const router = useRouter();
   const { can } = useAccess();
   const [activity, setActivity] = useState<Loaded | null>(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const load = useCallback(async () => {
     const { data } = await supabase
@@ -68,13 +66,6 @@ export default function ActivityDetailPage({ params }: { params: Promise<{ id: s
     load();
   }
 
-  async function remove() {
-    const { error } = await supabase.from("activities").delete().eq("id", id);
-    if (error) return toast.error(`Activity not deleted: ${error.message}`);
-    toast.success("Activity deleted");
-    router.push("/activities");
-  }
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -111,6 +102,12 @@ export default function ActivityDetailPage({ params }: { params: Promise<{ id: s
                 load();
               }}
             />
+            <EditDangerZone
+              entityType="activities"
+              entityId={activity.id}
+              entityLabel={activity.summary?.slice(0, 60) || `${activity.activity_type} activity`}
+              redirectAfter="/activities"
+            />
           </CardContent>
         </Card>
       </div>
@@ -142,11 +139,6 @@ export default function ActivityDetailPage({ params }: { params: Promise<{ id: s
           <Can module="activities" action="edit">
             <Button variant="outline" onClick={() => setEditing(true)}>
               <Pencil className="w-4 h-4" /> Edit
-            </Button>
-          </Can>
-          <Can module="activities" action="delete">
-            <Button variant="outline" className="text-destructive hover:text-destructive" onClick={() => setConfirmDelete(true)}>
-              <Trash2 className="w-4 h-4" /> Delete
             </Button>
           </Can>
         </div>
@@ -258,22 +250,6 @@ export default function ActivityDetailPage({ params }: { params: Promise<{ id: s
         </div>
       </div>
 
-      <Dialog open={confirmDelete} onOpenChange={setConfirmDelete}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete this activity?</DialogTitle>
-            <DialogDescription>It will be removed from the account, engagement, opportunity and contacts it&apos;s linked to. This can&apos;t be undone.</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setConfirmDelete(false)}>
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={remove}>
-              Delete activity
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

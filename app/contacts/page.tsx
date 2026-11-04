@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { Contact } from "@/lib/types";
 import { DataTable } from "@/components/data-table/DataTable";
 import { Button } from "@/components/ui/button";
-import { Plus, User, Mail, Building2, ArrowUpRight, Pencil } from "lucide-react";
+import { Plus, Mail, Building2, ArrowUpRight, Pencil } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { cn, getStatusColor } from "@/lib/utils";
@@ -15,14 +15,24 @@ export default function ContactsPage() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function fetchContacts() {
+  async function fetchContacts() {
       // Use simple join so list always loads even if account_contacts is missing or empty
       // Disambiguate the accounts join via the direct FK (not through account_contacts)
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from("contacts")
         .select("*, accounts!contacts_account_id_fkey ( name )")
+        .is("deleted_at", null)
         .order("full_name");
+
+      // Before the trash migration runs, deleted_at may not exist yet — fall back to the old query.
+      if (error && /deleted_at/i.test(error.message || "")) {
+        const fallback = await supabase
+          .from("contacts")
+          .select("*, accounts!contacts_account_id_fkey ( name )")
+          .order("full_name");
+        data = fallback.data;
+        error = fallback.error;
+      }
 
       if (error) {
         console.error("Error fetching contacts:", error);
@@ -38,8 +48,9 @@ export default function ContactsPage() {
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       setContacts(((data ?? []) as any[]).map((c) => ({ ...c, account_names: Array.from(new Set([...(c.accounts?.name ? [c.accounts.name] : []), ...(extra[c.id] || [])])) })));
       setLoading(false);
-    }
+  }
 
+  useEffect(() => {
     fetchContacts();
   }, []);
 
@@ -123,13 +134,13 @@ export default function ContactsPage() {
       cell: (contact: Contact) => (
         <div className="flex justify-end gap-2">
           <Can module="contacts" action="edit">
-            <Link href={`/contacts/${contact.id}/edit`}>
+            <Link href={`/contacts/${contact.id}/edit`} onClick={(e) => e.stopPropagation()}>
               <Button variant="ghost" size="icon" className="h-8 w-8 text-[#4f6178] hover:text-primary hover:bg-primary/10">
                 <Pencil className="w-3.5 h-3.5" />
               </Button>
             </Link>
           </Can>
-          <Link href={`/contacts/${contact.id}`}>
+          <Link href={`/contacts/${contact.id}`} onClick={(e) => e.stopPropagation()}>
             <Button variant="ghost" size="icon" className="h-8 w-8 text-[#4f6178] hover:text-white hover:bg-primary">
               <ArrowUpRight className="w-4 h-4" />
             </Button>

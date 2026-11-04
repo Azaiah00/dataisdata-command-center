@@ -132,7 +132,7 @@ export default function PipelinePage() {
   );
 
   const fetchOpportunities = useCallback(async () => {
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from("opportunities")
       .select(`
         *,
@@ -143,7 +143,17 @@ export default function PipelinePage() {
           full_name
         )
       `)
+      .is("deleted_at", null)
       .order("created_at", { ascending: false });
+
+    if (error && /deleted_at/i.test(error.message || "")) {
+      const fallback = await supabase
+        .from("opportunities")
+        .select(`*, accounts ( name ), contacts ( full_name )`)
+        .order("created_at", { ascending: false });
+      data = fallback.data;
+      error = fallback.error;
+    }
 
     if (error) {
       console.error("Error fetching opportunities:", error);

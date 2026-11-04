@@ -24,7 +24,15 @@ import {
   replacePermissions,
   saveSettings,
 } from "@/lib/access/repo";
-import { mapToRows, PERMISSION_TEMPLATES, rowsToMap, summarizeAccess, hasFullAccess } from "@/lib/access/permissions";
+import {
+  applyDeleteGrantPolicy,
+  canGrantDeletePermission,
+  mapToRows,
+  PERMISSION_TEMPLATES,
+  rowsToMap,
+  summarizeAccess,
+  hasFullAccess,
+} from "@/lib/access/permissions";
 import { MODULES } from "@/lib/access/modules";
 import { ROLE_DESCRIPTIONS, ROLE_LABELS, type AuditEntry, type PermissionMap, type PortalSettings, type PortalUser, type SeatRole } from "@/lib/access/types";
 import { exportAccessReportPdf } from "@/lib/pdf/reports";
@@ -373,7 +381,8 @@ function AddSeatDialog({
       });
       if (form.seat_role === "member" || form.seat_role === "guest") {
         const template = PERMISSION_TEMPLATES.find((t) => t.key === form.template) || PERMISSION_TEMPLATES[0];
-        await replacePermissions(u.id, mapToRows(u.id, template.build()));
+        const built = applyDeleteGrantPolicy(template.build(), {}, canGrantDeletePermission(realUser));
+        await replacePermissions(u.id, mapToRows(u.id, built));
       }
       await logAudit({
         actor_id: realUser?.id || null,

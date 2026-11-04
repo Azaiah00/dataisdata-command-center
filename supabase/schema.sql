@@ -22,7 +22,9 @@ CREATE TABLE accounts (
     notes TEXT,
     parent_account_id UUID REFERENCES accounts(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ DEFAULT now(),
-    updated_at TIMESTAMPTZ DEFAULT now()
+    updated_at TIMESTAMPTZ DEFAULT now(),
+    deleted_at TIMESTAMPTZ,
+    deleted_by UUID
 );
 
 -- Contacts
@@ -39,7 +41,9 @@ CREATE TABLE contacts (
     last_touch_date TIMESTAMPTZ,
     next_step TEXT,
     created_at TIMESTAMPTZ DEFAULT now(),
-    updated_at TIMESTAMPTZ DEFAULT now()
+    updated_at TIMESTAMPTZ DEFAULT now(),
+    deleted_at TIMESTAMPTZ,   -- soft delete; see 2026-11-portal-trash.sql
+    deleted_by UUID           -- portal_users.id when trashed
 );
 
 -- Engagements
@@ -113,7 +117,9 @@ CREATE TABLE partners (
     notes TEXT,
     attachments TEXT[],
     created_at TIMESTAMPTZ DEFAULT now(),
-    updated_at TIMESTAMPTZ DEFAULT now()
+    updated_at TIMESTAMPTZ DEFAULT now(),
+    deleted_at TIMESTAMPTZ,
+    deleted_by UUID
 );
 
 -- Contractors

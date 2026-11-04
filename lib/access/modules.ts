@@ -38,7 +38,8 @@ export type ModuleKey =
   | "client_intake"
   | "innovation_exchange"
   | "client_portal"
-  | "partner_portal";
+  | "partner_portal"
+  | "trash";
 
 export type GroupKey = "overview" | "crm" | "work" | "finance" | "innovation" | "portals";
 
@@ -71,6 +72,15 @@ export const MODULES: ModuleDef[] = [
   { key: "dashboard", label: "Dashboard", group: "overview", path: "/", description: "Home page with KPIs and widgets (widgets only show for modules the user can see)", actions: ["view"], scopeable: true },
   { key: "reports", label: "Reports", group: "overview", path: "/reports", description: "Executive business reports and PDF exports", actions: ["view"], scopeable: true },
   { key: "documents", label: "Documents", group: "overview", path: "/documents", description: "All attachments across engagements, pipeline, partners and activities", actions: ["view"], scopeable: true },
+  {
+    key: "trash",
+    label: "Recently Deleted",
+    group: "overview",
+    path: "/trash",
+    description: "Items admins removed — restore to sync back across the portal, or delete forever",
+    actions: ["view", "edit", "delete"],
+    scopeable: false,
+  },
 
   { key: "accounts", label: "Accounts", group: "crm", path: "/accounts", description: "Agencies, cities, universities and companies", actions: CRUD, scopeable: true },
   { key: "contacts", label: "Contacts", group: "crm", path: "/contacts", description: "People at accounts", actions: CRUD, scopeable: true },
@@ -140,6 +150,7 @@ const PREFIXES: { prefix: string; module: ModuleKey }[] = [
   { prefix: "/pipeline", module: "pipeline" },
   { prefix: "/reports", module: "reports" },
   { prefix: "/documents", module: "documents" },
+  { prefix: "/trash", module: "trash" },
   { prefix: "/portal/city", module: "client_portal" },
   { prefix: "/portal/partner", module: "partner_portal" },
 ];

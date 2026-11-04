@@ -15,21 +15,24 @@ export default function PartnersPage() {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function fetchPartners() {
-      const { data, error } = await supabase
-        .from("partners")
-        .select("*")
-        .order("name");
+  async function fetchPartners() {
+    let { data, error } = await supabase.from("partners").select("*").is("deleted_at", null).order("name");
 
-      if (error) {
-        console.error("Error fetching partners:", error);
-      } else {
-        setPartners(data || []);
-      }
-      setLoading(false);
+    if (error && /deleted_at/i.test(error.message || "")) {
+      const fallback = await supabase.from("partners").select("*").order("name");
+      data = fallback.data;
+      error = fallback.error;
     }
 
+    if (error) {
+      console.error("Error fetching partners:", error);
+    } else {
+      setPartners(data || []);
+    }
+    setLoading(false);
+  }
+
+  useEffect(() => {
     fetchPartners();
   }, []);
 
@@ -86,13 +89,13 @@ export default function PartnersPage() {
       cell: (partner: Partner) => (
         <div className="flex justify-end gap-2">
           <Can module="partners" action="edit">
-            <Link href={`/partners/${partner.id}/edit`}>
+            <Link href={`/partners/${partner.id}/edit`} onClick={(e) => e.stopPropagation()}>
               <Button variant="ghost" size="icon" className="h-8 w-8 text-[#4f6178] hover:text-primary hover:bg-primary/10">
                 <Pencil className="w-3.5 h-3.5" />
               </Button>
             </Link>
           </Can>
-          <Link href={`/partners/${partner.id}`}>
+          <Link href={`/partners/${partner.id}`} onClick={(e) => e.stopPropagation()}>
             <Button variant="ghost" size="icon" className="h-8 w-8 text-[#4f6178] hover:text-white hover:bg-primary">
               <ArrowUpRight className="w-4 h-4" />
             </Button>

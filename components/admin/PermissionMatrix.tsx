@@ -13,7 +13,7 @@ const ACTION_META: { key: Action; label: string; icon: React.ElementType; help: 
   { key: "view", label: "See", icon: Eye, help: "Can open and read this section" },
   { key: "create", label: "Add", icon: Plus, help: "Can create new records" },
   { key: "edit", label: "Edit", icon: Pencil, help: "Can change existing records" },
-  { key: "delete", label: "Delete", icon: Trash2, help: "Can permanently delete records" },
+  { key: "delete", label: "Delete", icon: Trash2, help: "Can move records to Trash / delete (Owner, Admin, or explicit grant only)" },
 ];
 
 export function PermissionMatrix({
@@ -22,12 +22,15 @@ export function PermissionMatrix({
   disabled,
   lockedReason,
   scoped,
+  canGrantDelete = true,
 }: {
   value: PermissionMap;
   onChange: (next: PermissionMap) => void;
   disabled?: boolean;
   lockedReason?: string;
   scoped?: boolean;
+  /** When false, Delete toggles are locked (only Tony / Azaiah grant delete access). */
+  canGrantDelete?: boolean;
 }) {
   const [open, setOpen] = useState<Record<GroupKey, boolean>>({ overview: true, crm: true, work: true, finance: true, innovation: true, portals: true });
 
@@ -36,6 +39,7 @@ export function PermissionMatrix({
   const setModule = (m: ModuleKey, p: ModulePermission) => onChange({ ...value, [m]: normalizePermission(m, p) });
 
   const toggle = (m: ModuleKey, action: Action, on: boolean) => {
+    if (action === "delete" && !canGrantDelete) return;
     const cur = get(m);
     if (action === "view") {
       setModule(m, on ? { ...cur, view: true } : NO_PERMISSION);
@@ -50,7 +54,12 @@ export function PermissionMatrix({
       next[m.key] =
         mode === "none"
           ? NO_PERMISSION
-          : normalizePermission(m.key, { view: true, create: mode === "full", edit: mode === "full", delete: mode === "full" });
+          : normalizePermission(m.key, {
+              view: true,
+              create: mode === "full",
+              edit: mode === "full",
+              delete: mode === "full" && canGrantDelete,
+            });
     }
     onChange(next);
   };
@@ -151,9 +160,10 @@ export function PermissionMatrix({
                             {supported ? (
                               <Switch
                                 checked={!!p[a.key]}
-                                disabled={disabled}
+                                disabled={disabled || (a.key === "delete" && !canGrantDelete)}
                                 onCheckedChange={(v) => toggle(m.key, a.key, v)}
                                 aria-label={`${a.label} ${m.label}`}
+                                title={a.key === "delete" && !canGrantDelete ? "Only Tony Wood or Azaiah Wood can grant delete access" : a.help}
                               />
                             ) : (
                               <span className="text-xs text-slate-300" title="Not applicable for this section">
@@ -174,6 +184,12 @@ export function PermissionMatrix({
       <p className="text-xs text-muted-foreground px-1">
         {MODULES.length} sections. Turning off <strong>See</strong> removes the section from the menu, search, dashboard widgets and
         notifications, and blocks its pages even if someone has the link.
+        {!canGrantDelete && (
+          <>
+            {" "}
+            <strong>Delete</strong> toggles are locked — contact Tony Wood or Azaiah Wood to grant deletion access.
+          </>
+        )}
       </p>
     </div>
   );

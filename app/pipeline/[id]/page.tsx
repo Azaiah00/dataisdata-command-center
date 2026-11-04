@@ -13,16 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn, formatCurrency, formatDate, getStatusColor } from "@/lib/utils";
-import { TrendingUp, Building2, User, Calendar, DollarSign, Pencil, Trash2 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { TrendingUp, Building2, User, Calendar, DollarSign, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { currentOptions, displayType } from "@/lib/engagementClassification";
 import { securityTerm } from "@/lib/terms";
@@ -54,8 +45,6 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
   const [opportunity, setOpportunity] = useState<(Opportunity & { accounts?: { name: string }; contacts?: { full_name: string } }) | null>(null);
   const [relatedAccounts, setRelatedAccounts] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deleting, setDeleting] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [linkedEngagement, setLinkedEngagement] = useState<{ id: string; name: string } | null>(null);
   const [converting, setConverting] = useState(false);
   const { can } = useAccess();
@@ -142,20 +131,6 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
     if (carryErr) toast.error(`Engagement created, but contacts/partners were not copied: ${carryErr.message}`);
     toast.success("Engagement created from the awarded opportunity");
     router.push(`/engagements/${data.id}`);
-  }
-
-  async function onDelete() {
-    setDeleting(true);
-    const { error } = await supabase.from("opportunities").delete().eq("id", id);
-    setDeleting(false);
-    setDeleteDialogOpen(false);
-    if (error) {
-      toast.error("Failed to delete opportunity");
-      return;
-    }
-    toast.success("Opportunity deleted");
-    router.push("/pipeline");
-    router.refresh();
   }
 
   if (loading) {
@@ -264,31 +239,6 @@ export default function PipelineDetailPage({ params }: { params: Promise<{ id: s
                   <Pencil className="w-4 h-4 mr-2" /> Edit
                 </Button>
               </Link>
-            </Can>
-            <Can module="pipeline" action="delete">
-              <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="border-red-200 text-red-600 hover:bg-red-50">
-                    <Trash2 className="w-4 h-4 mr-2" /> Delete
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Delete this opportunity?</DialogTitle>
-                    <DialogDescription>
-                      This will permanently delete &quot;{opportunity.name}&quot;. This cannot be undone.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <DialogFooter>
-                    <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
-                      Cancel
-                    </Button>
-                    <Button variant="destructive" disabled={deleting} onClick={onDelete}>
-                      {deleting ? "Deleting..." : "Delete"}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
             </Can>
           </div>
         </div>

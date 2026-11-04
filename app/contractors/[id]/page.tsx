@@ -48,8 +48,6 @@ export default function ContractorDetailPage({ params }: { params: Promise<{ id:
   const { can } = useAccess();
   const [roll, setRoll] = useState<ContractorRollup | null>(null);
   const [loading, setLoading] = useState(true);
-  const [deleting, setDeleting] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [managingEngagements, setManagingEngagements] = useState(false);
   const [savingEngagements, setSavingEngagements] = useState(false);
   const [allEngagements, setAllEngagements] = useState<(Pick<Engagement, "id" | "name" | "status" | "start_date" | "contract_value"> & { accounts?: { name: string } | null })[]>([]);
@@ -82,17 +80,6 @@ export default function ContractorDetailPage({ params }: { params: Promise<{ id:
   useEffect(() => {
     fetchData();
   }, [id]);
-
-  async function onDelete() {
-    setDeleting(true);
-    const { error } = await supabase.from("contractors").delete().eq("id", id);
-    setDeleting(false);
-    setDeleteDialogOpen(false);
-    if (error) { toast.error("Failed to delete contractor"); return; }
-    toast.success("Contractor deleted");
-    router.push("/contractors");
-    router.refresh();
-  }
 
   if (loading) {
     return (
@@ -148,29 +135,6 @@ export default function ContractorDetailPage({ params }: { params: Promise<{ id:
                   <Pencil className="w-4 h-4 mr-2" /> Edit
                 </Button>
               </Link>
-            </Can>
-            <Can module="contractors" action="delete">
-              <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="border-red-200 text-red-600 hover:bg-red-50">
-                    <Trash2 className="w-4 h-4 mr-2" /> Delete
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Delete Contractor</DialogTitle>
-                    <DialogDescription>
-                      Are you sure you want to delete &quot;{contractor.full_name}&quot;? This cannot be undone.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <DialogFooter>
-                    <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} disabled={deleting}>Cancel</Button>
-                    <Button variant="destructive" onClick={onDelete} disabled={deleting}>
-                      {deleting ? "Deleting..." : "Delete"}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
             </Can>
           </div>
         </div>

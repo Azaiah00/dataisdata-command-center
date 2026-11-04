@@ -22,6 +22,7 @@ import { recomputeInvoiceStatus, syncInvoiceStatuses } from "@/lib/finance/data"
 import { daysBetween, parseDate, todayISO } from "@/lib/finance/dates";
 import type { CustomField } from "@/lib/finance/types";
 import { toast } from "sonner";
+import { EditDangerZone } from "@/components/trash/EditDangerZone";
 import { Receipt, Pencil, Trash2, Send, DollarSign, Building2, Clock } from "lucide-react";
 
 type InvoiceWithExtras = Invoice & { payment_terms_days?: number | null; custom_fields?: Record<string, unknown> | null; sent_at?: string | null };
@@ -42,8 +43,6 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
   const [editDueDate, setEditDueDate] = useState("");
   const [editCustom, setEditCustom] = useState<Record<string, unknown>>({});
   const [saving, setSaving] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [paymentToDelete, setPaymentToDelete] = useState<Payment | null>(null);
 
   const fetchInvoice = useCallback(async () => {
@@ -93,15 +92,6 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
     toast.success("Invoice updated");
     setIsEditing(false);
     await fetchInvoice();
-  }
-
-  async function onDelete() {
-    setDeleting(true);
-    const { error } = await supabase.from("invoices").delete().eq("id", id);
-    setDeleting(false);
-    if (error) return toast.error(error.message);
-    toast.success(hoursCount ? "Invoice deleted — its timesheets are available to invoice again" : "Invoice deleted");
-    router.push("/finance/invoices");
   }
 
   async function markAsSent() {
@@ -228,33 +218,6 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
               </Button>
             </Can>
             <PdfButton onExport={downloadPdf} label="Invoice PDF" />
-            <Can module="invoices" action="delete">
-              <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="border-red-200 text-red-600 hover:bg-red-50">
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Delete
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Delete Invoice?</DialogTitle>
-                    <DialogDescription>
-                      This permanently deletes {invoice.invoice_number}, its line items and {payments.length} payment{payments.length === 1 ? "" : "s"}.
-                      {hoursCount > 0 && ` ${hoursCount} linked timesheet${hoursCount === 1 ? "" : "s"} will become available to invoice again.`}
-                    </DialogDescription>
-                  </DialogHeader>
-                  <DialogFooter>
-                    <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
-                      Cancel
-                    </Button>
-                    <Button variant="destructive" disabled={deleting} onClick={onDelete}>
-                      {deleting ? "Deleting..." : "Delete"}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </Can>
           </div>
         </div>
       </div>
@@ -304,6 +267,12 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
                 Cancel
               </Button>
             </div>
+            <EditDangerZone
+              entityType="invoices"
+              entityId={invoice.id}
+              entityLabel={invoice.invoice_number}
+              redirectAfter="/finance/invoices"
+            />
           </CardContent>
         </Card>
       )}

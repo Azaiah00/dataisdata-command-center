@@ -51,7 +51,7 @@ export default function EngagementsPage() {
 
   useEffect(() => {
     async function fetchEngagements() {
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from("engagements")
         .select(`
           *,
@@ -59,7 +59,17 @@ export default function EngagementsPage() {
             name
           )
         `)
+        .is("deleted_at", null)
         .order("start_date", { ascending: false });
+
+      if (error && /deleted_at/i.test(error.message || "")) {
+        const fallback = await supabase
+          .from("engagements")
+          .select(`*, accounts ( name )`)
+          .order("start_date", { ascending: false });
+        data = fallback.data;
+        error = fallback.error;
+      }
 
       if (error) {
         console.error("Error fetching engagements:", error?.message || error);

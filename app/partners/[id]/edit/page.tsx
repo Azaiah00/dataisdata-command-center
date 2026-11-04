@@ -30,6 +30,7 @@ import { FileAttachments } from "@/components/ui/FileAttachments";
 import { ChevronLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
+import { EditDangerZone } from "@/components/trash/EditDangerZone";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
@@ -255,6 +256,13 @@ export default function EditPartnerPage({ params }: { params: Promise<{ id: stri
                   {isSubmitting ? "Saving..." : "Save Changes"}
                 </Button>
               </div>
+
+              <EditDangerZone
+                entityType="partners"
+                entityId={id}
+                entityLabel={form.watch("name") || "this partner"}
+                redirectAfter="/partners"
+              />
             </form>
           </Form>
         </CardContent>

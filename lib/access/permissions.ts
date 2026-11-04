@@ -1,4 +1,5 @@
 import { ACTIONS, MODULES, MODULE_MAP, type Action, type ModuleKey } from "./modules";
+import { SEED_IDS } from "./repo";
 import type { ModulePermission, PermissionMap, PermissionRow, PortalUser, SeatRole } from "./types";
 
 export const NO_PERMISSION: ModulePermission = { view: false, create: false, edit: false, delete: false };
@@ -9,6 +10,30 @@ export function hasFullAccess(user: Pick<PortalUser, "seat_role"> | null | undef
 
 export function isManager(role: SeatRole | undefined | null) {
   return role === "owner" || role === "admin";
+}
+
+/** Tony (owner) and Azaiah may turn on Delete for other seats; everyone else manages view/add/edit only. */
+export function canGrantDeletePermission(user: PortalUser | null | undefined): boolean {
+  if (!user || user.status !== "active") return false;
+  if (user.seat_role === "owner") return true;
+  if (user.id === SEED_IDS.tony || user.id === SEED_IDS.azaiah) return true;
+  const email = (user.email || "").trim().toLowerCase();
+  return email === "tony@dataisdata.com" || email === "azaiah@dataisdata.com";
+}
+
+/**
+ * When a non-grantor saves access, keep each module's delete flag exactly as it was
+ * so they cannot grant or revoke deletion power.
+ */
+export function applyDeleteGrantPolicy(next: PermissionMap, previous: PermissionMap, grantorCanSetDelete: boolean): PermissionMap {
+  if (grantorCanSetDelete) return next;
+  const out: PermissionMap = { ...next };
+  for (const m of MODULES) {
+    const p = out[m.key];
+    if (!p) continue;
+    out[m.key] = { ...p, delete: !!previous[m.key]?.delete };
+  }
+  return out;
 }
 
 export function rowsToMap(rows: PermissionRow[]): PermissionMap {
@@ -59,6 +84,10 @@ export function canDo(
   action: Action = "view"
 ): boolean {
   if (!user || user.status !== "active") return false;
+  // Delete / Recently Deleted: Owner and Admin seats only (team uses view/add/edit).
+  if (action === "delete") {
+    return hasFullAccess(user);
+  }
   if (hasFullAccess(user)) return true;
   const p = map[module];
   if (!p || !p.view) return false;
@@ -85,7 +114,6 @@ function build(fn: (m: (typeof MODULES)[number]) => ModulePermission | null): Pe
   return out;
 }
 
-const all: ModulePermission = { view: true, create: true, edit: true, delete: true };
 const viewOnly: ModulePermission = { view: true, create: false, edit: false, delete: false };
 const contribute: ModulePermission = { view: true, create: true, edit: true, delete: false };
 
@@ -124,10 +152,10 @@ export const PERMISSION_TEMPLATES: PermissionTemplate[] = [
   {
     key: "finance",
     label: "Finance & operations",
-    description: "Full Finance plus read-only CRM and Work.",
+    description: "Create and edit Finance; read-only CRM and Work. No delete unless Tony or Azaiah grants it.",
     build: () =>
       build((m) => {
-        if (m.group === "finance") return all;
+        if (m.group === "finance") return contribute;
         if (m.group === "crm" || m.group === "work" || m.group === "overview") return viewOnly;
         return null;
       }),
@@ -135,8 +163,8 @@ export const PERMISSION_TEMPLATES: PermissionTemplate[] = [
   {
     key: "everything",
     label: "Everything (no admin rights)",
-    description: "All modules and actions, but cannot manage seats or permissions.",
-    build: () => build((m) => (m.group === "portals" ? null : all)),
+    description: "All modules with view/add/edit. Delete must be granted separately by Tony or Azaiah.",
+    build: () => build((m) => (m.group === "portals" ? null : contribute)),
   },
   {
     key: "city_login",

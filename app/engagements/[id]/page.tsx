@@ -61,6 +61,7 @@ import { EngagementInnovationCard } from "@/components/shared/EngagementInnovati
 import { LinkedRecordsCard, contractorOptions, contactOptions, partnerOptions } from "@/components/shared/LinkedRecordsCard";
 import { Users, Handshake, CalendarDays, TrendingUp, Plus } from "lucide-react";
 import { toast } from "sonner";
+import { EditDangerZone } from "@/components/trash/EditDangerZone";
 import { ClassificationCard, ClassificationFields } from "@/components/engagements/Classification";
 import { classificationPayload, displayType, useClassificationColumns } from "@/lib/engagementClassification";
 
@@ -92,9 +93,7 @@ export default function EngagementDetailPage({
   const [accounts, setAccounts] = useState<Pick<Account, "id" | "name">[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [deleting, setDeleting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [linkedContractors, setLinkedContractors] = useState<Contractor[]>([]);
   const [allContractors, setAllContractors] = useState<Pick<Contractor, "id" | "full_name" | "title_role">[]>([]);
   const [selectedContractorIds, setSelectedContractorIds] = useState<string[]>([]);
@@ -253,20 +252,6 @@ export default function EngagementDetailPage({
     router.refresh();
   }
 
-  async function onDelete() {
-    setDeleting(true);
-    const { error } = await supabase.from("engagements").delete().eq("id", id);
-    setDeleting(false);
-    setDeleteDialogOpen(false);
-    if (error) {
-      console.error("Error deleting engagement:", error);
-      toast.error(`Engagement not deleted: ${error.message}`);
-      return;
-    }
-    router.push("/engagements");
-    router.refresh();
-  }
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -359,36 +344,6 @@ export default function EngagementDetailPage({
                   <Pencil className="w-4 h-4 mr-2" />
                   {isEditing ? "Cancel" : "Edit"}
                 </Button>
-              </Can>
-              <Can module="engagements" action="delete">
-                <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" size="sm" className="border-red-200 text-red-600 hover:bg-red-50">
-                      <Trash2 className="w-4 h-4 mr-2" />
-                      Delete
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Delete this project?</DialogTitle>
-                      <DialogDescription>
-                        This will permanently delete &quot;{engagement.name}&quot;. Related activities will be unlinked. This cannot be undone.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                      <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
-                        Cancel
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        disabled={deleting}
-                        onClick={onDelete}
-                      >
-                        {deleting ? "Deleting..." : "Delete project"}
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
               </Can>
           </div>
         </div>
@@ -618,6 +573,15 @@ export default function EngagementDetailPage({
                     Cancel
                   </Button>
                 </div>
+
+                {engagement && (
+                  <EditDangerZone
+                    entityType="engagements"
+                    entityId={engagement.id}
+                    entityLabel={form.watch("name") || engagement.name}
+                    redirectAfter="/engagements"
+                  />
+                )}
               </form>
             </Form>
           </CardContent>

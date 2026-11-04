@@ -16,21 +16,24 @@ export default function AccountsPage() {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function fetchAccounts() {
-      const { data, error } = await supabase
-        .from("accounts")
-        .select("*")
-        .order("name");
+  async function fetchAccounts() {
+    let { data, error } = await supabase.from("accounts").select("*").is("deleted_at", null).order("name");
 
-      if (error) {
-        console.error("Error fetching accounts:", error);
-      } else {
-        setAccounts(data || []);
-      }
-      setLoading(false);
+    if (error && /deleted_at/i.test(error.message || "")) {
+      const fallback = await supabase.from("accounts").select("*").order("name");
+      data = fallback.data;
+      error = fallback.error;
     }
 
+    if (error) {
+      console.error("Error fetching accounts:", error);
+    } else {
+      setAccounts(data || []);
+    }
+    setLoading(false);
+  }
+
+  useEffect(() => {
     fetchAccounts();
   }, []);
 
@@ -95,8 +98,8 @@ export default function AccountsPage() {
       header: "",
       accessorKey: "actions",
       cell: (account: Account) => (
-        <div className="flex justify-end">
-          <Link href={`/accounts/${account.id}`}>
+        <div className="flex justify-end gap-2">
+          <Link href={`/accounts/${account.id}`} onClick={(e) => e.stopPropagation()}>
             <Button variant="ghost" size="icon" className="h-8 w-8 text-[#4f6178] hover:text-white hover:bg-primary">
               <ArrowUpRight className="w-4 h-4" />
             </Button>

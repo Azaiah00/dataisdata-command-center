@@ -53,6 +53,7 @@ import {
   SquareKanban,
   Landmark,
   BookOpen,
+  Trash2,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAccess } from "@/components/auth/AccessProvider";
@@ -112,6 +113,7 @@ const insightItems: NavItem[] = [
   { path: "/reports", label: "Reports", icon: BarChart3, module: "reports" },
   { path: "/documents", label: "Documents", icon: FolderOpen, module: "documents" },
   { path: "/glossary", label: "Glossary", icon: BookOpen },
+  { path: "/trash", label: "Recently Deleted", icon: Trash2, module: "trash" },
 ];
 
 const portalItems: NavItem[] = [
@@ -124,7 +126,7 @@ const SECTIONS: { label: string; items: NavItem[]; prefixes: string[] }[] = [
   { label: "Work", items: workItems, prefixes: ["/engagements", "/activities", "/pipeline"] },
   { label: "Finance", items: financeItems, prefixes: ["/finance"] },
   { label: "Innovation", items: innovationItems, prefixes: ["/innovation"] },
-  { label: "Insights", items: insightItems, prefixes: ["/reports", "/documents", "/glossary"] },
+  { label: "Insights", items: insightItems, prefixes: ["/reports", "/documents", "/glossary", "/trash"] },
   { label: "My Portal", items: portalItems, prefixes: ["/portal"] },
 ];
 
@@ -209,11 +211,22 @@ export function Header() {
       setSearchLoading(true);
       const empty = Promise.resolve({ data: [] as never[] });
       const [accountsRes, contactsRes, opportunitiesRes, engagementsRes, partnersRes, contractorsRes, invoicesRes] = await Promise.all([
-        searchable.accounts ? supabase.from("accounts").select("id, name, account_type").ilike("name", `%${term}%`).limit(4) : empty,
-        searchable.contacts ? supabase.from("contacts").select("id, full_name, title_role").or(`full_name.ilike.%${term}%,email.ilike.%${term}%`).limit(4) : empty,
+        searchable.accounts
+          ? supabase.from("accounts").select("id, name, account_type").is("deleted_at", null).ilike("name", `%${term}%`).limit(4)
+          : empty,
+        searchable.contacts
+          ? supabase
+              .from("contacts")
+              .select("id, full_name, title_role")
+              .is("deleted_at", null)
+              .or(`full_name.ilike.%${term}%,email.ilike.%${term}%`)
+              .limit(4)
+          : empty,
         searchable.pipeline ? supabase.from("opportunities").select("id, name, stage").ilike("name", `%${term}%`).limit(4) : empty,
         searchable.engagements ? supabase.from("engagements").select("id, name, status").ilike("name", `%${term}%`).limit(4) : empty,
-        searchable.partners ? supabase.from("partners").select("id, name, partner_type").ilike("name", `%${term}%`).limit(4) : empty,
+        searchable.partners
+          ? supabase.from("partners").select("id, name, partner_type").is("deleted_at", null).ilike("name", `%${term}%`).limit(4)
+          : empty,
         searchable.contractors ? supabase.from("contractors").select("id, full_name, title_role").ilike("full_name", `%${term}%`).limit(4) : empty,
         searchable.invoices ? supabase.from("invoices").select("id, invoice_number, status").ilike("invoice_number", `%${term}%`).limit(4) : empty,
       ]);

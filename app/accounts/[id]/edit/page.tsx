@@ -31,6 +31,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChevronLeft, Trash2, UserPlus } from "lucide-react";
 import { toast } from "sonner";
+import { EditDangerZone } from "@/components/trash/EditDangerZone";
 import { Badge } from "@/components/ui/badge";
 
 const formSchema = z.object({
@@ -399,6 +400,13 @@ export default function EditAccountPage({ params }: { params: Promise<{ id: stri
               {isSubmitting ? "Saving..." : "Save Changes"}
             </Button>
           </div>
+
+          <EditDangerZone
+            entityType="accounts"
+            entityId={id}
+            entityLabel={form.watch("name") || "this account"}
+            redirectAfter="/accounts"
+          />
         </form>
       </Form>
     </div>
